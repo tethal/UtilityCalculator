@@ -1,0 +1,14 @@
+# Normalize all text files to LF in repo, auto-convert on checkout
+* text=auto
+
+# Java files (force normalization)
+*.java text eol=lf
+
+# Shell scripts must be LF or they'll break
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Batch files can stay CRLF for Windows
+*.bat text eol=crlf
+
+*.jar binary
