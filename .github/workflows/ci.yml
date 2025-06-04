@@ -14,7 +14,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '23'
+          java-version: '21'
           distribution: 'temurin'
 
       - name: Grant Gradle execute permission
@@ -22,6 +22,9 @@ jobs:
 
       - name: Validate formatting (spotlessCheck)
         run: ./gradlew spotlessCheck
+
+      - name: Run SpotBugs analysis
+        run: ./gradlew spotbugsMain spotbugsTest
 
       - name: Run unit tests
         run: ./gradlew test
@@ -32,3 +35,10 @@ jobs:
         with:
           name: test-reports
           path: '**/build/reports/tests/test'
+
+      - name: Generate SpotBugs reports summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotbugs-reports
+          path: '**/build/reports/spotbugs/**/*.html'
