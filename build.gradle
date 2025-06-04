@@ -8,12 +8,6 @@ plugins {
     id 'com.github.spotbugs' version '6.1.13'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
 ext {
     spotbugsVersion = '4.9.3'
 }
