@@ -1,8 +1,7 @@
 package utilcalc.core.model.output;
 
-import utilcalc.core.model.Payment;
-
 import java.math.BigDecimal;
+import utilcalc.core.model.Payment;
 
 /**
  * Represents a single heating payment
@@ -27,5 +26,4 @@ public final class HeatingPayment extends Payment {
     public BigDecimal getCoefficient() {
         return coefficient;
     }
-
 }

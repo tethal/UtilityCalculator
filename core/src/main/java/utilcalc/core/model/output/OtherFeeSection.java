@@ -23,5 +23,4 @@ public final class OtherFeeSection extends ReportSection {
     public List<Payment> getOtherFees() {
         return otherFees;
     }
-
 }

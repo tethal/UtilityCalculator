@@ -43,5 +43,4 @@ public class Payment {
     public BigDecimal getAmount() {
         return amount;
     }
-
 }

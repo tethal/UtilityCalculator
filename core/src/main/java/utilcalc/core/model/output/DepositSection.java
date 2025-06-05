@@ -23,5 +23,4 @@ public final class DepositSection extends ReportSection {
     public List<Payment> getPayments() {
         return payments;
     }
-
 }

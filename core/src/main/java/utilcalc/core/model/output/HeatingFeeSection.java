@@ -7,6 +7,7 @@ import java.util.List;
  * Represent a report section for heating fee.
  *
  * <p>Contains a list of {@link HeatingPayment}.
+ *
  * <p>This class is immutable.
  */
 public final class HeatingFeeSection extends ReportSection {
@@ -22,5 +23,4 @@ public final class HeatingFeeSection extends ReportSection {
     public List<HeatingPayment> getHeatingFees() {
         return heatingFees;
     }
-
 }

@@ -28,5 +28,4 @@ public abstract class ReportSection {
     public BigDecimal getTotalAmount() {
         return totalAmount;
     }
-
 }

@@ -22,5 +22,4 @@ public class DepositSectionTest {
             assertEquals(new BigDecimal("6000"), payment.getAmount());
         }
     }
-
 }

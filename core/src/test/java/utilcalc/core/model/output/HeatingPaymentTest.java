@@ -17,5 +17,4 @@ public class HeatingPaymentTest {
         assertEquals(new BigDecimal("10992"), heatingPayment.getAmount());
         assertEquals(new BigDecimal("0.16"), heatingPayment.getCoefficient());
     }
-
 }
