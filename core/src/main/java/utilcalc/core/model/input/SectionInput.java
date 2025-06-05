@@ -1,4 +1,4 @@
-package utilcalc.core.in;
+package utilcalc.core.model.input;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
