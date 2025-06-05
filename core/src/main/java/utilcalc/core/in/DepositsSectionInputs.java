@@ -1,6 +1,5 @@
 package utilcalc.core.in;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public final class DepositsSectionInputs extends SectionInput {
@@ -18,15 +17,5 @@ public final class DepositsSectionInputs extends SectionInput {
 
     public List<Payment> getPayments() {
         return payments;
-    }
-
-    public boolean allCountsAreOne() {
-        return payments.stream().allMatch(p -> BigDecimal.ONE.equals(p.getCount()));
-    }
-
-    public BigDecimal getTotalDeposits() {
-        return payments.stream()
-                .map(Payment::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

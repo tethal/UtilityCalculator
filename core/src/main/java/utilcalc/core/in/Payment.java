@@ -35,10 +35,6 @@ public final class Payment {
         return unitAmount;
     }
 
-    public BigDecimal getTotalAmount() {
-        return count.multiply(unitAmount);
-    }
-
     @Override
     public String toString() {
         return "Payment [description="
