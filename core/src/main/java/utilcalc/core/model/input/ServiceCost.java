@@ -1,5 +1,7 @@
 package utilcalc.core.model.input;
 
+import static utilcalc.core.utils.Util.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -9,12 +11,10 @@ public final class ServiceCost {
     private final BigDecimal annualCost;
 
     public ServiceCost(LocalDate startDate, LocalDate endDate, BigDecimal annualCost) {
-        if (startDate == null) throw new IllegalArgumentException("startDate cannot be null");
-        if (endDate == null) throw new IllegalArgumentException("endDate cannot be null");
-        if (annualCost == null) throw new IllegalArgumentException("annualCost cannot be null");
-        if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("endDate must be before startDate");
-        }
+        ensureNonNull(startDate, "startDate");
+        ensureNonNull(endDate, "endDate");
+        ensureNonNull(annualCost, "annualCost");
+        ensureValidDateRange(startDate, endDate);
 
         this.startDate = startDate;
         this.endDate = endDate;

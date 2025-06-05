@@ -1,5 +1,7 @@
 package utilcalc.core.model.input;
 
+import static utilcalc.core.utils.Util.ensureNonEmpty;
+
 import java.util.List;
 
 public final class HeatingFeeInputs extends SectionInput {
@@ -8,10 +10,7 @@ public final class HeatingFeeInputs extends SectionInput {
     public HeatingFeeInputs(String name, List<ServiceCost> heatingFees) {
         super(name);
 
-        if (heatingFees == null || heatingFees.isEmpty()) {
-            throw new IllegalArgumentException("heatingFees must not be null or empty");
-        }
-
+        ensureNonEmpty(heatingFees, "heatingFees");
         this.heatingFees = List.copyOf(heatingFees);
     }
 

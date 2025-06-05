@@ -1,5 +1,7 @@
 package utilcalc.core.model.input;
 
+import static utilcalc.core.utils.Util.ensureNonEmpty;
+
 import java.util.List;
 
 public final class DepositsSectionInputs extends SectionInput {
@@ -8,9 +10,7 @@ public final class DepositsSectionInputs extends SectionInput {
     public DepositsSectionInputs(String name, List<Payment> payments) {
         super(name);
 
-        if (payments == null || payments.isEmpty()) {
-            throw new IllegalArgumentException("payments is null or empty");
-        }
+        ensureNonEmpty(payments, "payments");
 
         this.payments = List.copyOf(payments);
     }

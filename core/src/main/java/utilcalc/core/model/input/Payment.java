@@ -1,5 +1,7 @@
 package utilcalc.core.model.input;
 
+import static utilcalc.core.utils.Util.*;
+
 import java.math.BigDecimal;
 
 public final class Payment {
@@ -8,15 +10,9 @@ public final class Payment {
     private final BigDecimal unitAmount;
 
     public Payment(String description, BigDecimal count, BigDecimal unitAmount) {
-        if (description == null || description.isBlank()) {
-            throw new IllegalArgumentException("description cannot be blank");
-        }
-        if (count == null) {
-            throw new IllegalArgumentException("count cannot be null");
-        }
-        if (unitAmount == null) {
-            throw new IllegalArgumentException("unitAmount cannot be null");
-        }
+        ensureNonBlank(description, "description");
+        ensureNonNull(count, "count");
+        ensureNonNull(unitAmount, "unitAmount");
 
         this.description = description;
         this.count = count;

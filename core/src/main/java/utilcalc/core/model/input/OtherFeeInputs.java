@@ -1,5 +1,7 @@
 package utilcalc.core.model.input;
 
+import static utilcalc.core.utils.Util.ensureNonEmpty;
+
 import java.util.List;
 
 public final class OtherFeeInputs extends SectionInput {
@@ -8,9 +10,7 @@ public final class OtherFeeInputs extends SectionInput {
     public OtherFeeInputs(String name, List<ServiceCost> otherFees) {
         super(name);
 
-        if (otherFees == null || otherFees.isEmpty()) {
-            throw new IllegalArgumentException("otherFees is null or empty");
-        }
+        ensureNonEmpty(otherFees, "otherFees");
         this.otherFees = List.copyOf(otherFees);
     }
 

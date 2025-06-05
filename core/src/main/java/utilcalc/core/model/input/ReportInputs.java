@@ -1,8 +1,9 @@
 package utilcalc.core.model.input;
 
+import static utilcalc.core.utils.Util.*;
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 public final class ReportInputs {
     private final LocalDate startDate;
@@ -23,27 +24,15 @@ public final class ReportInputs {
             LocalDate reportDate,
             List<String> sources,
             List<SectionInputs> sections) {
-        if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("startDate and endDate must be non-null");
-        }
-        if (endDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("endDate must not be before startDate");
-        }
-        if (tenant == null || tenant.isEmpty()) {
-            throw new IllegalArgumentException("tenant must be non-empty");
-        }
-        if (owner == null || owner.isEmpty()) {
-            throw new IllegalArgumentException("owner must be non-empty");
-        }
-        if (reportPlace == null || reportPlace.isBlank()) {
-            throw new IllegalArgumentException("reportPlace must be non-empty");
-        }
-        if (reportDate == null) {
-            throw new IllegalArgumentException("reportDate must be non-null");
-        }
-        if (sections.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("sections must not contain null elements");
-        }
+
+        ensureNonNull(startDate, "startDate");
+        ensureNonNull(endDate, "endDate");
+        ensureValidDateRange(startDate, endDate);
+        ensureNonEmpty(tenant, "tenant");
+        ensureNonEmpty(owner, "owner");
+        ensureNonBlank(reportPlace, "reportPlace");
+        ensureNonNull(reportDate, "reportDate");
+        ensureNoNullElements(sections, "sections");
 
         this.startDate = startDate;
         this.endDate = endDate;
