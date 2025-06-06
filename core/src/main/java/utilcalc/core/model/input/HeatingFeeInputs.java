@@ -12,9 +12,4 @@ public record HeatingFeeInputs(String name, List<ServiceCost> heatingFees)
         ensureNonEmpty(heatingFees, "heatingFees");
         heatingFees = List.copyOf(heatingFees);
     }
-
-    @Override
-    public String getName() {
-        return name;
-    }
 }

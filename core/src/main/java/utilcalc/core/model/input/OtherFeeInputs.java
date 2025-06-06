@@ -11,9 +11,4 @@ public record OtherFeeInputs(String name, List<ServiceCost> otherFees) implement
         ensureNonEmpty(otherFees, "otherFees");
         otherFees = List.copyOf(otherFees);
     }
-
-    @Override
-    public String getName() {
-        return name;
-    }
 }

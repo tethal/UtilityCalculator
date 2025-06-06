@@ -11,9 +11,4 @@ public record DepositsSectionInputs(String name, List<Payment> payments) impleme
         ensureNonEmpty(payments, "payments");
         payments = List.copyOf(payments);
     }
-
-    @Override
-    public String getName() {
-        return name;
-    }
 }
