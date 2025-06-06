@@ -53,6 +53,8 @@ subprojects {
             html.stylesheet = 'fancy-hist.xsl'
         }
 
+        excludeFilter = file("$rootDir/config/spotbugs/spotbugs-exclude.xml")
+
         if (name == "spotbugsMain") {
             reports.html.outputLocation.set(mainHtmlReport)
         } else if (name == "spotbugsTest") {
