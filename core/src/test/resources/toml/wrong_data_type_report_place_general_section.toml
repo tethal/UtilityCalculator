@@ -6,37 +6,3 @@ owner = ["Jméno majitele", "majitel@example.com"]
 report_place = 2025-05-20
 report_date = 2025-05-20
 sources = ["vyúčtování SVJ za rok 2024"]
-
-[[deposits]]
-description="leden - duben"
-count=4
-amount=3000
-
-[[deposits]]
-description="květen"
-amount=3500
-
-[[deposits]]
-description="červen - prosinec"
-count=7
-amount=3500
-
-[[heating]]
-annual_cost = 10992
-start_date = 2021-01-01
-end_date = 2021-12-31
-
-[[heating]]
-annual_cost = 10992
-start_date = 2022-01-01
-end_date = 2023-12-31
-
-[[other_fees]]
-start_date = 2021-01-01
-end_date = 2021-12-31
-annual_cost = 3000
-
-[[other_fees]]
-start_date = 2022-01-01
-end_date = 2022-12-31
-annual_cost = 3200
