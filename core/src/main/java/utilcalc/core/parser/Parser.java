@@ -8,10 +8,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.tomlj.*;
 import utilcalc.core.model.input.ReportInputs;
+import utilcalc.core.model.input.SectionInputs;
 
 public final class Parser {
 
-    private static final String GENERAL_SECTION_NAME = "general";
+    static final String GENERAL_SECTION_NAME = "general";
+
     private static final String START_DATE = "start_date";
     private static final String END_DATE = "end_date";
     private static final String TENANT = "tenant";
@@ -36,25 +38,31 @@ public final class Parser {
         }
 
         try {
-            TomlTable general = requireTable(parseResult, GENERAL_SECTION_NAME);
-
-            checkThatSectionContainsOnlyKnownFields(
-                    general, GENERAL_SECTION_KNOWN_FIELDS, GENERAL_SECTION_NAME);
-
-            LocalDate startDate = requireLocalDate(general, START_DATE);
-            LocalDate endDate = requireLocalDate(general, END_DATE);
-            List<String> tenant = requireList(general, TENANT, String.class);
-            List<String> owner = requireList(general, OWNER, String.class);
-            String reportPlace = requireString(general, REPORT_PLACE);
-            LocalDate reportDate = requireLocalDate(general, REPORT_DATE);
-            List<String> sources = optionalList(general, SOURCES, String.class);
-
-            return new ReportInputs(
-                    startDate, endDate, tenant, owner, reportPlace, reportDate, sources, List.of());
+            return parseReportInputs(parseResult);
         } catch (TomlInvalidTypeException e) {
             throw new ParsingException("Invalid data type: " + e.getMessage(), e);
         } catch (IllegalArgumentException e) {
             throw new ParsingException("Unknown error when parsing: " + e.getMessage(), e);
         }
+    }
+
+    private static ReportInputs parseReportInputs(TomlParseResult parseResult) {
+        TomlTable general = requireTable(parseResult, GENERAL_SECTION_NAME);
+
+        checkThatSectionContainsOnlyKnownFields(
+                general, GENERAL_SECTION_KNOWN_FIELDS, GENERAL_SECTION_NAME);
+
+        LocalDate startDate = requireLocalDate(general, START_DATE);
+        LocalDate endDate = requireLocalDate(general, END_DATE);
+        List<String> tenant = requireList(general, TENANT, String.class);
+        List<String> owner = requireList(general, OWNER, String.class);
+        String reportPlace = requireString(general, REPORT_PLACE);
+        LocalDate reportDate = requireLocalDate(general, REPORT_DATE);
+        List<String> sources = optionalList(general, SOURCES, String.class);
+
+        List<SectionInputs> sections = SectionInputsParser.parse(parseResult);
+
+        return new ReportInputs(
+                startDate, endDate, tenant, owner, reportPlace, reportDate, sources, sections);
     }
 }
