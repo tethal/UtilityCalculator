@@ -34,7 +34,7 @@ final class DepositSectionGenerator {
         BigDecimal count = payment.count();
         BigDecimal unitAmount = payment.unitAmount();
 
-        ensureNotNegativeBigDecimalValue(count, "deposit");
+        ensureNotNegativeBigDecimalValue(count, "count");
 
         BigDecimal amount = count.multiply(unitAmount);
 

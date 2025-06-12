@@ -15,21 +15,20 @@ import utilcalc.core.model.output.DepositSection;
 class DepositSectionGeneratorTest {
     private final Payment payment1 = validPayment1();
     private final Payment payment2 = validPayment2();
-    private final DepositSection depositSectionWithOnePayment = createDepositSection(payment1);
 
     @Test
     void depositSection_withOnePayment_should_haveCorrectNameAndSum() {
-        DepositSection depositSection = depositSectionWithOnePayment;
+        DepositSection depositSection = createDepositSection(payment1);
 
         assertThat(depositSection.name()).isEqualTo("deposits");
         assertThat(depositSection.totalAmount()).isEqualTo("-3000");
     }
 
     @Test
-    void depositSection_withOnePayment_should_HaveCorrectDepositProperties() {
-        Deposit deposit = depositSectionWithOnePayment.deposits().getFirst();
+    void depositSection_withOnePayment_should_haveCorrectDepositProperties() {
+        Deposit deposit = createDepositSection(payment1).deposits().getFirst();
 
-        assertDepositMatchesPayment(deposit, payment1, null);
+        assertDepositMatchesPayment(deposit, payment1, "3000");
     }
 
     @Test
@@ -45,13 +44,13 @@ class DepositSectionGeneratorTest {
     }
 
     @Test
-    void payment_withInvalidValues_should_throw_illegalArgumentException() {
+    void payment_withInvalidCount_should_throw_illegalArgumentException() {
         DepositsSectionInputs depositsSectionInputs =
                 new DepositsSectionInputs("deposits", List.of(invalidPaymentWithNegativeCount()));
 
         assertThatThrownBy(() -> generateDepositSection(depositsSectionInputs))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("deposit must not be a negative value");
+                .hasMessageContaining("count must not be a negative value");
     }
 
     private void assertDepositMatchesPayment(
@@ -60,10 +59,7 @@ class DepositSectionGeneratorTest {
         assertThat(deposit.description()).isEqualTo(payment.description());
         assertThat(deposit.count()).isEqualTo(payment.count());
         assertThat(deposit.unitAmount()).isEqualTo(payment.unitAmount());
-
-        if (expectedAmount != null) {
-            assertThat(deposit.amount()).isEqualTo(expectedAmount);
-        }
+        assertThat(deposit.amount()).isEqualTo(expectedAmount);
     }
 
     private DepositSection createDepositSection(Payment... payments) {
