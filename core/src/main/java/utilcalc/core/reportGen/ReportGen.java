@@ -3,9 +3,8 @@ package utilcalc.core.reportGen;
 import static utilcalc.core.reportGen.DepositSectionGenerator.generateDepositSection;
 import static utilcalc.core.utils.Util.ensureNonNull;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import utilcalc.core.model.input.DepositsSectionInputs;
 import utilcalc.core.model.input.ReportInputs;
 import utilcalc.core.model.input.SectionInputs;
@@ -19,40 +18,29 @@ public final class ReportGen {
     public static Report generateReport(ReportInputs reportInputs) {
         ensureNonNull(reportInputs, "Report inputs");
 
-        LocalDate startDate = reportInputs.startDate();
-        LocalDate endDate = reportInputs.endDate();
-        List<String> tenant = reportInputs.tenant();
-        List<String> owner = reportInputs.owner();
-        String reportPlace = reportInputs.reportPlace();
-        LocalDate reportDate = reportInputs.reportDate();
-        List<String> sources = reportInputs.sources();
         List<SectionInputs> inputSections = reportInputs.sections();
 
-        List<ReportSection> reportSections = new ArrayList<>();
-        generateReportSection(reportSections, inputSections);
+        List<ReportSection> reportSections =
+                inputSections.stream()
+                        .map(ReportGen::generateReportSection)
+                        .collect(Collectors.toList());
 
         return new Report(
-                startDate,
-                endDate,
-                tenant,
-                owner,
-                reportPlace,
-                reportDate,
-                sources,
+                reportInputs.startDate(),
+                reportInputs.endDate(),
+                reportInputs.tenant(),
+                reportInputs.owner(),
+                reportInputs.reportPlace(),
+                reportInputs.reportDate(),
+                reportInputs.sources(),
                 reportSections);
     }
 
-    private static void generateReportSection(
-            List<ReportSection> reportSections, List<SectionInputs> sections) {
-
-        for (SectionInputs sectionInputs : sections) {
-
-            switch (sectionInputs) {
-                case DepositsSectionInputs deposit -> reportSections.add(
-                        generateDepositSection(deposit));
-                default -> throw new IllegalStateException(
-                        "Unexpected section: " + sectionInputs.name());
-            }
-        }
+    private static ReportSection generateReportSection(SectionInputs sectionInputs) {
+        return switch (sectionInputs) {
+            case DepositsSectionInputs deposit -> generateDepositSection(deposit);
+            default -> throw new IllegalStateException(
+                    "Unexpected section: " + sectionInputs.name());
+        };
     }
 }

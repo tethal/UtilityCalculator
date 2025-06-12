@@ -8,17 +8,23 @@ import utilcalc.core.model.input.DepositsSectionInputs;
 import utilcalc.core.model.input.Payment;
 import utilcalc.core.model.output.Deposit;
 import utilcalc.core.model.output.DepositSection;
-import utilcalc.core.model.output.ReportSection;
 
-public final class DepositSectionGenerator {
+final class DepositSectionGenerator {
 
-    public static ReportSection generateDepositSection(DepositsSectionInputs depositsInputs) {
+    private DepositSectionGenerator() {}
+
+    static DepositSection generateDepositSection(DepositsSectionInputs depositsInputs) {
         String name = depositsInputs.name();
         List<Payment> payments = depositsInputs.payments();
-        List<Deposit> deposits = mapPaymentListToDepositList(payments);
+
+        List<Deposit> deposits =
+                payments.stream().map(DepositSectionGenerator::mapPaymentToDeposit).toList();
 
         BigDecimal totalAmount =
-                deposits.stream().map(Deposit::amount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                deposits.stream()
+                        .map(Deposit::amount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .negate();
 
         return new DepositSection(name, totalAmount, deposits);
     }
@@ -29,18 +35,9 @@ public final class DepositSectionGenerator {
         BigDecimal unitAmount = payment.unitAmount();
 
         ensureNotNegativeBigDecimalValue(count, "deposit");
-        ensureNotNegativeBigDecimalValue(unitAmount, "unitAmount");
 
-        BigDecimal amount = calculateAmount(count, unitAmount);
+        BigDecimal amount = count.multiply(unitAmount);
 
         return new Deposit(description, count, unitAmount, amount);
-    }
-
-    private static List<Deposit> mapPaymentListToDepositList(List<Payment> payments) {
-        return payments.stream().map(DepositSectionGenerator::mapPaymentToDeposit).toList();
-    }
-
-    private static BigDecimal calculateAmount(BigDecimal count, BigDecimal unitAmount) {
-        return count.multiply(unitAmount).negate();
     }
 }

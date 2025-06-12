@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import utilcalc.core.model.input.ReportInputs;
 import utilcalc.core.model.output.Report;
 
-public class ReportGenTest {
+class ReportGenTest {
 
     @Test
     void valid_ReportInput_should_return_valid_report_class() {

@@ -18,8 +18,4 @@ final class PaymentFactory {
     public static Payment invalidPaymentWithNegativeCount() {
         return new Payment("Leden - Červen", new BigDecimal("-6"), new BigDecimal("200"));
     }
-
-    public static Payment invalidPaymentWithNegativeUnitAmount() {
-        return new Payment("Leden - Červen", new BigDecimal("6"), new BigDecimal("-200"));
-    }
 }
