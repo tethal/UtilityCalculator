@@ -1,8 +1,11 @@
 package utilcalc.core.parser;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.tomlj.TomlArray;
 import org.tomlj.TomlTable;
 
@@ -25,12 +28,33 @@ final class ParserUtils {
         return requireNonNull(table.getTable(key), key, "table");
     }
 
+    static TomlArray requireArray(TomlTable table, String key) {
+        return requireNonNull(table.getArray(key), key, "array");
+    }
+
     static LocalDate requireLocalDate(TomlTable table, String key) {
         return requireNonNull(table.getLocalDate(key), key, "date");
     }
 
     static String requireString(TomlTable table, String key) {
         return requireNonNull(table.getString(key), key, "string");
+    }
+
+    static BigDecimal requireBigDecimal(TomlTable table, String key) {
+        return requireNonEmpty(optionalBigDecimal(table, key), key, "bigDecimal");
+    }
+
+    static BigDecimal requireBigDecimal(
+            TomlTable table, String key, Supplier<BigDecimal> defaultValue) {
+        return optionalBigDecimal(table, key).orElseGet(defaultValue);
+    }
+
+    static Optional<BigDecimal> optionalBigDecimal(TomlTable table, String key) {
+        if (table.isDouble(key)) {
+            return Optional.ofNullable(table.getDouble(key)).map(BigDecimal::valueOf);
+        } else {
+            return Optional.ofNullable(table.getLong(key)).map(BigDecimal::valueOf);
+        }
     }
 
     static <T> List<T> requireList(TomlTable table, String key, Class<T> clazz) {
@@ -59,5 +83,12 @@ final class ParserUtils {
             throw new ParsingException("Missing required " + dataType + " field: " + key);
         }
         return input;
+    }
+
+    private static <T> T requireNonEmpty(Optional<T> input, String key, String dataType) {
+        if (input == null || input.isEmpty()) {
+            throw new ParsingException("Missing required " + dataType + " field: " + key);
+        }
+        return input.orElseThrow();
     }
 }
