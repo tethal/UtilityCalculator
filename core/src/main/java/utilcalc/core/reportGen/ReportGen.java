@@ -1,24 +1,46 @@
 package utilcalc.core.reportGen;
 
-import java.time.LocalDate;
+import static utilcalc.core.reportGen.DepositSectionGenerator.generateDepositSection;
+import static utilcalc.core.utils.Util.ensureNonNull;
+
 import java.util.List;
+import java.util.stream.Collectors;
+import utilcalc.core.model.input.DepositsSectionInputs;
 import utilcalc.core.model.input.ReportInputs;
+import utilcalc.core.model.input.SectionInputs;
 import utilcalc.core.model.output.Report;
+import utilcalc.core.model.output.ReportSection;
 
 public final class ReportGen {
 
     private ReportGen() {}
 
     public static Report generateReport(ReportInputs reportInputs) {
-        LocalDate startDate = reportInputs.startDate();
-        LocalDate endDate = reportInputs.endDate();
-        List<String> tenant = reportInputs.tenant();
-        List<String> owner = reportInputs.owner();
-        String reportPlace = reportInputs.reportPlace();
-        LocalDate reportDate = reportInputs.reportDate();
-        List<String> sources = reportInputs.sources();
+        ensureNonNull(reportInputs, "Report inputs");
+
+        List<SectionInputs> inputSections = reportInputs.sections();
+
+        List<ReportSection> reportSections =
+                inputSections.stream()
+                        .map(ReportGen::generateReportSection)
+                        .collect(Collectors.toList());
 
         return new Report(
-                startDate, endDate, tenant, owner, reportPlace, reportDate, sources, List.of());
+                reportInputs.startDate(),
+                reportInputs.endDate(),
+                reportInputs.tenant(),
+                reportInputs.owner(),
+                reportInputs.reportPlace(),
+                reportInputs.reportDate(),
+                reportInputs.sources(),
+                reportSections);
+    }
+
+    private static ReportSection generateReportSection(SectionInputs sectionInputs) {
+        return switch (sectionInputs) {
+            case DepositsSectionInputs deposit -> generateDepositSection(deposit);
+            default -> throw new IllegalStateException(
+                    "Unexpected section: " + sectionInputs.name());
+        };
     }
 }

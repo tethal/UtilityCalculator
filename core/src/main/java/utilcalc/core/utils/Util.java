@@ -1,5 +1,6 @@
 package utilcalc.core.utils;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -37,6 +38,12 @@ public final class Util {
     public static <T extends Comparable<T>> void ensureValidDateRange(T startDate, T endDate) {
         if (startDate != null && endDate != null && endDate.compareTo(startDate) < 0) {
             throw new IllegalArgumentException("endDate must not be before startDate");
+        }
+    }
+
+    public static void ensureNotNegativeBigDecimalValue(BigDecimal value, String name) {
+        if (value.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(name + " must not be a negative value");
         }
     }
 }
