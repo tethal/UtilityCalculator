@@ -7,9 +7,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import utilcalc.core.model.input.DepositsSectionInputs;
-import utilcalc.core.model.input.Payment;
-import utilcalc.core.model.input.ReportInputs;
+import utilcalc.core.model.input.*;
 
 class ParserTest {
 
@@ -24,9 +22,9 @@ class ParserTest {
         assertThat(inputs.reportPlace()).isEqualTo("V Praze");
         assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2025, 5, 20));
         assertThat(inputs.sources()).containsExactly("vyúčtování SVJ za rok 2024");
-        assertThat(inputs.sections()).hasSize(1);
+        assertThat(inputs.sections()).hasSize(3);
+
         DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
-        assertThat(deposits).isInstanceOf(DepositsSectionInputs.class);
         assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
         assertThat(deposits.payments())
                 .hasSize(3)
@@ -38,6 +36,34 @@ class ParserTest {
                                 "červen - prosinec",
                                 BigDecimal.valueOf(7),
                                 BigDecimal.valueOf(3500)));
+
+        HeatingFeeInputs heating = (HeatingFeeInputs) inputs.sections().get(1);
+        assertThat(heating.name()).isEqualTo("Vytápění");
+        assertThat(heating.heatingFees())
+                .hasSize(2)
+                .containsExactly(
+                        new ServiceCost(
+                                LocalDate.of(2021, 1, 1),
+                                LocalDate.of(2021, 12, 31),
+                                BigDecimal.valueOf(10992)),
+                        new ServiceCost(
+                                LocalDate.of(2022, 1, 1),
+                                LocalDate.of(2022, 12, 31),
+                                BigDecimal.valueOf(10992)));
+
+        OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(2);
+        assertThat(otherFee.name()).isEqualTo("Ostatní poplatky");
+        assertThat(otherFee.otherFees())
+                .hasSize(2)
+                .containsExactly(
+                        new ServiceCost(
+                                LocalDate.of(2021, 1, 1),
+                                LocalDate.of(2021, 12, 31),
+                                BigDecimal.valueOf(3000)),
+                        new ServiceCost(
+                                LocalDate.of(2022, 1, 1),
+                                LocalDate.of(2022, 12, 31),
+                                BigDecimal.valueOf(3200)));
     }
 
     @Test
@@ -67,7 +93,13 @@ class ParserTest {
         "missing_report_place_general_section,Missing required string field: report_place",
         "missing_report_date_general_section,Missing required date field: report_date",
         "missing_description_deposits_section,Missing required string field: description",
-        "missing_amount_deposits_section,Missing required bigDecimal field: amount"
+        "missing_amount_deposits_section,Missing required bigDecimal field: amount",
+        "missing_annual_cost_heating_section,Missing required bigDecimal field: annual_cost",
+        "missing_start_date_heating_section,Missing required date field: start_date",
+        "missing_end_date_heating_section,Missing required date field: end_date",
+        "missing_annual_cost_other_fees_section,Missing required bigDecimal field: annual_cost",
+        "missing_start_date_other_fees_section,Missing required date field: start_date",
+        "missing_end_date_other_fees_section,Missing required date field: end_date",
     })
     @ParameterizedTest
     void missing_required_field_should_throw_ParsingException(String textCase, String message) {
@@ -101,6 +133,12 @@ class ParserTest {
         "wrong_data_type_amount_deposits_section,Invalid data type: Value of 'amount' is a string",
         "wrong_data_type_count_deposits_section,Invalid data type: Value of 'count' is a string",
         "wrong_data_type_description_deposits_section,Invalid data type: Value of 'description' is a integer",
+        "wrong_data_type_annual_cost_heating_section,Invalid data type: Value of 'annual_cost' is a string",
+        "wrong_data_type_start_date_heating_section,Invalid data type: Value of 'start_date' is a string",
+        "wrong_data_type_end_date_heating_section,Invalid data type: Value of 'end_date' is a string",
+        "wrong_data_type_annual_cost_other_fees_section,Invalid data type: Value of 'annual_cost' is a string",
+        "wrong_data_type_start_date_other_fees_section,Invalid data type: Value of 'start_date' is a string",
+        "wrong_data_type_end_date_other_fees_section,Invalid data type: Value of 'end_date' is a string",
     })
     @ParameterizedTest
     void invalid_field_data_type_should_throw_ParsingException(String textCase, String message) {

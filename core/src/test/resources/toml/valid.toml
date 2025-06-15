@@ -29,7 +29,7 @@ end_date = 2021-12-31
 [[heating]]
 annual_cost = 10992
 start_date = 2022-01-01
-end_date = 2023-12-31
+end_date = 2022-12-31
 
 [[other_fees]]
 start_date = 2021-01-01
