@@ -5,7 +5,6 @@ import static utilcalc.core.parser.ParserUtils.requireBigDecimal;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.IntStream;
 import org.tomlj.TomlArray;
@@ -25,22 +24,20 @@ class DepositsSectionParser {
     private static final String COUNT = "count";
     private static final String AMOUNT = "amount";
 
-    private static final Set<String> DEPOSITS_SECTION_KNOWN_FIELDS =
-            Set.of(DESCRIPTION, COUNT, AMOUNT);
+    private static final Set<String> SECTION_KNOWN_FIELDS = Set.of(DESCRIPTION, COUNT, AMOUNT);
 
-    static Optional<SectionInputs> parse(TomlArray depositPayments) {
+    static SectionInputs parse(TomlArray depositPayments) {
         List<Payment> payments =
                 IntStream.range(0, depositPayments.size())
                         .mapToObj(depositPayments::getTable)
                         .map(DepositsSectionParser::parsePayment)
                         .toList();
 
-        return Optional.of(new DepositsSectionInputs(SECTION_INPUTS_NAME, payments));
+        return new DepositsSectionInputs(SECTION_INPUTS_NAME, payments);
     }
 
     private static Payment parsePayment(TomlTable payment) {
-        checkThatSectionContainsOnlyKnownFields(
-                payment, DEPOSITS_SECTION_KNOWN_FIELDS, SECTION_NAME);
+        checkThatSectionContainsOnlyKnownFields(payment, SECTION_KNOWN_FIELDS, SECTION_NAME);
         String description = requireString(payment, DESCRIPTION);
         BigDecimal count = requireBigDecimal(payment, COUNT, () -> BigDecimal.ONE);
         BigDecimal amount = requireBigDecimal(payment, AMOUNT);
