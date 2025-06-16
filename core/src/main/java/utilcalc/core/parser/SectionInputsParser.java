@@ -2,7 +2,6 @@ package utilcalc.core.parser;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.tomlj.TomlArray;
 import org.tomlj.TomlTable;
 import utilcalc.core.model.input.SectionInputs;
@@ -15,16 +14,14 @@ class SectionInputsParser {
         return parseResult.entrySet().stream()
                 .filter(entry -> !Parser.GENERAL_SECTION_NAME.equals(entry.getKey()))
                 .map(entry -> parserSectionInputs(getTomlArray(entry), entry.getKey()))
-                .flatMap(Optional::stream)
                 .toList();
     }
 
-    private static Optional<SectionInputs> parserSectionInputs(
-            TomlArray section, String sectionName) {
+    private static SectionInputs parserSectionInputs(TomlArray section, String sectionName) {
         return switch (sectionName) {
             case DepositsSectionParser.SECTION_NAME -> DepositsSectionParser.parse(section);
-            case HeatingSectionParser.SECTION_NAME, OtherFeesSectionParser.SECTION_NAME -> Optional
-                    .empty();
+            case HeatingSectionParser.SECTION_NAME -> HeatingSectionParser.parse(section);
+            case OtherFeesSectionParser.SECTION_NAME -> OtherFeesSectionParser.parse(section);
             default -> throw new ParsingException("Unknown section " + sectionName);
         };
     }
