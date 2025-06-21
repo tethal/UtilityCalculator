@@ -1,12 +1,13 @@
 package utilcalc.core.reportGen;
 
+import static utilcalc.core.reportGen.ReportGenUtil.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
+import utilcalc.core.model.OpenInterval;
 import utilcalc.core.model.input.OtherFeeInputs;
 import utilcalc.core.model.input.ServiceCost;
 import utilcalc.core.model.output.OtherFee;
@@ -19,13 +20,18 @@ final class OtherFeeSectionGenerator {
 
     private OtherFeeSectionGenerator() {}
 
-    static OtherFeeSection generateOtherFeeSection(OtherFeeInputs otherFeeInputs) {
+    static OtherFeeSection generateOtherFeeSection(
+            OtherFeeInputs otherFeeInputs, LocalDate reportStartDate, LocalDate reportEndDate) {
+        validateServiceCostCoverage(reportStartDate, reportEndDate, otherFeeInputs.otherFees());
+
         String name = otherFeeInputs.name();
         List<ServiceCost> serviceCosts = otherFeeInputs.otherFees();
+        List<ServiceCost> partialServiceCost =
+                splitServiceCostsByReport(reportStartDate, reportEndDate, serviceCosts);
 
         List<OtherFee> otherFees =
-                serviceCosts.stream()
-                        .map(OtherFeeSectionGenerator::mapServiceCostToOtherFee)
+                partialServiceCost.stream()
+                        .map(OtherFeeSectionGenerator::calculateOtherFee)
                         .toList();
 
         BigDecimal totalAmount =
@@ -36,15 +42,19 @@ final class OtherFeeSectionGenerator {
         return new OtherFeeSection(name, totalAmount, otherFees);
     }
 
-    private static OtherFee mapServiceCostToOtherFee(ServiceCost serviceCost) {
+    private static OtherFee calculateOtherFee(ServiceCost serviceCost) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.yyyy");
-        String startDate = serviceCost.startDate().format(formatter);
-        String endDate = serviceCost.endDate().format(formatter);
-        String description = String.format("%s - %s", startDate, endDate);
+        LocalDate startDate = serviceCost.startDate();
+        LocalDate endDate = serviceCost.endDate();
+        String description =
+                String.format(
+                        "%s - %s",
+                        startDate.format(formatter), endDate.minusDays(1).format(formatter));
+
+        OpenInterval openInterval = new OpenInterval(startDate, endDate);
 
         BigDecimal annualCost = serviceCost.annualCost();
-        BigDecimal notRoundMountCount =
-                getMonthCount(serviceCost.startDate(), serviceCost.endDate());
+        BigDecimal notRoundMountCount = openInterval.getMonthCount();
         BigDecimal monthCount =
                 notRoundMountCount.setScale(DISPLAY_DECIMAL_PLACES, RoundingMode.HALF_UP);
         BigDecimal unitAmount =
@@ -55,46 +65,5 @@ final class OtherFeeSectionGenerator {
                         .setScale(DISPLAY_DECIMAL_PLACES, RoundingMode.HALF_UP);
 
         return new OtherFee(description, annualCost, monthCount, feeAmount);
-    }
-
-    private static BigDecimal getMonthCount(LocalDate startDate, LocalDate endDate) {
-        YearMonth startMonth = YearMonth.from(startDate);
-        YearMonth endMonth = YearMonth.from(endDate);
-
-        if (startMonth.equals(endMonth)) {
-            return calculateSingleMonth(startDate, endDate);
-        }
-
-        BigDecimal partialStart = calculatePartialMonth(startDate, true);
-        BigDecimal partialEnd = calculatePartialMonth(endDate, false);
-
-        long fullMonths =
-                Math.max(0, ChronoUnit.MONTHS.between(startMonth.plusMonths(1), endMonth));
-
-        return BigDecimal.valueOf(fullMonths).add(partialStart).add(partialEnd);
-    }
-
-    private static BigDecimal calculateSingleMonth(LocalDate startDate, LocalDate endDate) {
-        YearMonth month = YearMonth.from(startDate);
-        int daysInMonth = month.lengthOfMonth();
-
-        if (startDate.getDayOfMonth() == 1 && endDate.getDayOfMonth() == daysInMonth) {
-            return BigDecimal.ONE;
-        }
-
-        int daysBetween = endDate.getDayOfMonth() - startDate.getDayOfMonth() + 1;
-
-        return BigDecimal.valueOf(daysBetween)
-                .divide(BigDecimal.valueOf(daysInMonth), CALCULATION_SCALE, RoundingMode.HALF_UP);
-    }
-
-    private static BigDecimal calculatePartialMonth(LocalDate date, boolean isStart) {
-        int day = date.getDayOfMonth();
-        int daysInMonth = YearMonth.from(date).lengthOfMonth();
-
-        int effectiveDays = isStart ? (daysInMonth - day + 1) : day;
-
-        return BigDecimal.valueOf(effectiveDays)
-                .divide(BigDecimal.valueOf(daysInMonth), CALCULATION_SCALE, RoundingMode.HALF_UP);
     }
 }

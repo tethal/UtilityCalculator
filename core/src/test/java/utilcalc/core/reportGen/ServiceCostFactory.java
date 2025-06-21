@@ -1,30 +1,43 @@
 package utilcalc.core.reportGen;
 
+import static utilcalc.core.model.OpenIntervalFactory.*;
+
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import utilcalc.core.model.OpenInterval;
 import utilcalc.core.model.input.ServiceCost;
 
 final class ServiceCostFactory {
+    private static final OpenInterval FULL_2024_YEAR_INTERVAL = full2024Interval();
+    private static final OpenInterval FULL_2025_YEAR_INTERVAL = full2025Interval();
+
+    private static final BigDecimal SERVICE_COST_2024 = new BigDecimal("8772");
+    private static final BigDecimal SERVICE_COST_2025 = new BigDecimal("8000");
 
     private ServiceCostFactory() {}
 
-    public static ServiceCost validOneFullYearServiceCost() {
+    /** [ 1.1.2024 ; 1.1.2025) cost: 8772 */
+    public static ServiceCost valid2024ServiceCost() {
         return new ServiceCost(
-                LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), new BigDecimal("8772"));
+                FULL_2024_YEAR_INTERVAL.startDate(),
+                FULL_2024_YEAR_INTERVAL.endDateExclusive(),
+                SERVICE_COST_2024);
     }
 
-    public static ServiceCost validOneAndHalfYearServiceCost() {
+    /** [ 1.1.2025 ; 1.1.2026) cost: 8000 */
+    public static ServiceCost valid2025ServiceCost() {
         return new ServiceCost(
-                LocalDate.of(2024, 1, 1), LocalDate.of(2025, 6, 15), new BigDecimal("8000"));
+                FULL_2025_YEAR_INTERVAL.startDate(),
+                FULL_2025_YEAR_INTERVAL.endDateExclusive(),
+                SERVICE_COST_2025);
     }
 
-    public static ServiceCost validPartialMonthServiceCost() {
-        return new ServiceCost(
-                LocalDate.of(2024, 1, 6), LocalDate.of(2024, 1, 16), new BigDecimal("8000"));
-    }
+    /** [ 15.1.2024 ; 15.1.2025 ) cost: 8772 */
+    public static ServiceCost partialServiceCost() {
+        OpenInterval twoPartialMonthsInterval = twoPartialMonthsInterval();
 
-    public static ServiceCost validTwoPartialMonthsServiceCost() {
         return new ServiceCost(
-                LocalDate.of(2024, 12, 6), LocalDate.of(2025, 1, 16), new BigDecimal("8000"));
+                twoPartialMonthsInterval.startDate(),
+                twoPartialMonthsInterval.endDateExclusive(),
+                SERVICE_COST_2024);
     }
 }
