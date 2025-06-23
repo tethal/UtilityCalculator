@@ -12,7 +12,7 @@ public final class HtmlBuilder {
             <head>
                 <meta charset="UTF-8" />
                 <style type="text/css">
-                    body { font-family: sans-serif; margin: 40px; }
+                    body { font-family: 'DejaVu Sans', sans-serif; margin: 40px; }
                     h1 { font-size: 20pt; }
                     p { font-size: 12pt; margin: 4pt 0; }
                     .italic { font-style: italic; font-size: 10pt; }

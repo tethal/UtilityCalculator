@@ -1,10 +1,10 @@
 package utilcalc.core.pdfGen;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.utils.ReportFormatter;
+import com.lowagie.text.pdf.BaseFont;
 
 public final class PdfGenerator {
 
@@ -15,6 +15,8 @@ public final class PdfGenerator {
             String htmlContent = buildHtml(report);
 
             ITextRenderer renderer = new ITextRenderer();
+            registerFonts(renderer);
+
             renderer.setDocumentFromString(htmlContent);
             renderer.layout();
             renderer.createPDF(outputStream);
@@ -25,9 +27,33 @@ public final class PdfGenerator {
         }
     }
 
+    private static void registerFonts(ITextRenderer renderer) throws IOException {
+        try (InputStream fontStream = PdfGenerator.class.getResourceAsStream("/fonts/DejaVuSans.ttf")) {
+            if (fontStream == null) {
+                throw new IOException("Font DejaVuSans.ttf nebyl nalezen v resources.");
+            }
+
+            File tempFontFile = File.createTempFile("dejavusans", ".ttf");
+            tempFontFile.deleteOnExit();
+
+            try (FileOutputStream out = new FileOutputStream(tempFontFile)) {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = fontStream.read(buffer)) != -1) {
+                    out.write(buffer, 0, length);
+                }
+            }
+
+            renderer.getFontResolver().addFont(
+                    tempFontFile.getAbsolutePath(),
+                    BaseFont.IDENTITY_H,
+                    BaseFont.EMBEDDED
+            );
+        }
+    }
+
     private static String buildHtml(Report report) {
         ReportFormatter formatter = new ReportFormatter();
-
         HtmlBuilder html = new HtmlBuilder();
 
         html.h1("Vyúčtování poplatků za služby a energie")
