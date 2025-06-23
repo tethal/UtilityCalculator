@@ -7,7 +7,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import utilcalc.core.model.OpenInterval;
+import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.OtherFeeInputs;
 import utilcalc.core.model.input.ServiceCost;
 import utilcalc.core.model.output.OtherFee;
@@ -51,10 +51,10 @@ final class OtherFeeSectionGenerator {
                         "%s - %s",
                         startDate.format(formatter), endDate.minusDays(1).format(formatter));
 
-        OpenInterval openInterval = new OpenInterval(startDate, endDate);
+        DateRange dateRange = new DateRange(startDate, endDate);
 
         BigDecimal annualCost = serviceCost.annualCost();
-        BigDecimal notRoundMountCount = openInterval.getMonthCount();
+        BigDecimal notRoundMountCount = dateRange.getMonthCount();
         BigDecimal monthCount =
                 notRoundMountCount.setScale(DISPLAY_DECIMAL_PLACES, RoundingMode.HALF_UP);
         BigDecimal unitAmount =

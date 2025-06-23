@@ -2,18 +2,26 @@ package utilcalc.core.reportGen;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static utilcalc.core.reportGen.OtherFeeSectionFactory.*;
+import static utilcalc.core.reportGen.OtherFeeSectionGenerator.generateOtherFeeSection;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import utilcalc.core.model.input.OtherFeeInputs;
+import utilcalc.core.model.input.ServiceCost;
 import utilcalc.core.model.output.OtherFee;
 import utilcalc.core.model.output.OtherFeeSection;
 
 class OtherFeeSectionGeneratorTest {
-    private static final OtherFeeSection YEAR_OTHER_FEE_SECTION = createOneYearOtherFeeSection();
 
     @Test
     void otherFee_withOneServiceCost_should_haveCorrectNameAndSum() {
-        OtherFeeSection otherFeeSection = YEAR_OTHER_FEE_SECTION;
+        OtherFeeSection otherFeeSection =
+                generateOtherFeeSection(
+                        createOtherFeeInputs(createServiceCost("2024-01-01", "2025-01-01", "8772")),
+                        LocalDate.parse("2024-01-01"),
+                        LocalDate.parse("2025-01-01"));
 
         assertThat(otherFeeSection.name()).isEqualTo("Other fees");
         assertThat(otherFeeSection.totalAmount()).isEqualTo("8772.00");
@@ -22,7 +30,13 @@ class OtherFeeSectionGeneratorTest {
 
     @Test
     void otherFee_withOneServiceCost_should_haveCorrectOtherFeeProperties() {
-        OtherFee otherFee = YEAR_OTHER_FEE_SECTION.fees().getFirst();
+        OtherFeeSection otherFeeSection =
+                generateOtherFeeSection(
+                        createOtherFeeInputs(createServiceCost("2024-01-01", "2025-01-01", "8772")),
+                        LocalDate.parse("2024-01-01"),
+                        LocalDate.parse("2025-01-01"));
+
+        OtherFee otherFee = otherFeeSection.fees().getFirst();
 
         assertThat(otherFee.description()).isEqualTo("1.1.2024 - 31.12.2024");
         assertThat(otherFee.annualCost()).isEqualTo("8772");
@@ -32,7 +46,13 @@ class OtherFeeSectionGeneratorTest {
 
     @Test
     void otherFee_withMultipleServiceCost_should_haveCorrectOtherFeeProperties() {
-        OtherFeeSection otherFeeSection = createTwoYearOtherFeeSection();
+        OtherFeeSection otherFeeSection =
+                generateOtherFeeSection(
+                        createOtherFeeInputs(
+                                createServiceCost("2024-01-01", "2025-01-01", "8772"),
+                                createServiceCost("2025-01-01", "2026-01-01", "8000")),
+                        LocalDate.parse("2024-01-01"),
+                        LocalDate.parse("2026-01-01"));
 
         assertThat(otherFeeSection.totalAmount()).isEqualTo("16772.00");
 
@@ -52,7 +72,11 @@ class OtherFeeSectionGeneratorTest {
 
     @Test
     void otherFee_withPartialMonthServiceCost_should_haveCorrectOtherFeeProperties() {
-        OtherFeeSection otherFeeSection = createPartialMonthOtherFeeSection();
+        OtherFeeSection otherFeeSection =
+                generateOtherFeeSection(
+                        createOtherFeeInputs(createServiceCost("2024-01-01", "2025-01-01", "8772")),
+                        LocalDate.parse("2024-01-15"),
+                        LocalDate.parse("2024-01-25"));
 
         OtherFee otherFee = otherFeeSection.fees().getFirst();
 
@@ -66,7 +90,13 @@ class OtherFeeSectionGeneratorTest {
 
     @Test
     void otherFee_withTwoPartialMonthServiceCost_should_haveCorrectOtherFeeProperties() {
-        OtherFeeSection otherFeeSection = createPartialMonthOverTwoYearsOtherFeeSection();
+        OtherFeeSection otherFeeSection =
+                generateOtherFeeSection(
+                        createOtherFeeInputs(
+                                createServiceCost("2024-01-01", "2025-01-01", "8772"),
+                                createServiceCost("2025-01-01", "2026-01-01", "8000")),
+                        LocalDate.parse("2024-01-15"),
+                        LocalDate.parse("2025-01-15"));
 
         assertThat(otherFeeSection.totalAmount()).isEqualTo("8742.95");
 
@@ -86,15 +116,65 @@ class OtherFeeSectionGeneratorTest {
 
     @Test
     void otherFee_withPartialServiceCost_should_throw_illegalArgumentException() {
-        assertThatThrownBy(OtherFeeSectionFactory::invalidServiceCostCoverageOtherFeeSection)
+        OtherFeeInputs otherFeeInputs =
+                createOtherFeeInputs(createServiceCost("2024-01-15", "2025-01-15", "8772"));
+
+        assertThatThrownBy(
+                        () ->
+                                generateOtherFeeSection(
+                                        otherFeeInputs,
+                                        LocalDate.parse("2024-01-01"),
+                                        LocalDate.parse("2025-01-01")))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ServiceCosts do not fully cover the report date interval.");
+                .hasMessage("ServiceCosts do not fully cover the report date interval.");
     }
 
     @Test
     void otherFee_withOverlapServiceCost_should_throw_illegalArgumentException() {
-        assertThatThrownBy(OtherFeeSectionFactory::overlapServiceCostOtherFeeSection)
+        OtherFeeInputs otherFeeInputs =
+                createOtherFeeInputs(
+                        createServiceCost("2024-01-15", "2025-01-15", "8775"),
+                        createServiceCost("2025-01-01", "2026-01-01", "8000"));
+
+        assertThatThrownBy(
+                        () ->
+                                generateOtherFeeSection(
+                                        otherFeeInputs,
+                                        LocalDate.parse("2025-01-01"),
+                                        LocalDate.parse("2026-01-01")))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ServiceCosts do not connect seamlessly or they overlap: ");
+                .hasMessage(
+                        "ServiceCosts do not connect seamlessly or they overlap: "
+                                + "ServiceCost[startDate=2024-01-15, endDate=2025-01-15, annualCost=8775] and "
+                                + "ServiceCost[startDate=2025-01-01, endDate=2026-01-01, annualCost=8000]");
+    }
+
+    @Test
+    void otherFee_withNotConnectServiceCost_should_throw_illegalArgumentException() {
+        OtherFeeInputs otherFeeInputs =
+                createOtherFeeInputs(
+                        createServiceCost("2024-01-01", "2024-12-15", "8775"),
+                        createServiceCost("2025-01-01", "2026-01-01", "8000"));
+
+        assertThatThrownBy(
+                        () ->
+                                generateOtherFeeSection(
+                                        otherFeeInputs,
+                                        LocalDate.parse("2025-01-01"),
+                                        LocalDate.parse("2026-01-01")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                        "ServiceCosts do not connect seamlessly or they overlap: "
+                                + "ServiceCost[startDate=2024-01-01, endDate=2024-12-15, annualCost=8775] "
+                                + "and ServiceCost[startDate=2025-01-01, endDate=2026-01-01, annualCost=8000]");
+    }
+
+    private static OtherFeeInputs createOtherFeeInputs(ServiceCost... serviceCosts) {
+        return new OtherFeeInputs("Other fees", List.of(serviceCosts));
+    }
+
+    private static ServiceCost createServiceCost(String start, String end, String annualCost) {
+        return new ServiceCost(
+                LocalDate.parse(start), LocalDate.parse(end), new BigDecimal(annualCost));
     }
 }

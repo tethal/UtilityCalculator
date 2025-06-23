@@ -26,7 +26,7 @@ public final class ReportGen {
         List<ReportSection> reportSections =
                 inputSections.stream()
                         .map(
-                                (SectionInputs sectionInputs) ->
+                                sectionInputs ->
                                         generateReportSection(
                                                 sectionInputs, reportStart, reportEnd))
                         .collect(Collectors.toList());

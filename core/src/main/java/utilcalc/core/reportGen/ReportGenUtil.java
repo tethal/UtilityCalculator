@@ -34,8 +34,8 @@ final class ReportGenUtil {
     static void validateServiceCostCoverage(
             LocalDate reportStartDate, LocalDate reportEndDate, List<ServiceCost> serviceCosts) {
 
-        List<ServiceCost> sortedServiceCosts = new ArrayList<>(serviceCosts);
-        sortedServiceCosts.sort(Comparator.comparing(ServiceCost::startDate));
+        List<ServiceCost> sortedServiceCosts =
+                serviceCosts.stream().sorted(Comparator.comparing(ServiceCost::startDate)).toList();
 
         if (sortedServiceCosts.getFirst().startDate().isAfter(reportStartDate)
                 || sortedServiceCosts.getLast().endDate().isBefore(reportEndDate)) {

@@ -16,7 +16,8 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
         ensureValidDateRange(startDate, endDateExclusive);
 
         if (startDate.equals(endDateExclusive)) {
-            throw new IllegalArgumentException("Date range must not have same start and end date");
+            throw new IllegalArgumentException(
+                    "Open interval must not have same start and end date");
         }
     }
 
