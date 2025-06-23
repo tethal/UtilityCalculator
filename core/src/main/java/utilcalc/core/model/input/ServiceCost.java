@@ -3,13 +3,10 @@ package utilcalc.core.model.input;
 import static utilcalc.core.utils.Util.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import utilcalc.core.model.DateRange;
 
-public record ServiceCost(LocalDate startDate, LocalDate endDate, BigDecimal annualCost) {
+public record ServiceCost(DateRange dateRange, BigDecimal annualCost) {
     public ServiceCost {
-        ensureNonNull(startDate, "startDate");
-        ensureNonNull(endDate, "endDate");
         ensureNonNull(annualCost, "annualCost");
-        ensureValidDateRange(startDate, endDate);
     }
 }

@@ -17,8 +17,7 @@ class ReportGenTest {
 
         Report report = generateReport(reportInputs);
 
-        assertThat(report.startDate()).isEqualTo(reportInputs.startDate());
-        assertThat(report.endDate()).isEqualTo(reportInputs.endDate());
+        assertThat(report.dateRange()).isEqualTo(reportInputs.dateRange());
         assertThat(report.tenant()).isEqualTo(reportInputs.tenant());
         assertThat(report.owner()).isEqualTo(reportInputs.owner());
         assertThat(report.reportPlace()).isEqualTo(reportInputs.reportPlace());

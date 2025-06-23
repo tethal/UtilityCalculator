@@ -4,10 +4,10 @@ import static utilcalc.core.utils.Util.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import utilcalc.core.model.DateRange;
 
 public record Report(
-        LocalDate startDate,
-        LocalDate endDate,
+        DateRange dateRange,
         List<String> tenant,
         List<String> owner,
         String reportPlace,
@@ -16,9 +16,6 @@ public record Report(
         List<ReportSection> sections) {
 
     public Report {
-        ensureNonNull(startDate, "startDate");
-        ensureNonNull(endDate, "endDate");
-        ensureValidDateRange(startDate, endDate);
         ensureNonEmpty(tenant, "tenant");
         ensureNonEmpty(owner, "owner");
         ensureNonBlank(reportPlace, "reportPlace");

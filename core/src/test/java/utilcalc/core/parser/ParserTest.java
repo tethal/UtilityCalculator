@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.*;
 
 class ParserTest {
@@ -15,8 +16,8 @@ class ParserTest {
     void valid_input_should_return_valid_ReportInputs_class() {
         ReportInputs inputs = Parser.parse(ParserTestHelper.getTestCaseContent("valid"));
 
-        assertThat(inputs.startDate()).isEqualTo(LocalDate.of(2024, 2, 15));
-        assertThat(inputs.endDate()).isEqualTo(LocalDate.of(2024, 12, 31));
+        assertThat(inputs.dateRange().startDate()).isEqualTo(LocalDate.of(2024, 2, 15));
+        assertThat(inputs.dateRange().endDateExclusive()).isEqualTo(LocalDate.of(2024, 12, 31));
         assertThat(inputs.tenant()).containsExactly("Jméno nájemníka", "Adresa nemovitosti");
         assertThat(inputs.owner()).containsExactly("Jméno majitele", "majitel@example.com");
         assertThat(inputs.reportPlace()).isEqualTo("V Praze");
@@ -43,12 +44,10 @@ class ParserTest {
                 .hasSize(2)
                 .containsExactly(
                         new ServiceCost(
-                                LocalDate.of(2021, 1, 1),
-                                LocalDate.of(2021, 12, 31),
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2021, 12, 31)),
                                 BigDecimal.valueOf(10992)),
                         new ServiceCost(
-                                LocalDate.of(2022, 1, 1),
-                                LocalDate.of(2022, 12, 31),
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 31)),
                                 BigDecimal.valueOf(10992)));
 
         OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(2);
@@ -57,12 +56,10 @@ class ParserTest {
                 .hasSize(2)
                 .containsExactly(
                         new ServiceCost(
-                                LocalDate.of(2021, 1, 1),
-                                LocalDate.of(2021, 12, 31),
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2021, 12, 31)),
                                 BigDecimal.valueOf(3000)),
                         new ServiceCost(
-                                LocalDate.of(2022, 1, 1),
-                                LocalDate.of(2022, 12, 31),
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 31)),
                                 BigDecimal.valueOf(3200)));
     }
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.tomlj.*;
+import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.ReportInputs;
 import utilcalc.core.model.input.SectionInputs;
 
@@ -52,8 +53,7 @@ public final class Parser {
         checkThatSectionContainsOnlyKnownFields(
                 general, GENERAL_SECTION_KNOWN_FIELDS, GENERAL_SECTION_NAME);
 
-        LocalDate startDate = requireLocalDate(general, START_DATE);
-        LocalDate endDate = requireLocalDate(general, END_DATE);
+        DateRange dateRange = requireDateRange(general, START_DATE, END_DATE);
         List<String> tenant = requireList(general, TENANT, String.class);
         List<String> owner = requireList(general, OWNER, String.class);
         String reportPlace = requireString(general, REPORT_PLACE);
@@ -63,6 +63,6 @@ public final class Parser {
         List<SectionInputs> sections = SectionInputsParser.parse(parseResult);
 
         return new ReportInputs(
-                startDate, endDate, tenant, owner, reportPlace, reportDate, sources, sections);
+                dateRange, tenant, owner, reportPlace, reportDate, sources, sections);
     }
 }

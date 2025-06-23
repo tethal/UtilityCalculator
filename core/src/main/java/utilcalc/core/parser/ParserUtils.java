@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.tomlj.TomlArray;
 import org.tomlj.TomlTable;
+import utilcalc.core.model.DateRange;
 
 final class ParserUtils {
 
@@ -34,6 +35,12 @@ final class ParserUtils {
 
     static LocalDate requireLocalDate(TomlTable table, String key) {
         return requireNonNull(table.getLocalDate(key), key, "date");
+    }
+
+    static DateRange requireDateRange(TomlTable table, String startDateKey, String endDateKey) {
+        LocalDate startDate = requireLocalDate(table, startDateKey);
+        LocalDate endDate = requireLocalDate(table, endDateKey);
+        return new DateRange(startDate, endDate);
     }
 
     static String requireString(TomlTable table, String key) {
