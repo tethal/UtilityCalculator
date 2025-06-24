@@ -20,6 +20,11 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
         }
     }
 
+    public static DateRange fromInclusive(
+            LocalDate startDateInclusive, LocalDate endDateInclusive) {
+        return new DateRange(startDateInclusive, endDateInclusive.plusDays(1));
+    }
+
     public BigDecimal getMonthCount() {
         YearMonth startMonth = YearMonth.from(startDate);
         YearMonth endMonth = YearMonth.from(endDateExclusive);

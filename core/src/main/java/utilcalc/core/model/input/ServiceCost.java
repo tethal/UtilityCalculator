@@ -7,6 +7,7 @@ import utilcalc.core.model.DateRange;
 
 public record ServiceCost(DateRange dateRange, BigDecimal annualCost) {
     public ServiceCost {
+        ensureNonNull(dateRange, "dateRange");
         ensureNonNull(annualCost, "annualCost");
     }
 }

@@ -16,6 +16,7 @@ public record Report(
         List<ReportSection> sections) {
 
     public Report {
+        ensureNonNull(dateRange, "dateRange");
         ensureNonEmpty(tenant, "tenant");
         ensureNonEmpty(owner, "owner");
         ensureNonBlank(reportPlace, "reportPlace");

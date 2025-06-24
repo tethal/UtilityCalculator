@@ -15,6 +15,7 @@ public record ReportInputs(
         List<String> sources,
         List<SectionInputs> sections) {
     public ReportInputs {
+        ensureNonNull(dateRange, "dateRange");
         ensureNonEmpty(tenant, "tenant");
         ensureNonEmpty(owner, "owner");
         ensureNonBlank(reportPlace, "reportPlace");

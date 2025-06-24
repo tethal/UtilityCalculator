@@ -40,7 +40,7 @@ final class ParserUtils {
     static DateRange requireDateRange(TomlTable table, String startDateKey, String endDateKey) {
         LocalDate startDate = requireLocalDate(table, startDateKey);
         LocalDate endDate = requireLocalDate(table, endDateKey);
-        return new DateRange(startDate, endDate);
+        return DateRange.fromInclusive(startDate, endDate);
     }
 
     static String requireString(TomlTable table, String key) {
