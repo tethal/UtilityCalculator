@@ -26,8 +26,7 @@ public final class ReportGen {
                         .collect(Collectors.toList());
 
         return new Report(
-                reportInputs.startDate(),
-                reportInputs.endDate(),
+                reportInputs.dateRange(),
                 reportInputs.tenant(),
                 reportInputs.owner(),
                 reportInputs.reportPlace(),
