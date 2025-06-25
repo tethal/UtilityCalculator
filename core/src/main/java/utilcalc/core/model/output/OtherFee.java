@@ -1,15 +1,15 @@
 package utilcalc.core.model.output;
 
-import static utilcalc.core.utils.Util.ensureNonBlank;
-import static utilcalc.core.utils.Util.ensureNonNull;
+import static utilcalc.core.utils.Util.*;
 
 import java.math.BigDecimal;
+import utilcalc.core.model.DateRange;
 
 public record OtherFee(
-        String description, BigDecimal annualCost, BigDecimal monthCount, BigDecimal feeAmount) {
+        DateRange dateRange, BigDecimal monthlyCost, BigDecimal monthCount, BigDecimal feeAmount) {
     public OtherFee {
-        ensureNonBlank(description, "description");
-        ensureNonNull(annualCost, "annualCost");
+        ensureNonNull(dateRange, "dateRange");
+        ensureNonNull(monthlyCost, "monthlyCost");
         ensureNonNull(monthCount, "monthCount");
         ensureNonNull(feeAmount, "feeAmount");
     }

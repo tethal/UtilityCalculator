@@ -4,9 +4,9 @@ import static utilcalc.core.reportGen.DepositSectionGenerator.generateDepositSec
 import static utilcalc.core.reportGen.OtherFeeSectionGenerator.generateOtherFeeSection;
 import static utilcalc.core.utils.Util.ensureNonNull;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.DepositsSectionInputs;
 import utilcalc.core.model.input.OtherFeeInputs;
 import utilcalc.core.model.input.ReportInputs;
@@ -21,18 +21,16 @@ public final class ReportGen {
     public static Report generateReport(ReportInputs reportInputs) {
         ensureNonNull(reportInputs, "Report inputs");
 
+        DateRange reportDateRange = reportInputs.dateRange();
         List<SectionInputs> inputSections = reportInputs.sections();
 
         List<ReportSection> reportSections =
                 inputSections.stream()
-                        .map(
-                                sectionInputs ->
-                                        generateReportSection(
-                                                sectionInputs, reportStart, reportEnd))
+                        .map(sectionInputs -> generateReportSection(sectionInputs, reportDateRange))
                         .collect(Collectors.toList());
 
         return new Report(
-                reportInputs.dateRange(),
+                reportDateRange,
                 reportInputs.tenant(),
                 reportInputs.owner(),
                 reportInputs.reportPlace(),
@@ -42,11 +40,10 @@ public final class ReportGen {
     }
 
     private static ReportSection generateReportSection(
-            SectionInputs sectionInputs, LocalDate reportStart, LocalDate reportEnd) {
+            SectionInputs sectionInputs, DateRange reportDateRange) {
         return switch (sectionInputs) {
             case DepositsSectionInputs deposit -> generateDepositSection(deposit);
-            case OtherFeeInputs otherFee -> generateOtherFeeSection(
-                    otherFee, reportStart, reportEnd);
+            case OtherFeeInputs otherFee -> generateOtherFeeSection(reportDateRange, otherFee);
             default -> throw new IllegalStateException(
                     "Unexpected section: " + sectionInputs.name());
         };

@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
     public DateRange {
@@ -16,14 +17,26 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
         ensureValidDateRange(startDate, endDateExclusive);
 
         if (startDate.equals(endDateExclusive)) {
-            throw new IllegalArgumentException(
-                    "Open interval must not have same start and end date");
+            throw new IllegalArgumentException("Date range must not have same start and end date");
         }
     }
 
     public static DateRange fromInclusive(
             LocalDate startDateInclusive, LocalDate endDateInclusive) {
         return new DateRange(startDateInclusive, endDateInclusive.plusDays(1));
+    }
+
+    public Optional<DateRange> intersect(DateRange other) {
+        LocalDate otherStartDate = other.startDate;
+        LocalDate otherEndDate = other.endDateExclusive;
+
+        LocalDate overlapStart = otherStartDate.isAfter(startDate) ? otherStartDate : startDate;
+        LocalDate overlapEnd =
+                otherEndDate.isBefore(endDateExclusive) ? otherEndDate : endDateExclusive;
+
+        return overlapStart.isBefore(overlapEnd)
+                ? Optional.of(new DateRange(overlapStart, overlapEnd))
+                : Optional.empty();
     }
 
     public BigDecimal getMonthCount() {
