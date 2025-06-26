@@ -45,10 +45,7 @@ class DepositSectionGeneratorTest {
 
     @Test
     void payment_withInvalidCount_should_throw_illegalArgumentException() {
-        DepositsSectionInputs depositsSectionInputs =
-                new DepositsSectionInputs("deposits", List.of(invalidPaymentWithNegativeCount()));
-
-        assertThatThrownBy(() -> generateDepositSection(depositsSectionInputs))
+        assertThatThrownBy(() -> createDepositSection(invalidPaymentWithNegativeCount()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("count must not be a negative value");
     }
