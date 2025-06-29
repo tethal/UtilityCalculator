@@ -1,9 +1,12 @@
 package utilcalc.core.reportGen;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.ServiceCost;
 
@@ -25,6 +28,23 @@ final class ReportGenUtil {
         }
 
         return result;
+    }
+
+    static Map<YearMonth, ServiceCost> mapServiceCostsByMonth(List<ServiceCost> serviceCosts) {
+        return serviceCosts.stream()
+                .flatMap(
+                        cost -> {
+                            LocalDate start = cost.dateRange().startDate();
+                            LocalDate end = cost.dateRange().endDateExclusive().minusDays(1);
+                            List<YearMonth> months = new ArrayList<>();
+                            for (YearMonth ym = YearMonth.from(start);
+                                    !ym.isAfter(YearMonth.from(end));
+                                    ym = ym.plusMonths(1)) {
+                                months.add(ym);
+                            }
+                            return months.stream().map(m -> Map.entry(m, cost));
+                        })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private static void validateServiceCostCoverage(

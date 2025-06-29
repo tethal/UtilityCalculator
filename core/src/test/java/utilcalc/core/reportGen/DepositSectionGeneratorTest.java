@@ -3,37 +3,41 @@ package utilcalc.core.reportGen;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static utilcalc.core.reportGen.DepositSectionGenerator.generateDepositSection;
-import static utilcalc.core.reportGen.PaymentFactory.*;
+import static utilcalc.core.reportGen.TestDataFactory.createDepositSectionInput;
+import static utilcalc.core.reportGen.TestDataFactory.createPayment;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
-import utilcalc.core.model.input.DepositsSectionInputs;
 import utilcalc.core.model.input.Payment;
 import utilcalc.core.model.output.Deposit;
 import utilcalc.core.model.output.DepositSection;
 
 class DepositSectionGeneratorTest {
-    private final Payment payment1 = validPayment1();
-    private final Payment payment2 = validPayment2();
 
     @Test
     void depositSection_withOnePayment_should_haveCorrectNameAndSum() {
-        DepositSection depositSection = createDepositSection(payment1);
+        DepositSection depositSection =
+                generateDepositSection(
+                        createDepositSectionInput(createPayment("Leden - Červen", "6", "500")));
 
-        assertThat(depositSection.name()).isEqualTo("deposits");
+        assertThat(depositSection.name()).isEqualTo("Deposits");
         assertThat(depositSection.totalAmount()).isEqualTo("-3000");
     }
 
     @Test
     void depositSection_withOnePayment_should_haveCorrectDepositProperties() {
-        Deposit deposit = createDepositSection(payment1).deposits().getFirst();
+        Payment payment = createPayment("Leden - Červen", "6", "500");
+        DepositSection depositSection = generateDepositSection(createDepositSectionInput(payment));
+        Deposit deposit = depositSection.deposits().getFirst();
 
-        assertDepositMatchesPayment(deposit, payment1, "3000");
+        assertDepositMatchesPayment(deposit, payment, "3000");
     }
 
     @Test
     void depositSection_withMultiplePayments_should_haveCorrectDepositsProperties() {
-        DepositSection depositSection = createDepositSection(payment1, payment2);
+        Payment payment1 = createPayment("Leden - Červen", "6", "500");
+        Payment payment2 = createPayment("Červenec - Září", "4", "600");
+        DepositSection depositSection =
+                generateDepositSection(createDepositSectionInput(payment1, payment2));
         Deposit deposit1 = depositSection.deposits().getFirst();
         Deposit deposit2 = depositSection.deposits().get(1);
 
@@ -45,7 +49,11 @@ class DepositSectionGeneratorTest {
 
     @Test
     void payment_withInvalidCount_should_throw_illegalArgumentException() {
-        assertThatThrownBy(() -> createDepositSection(invalidPaymentWithNegativeCount()))
+        assertThatThrownBy(
+                        () ->
+                                generateDepositSection(
+                                        createDepositSectionInput(
+                                                createPayment("Leden - Červen", "-6", "200"))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("count must not be a negative value");
     }
@@ -57,9 +65,5 @@ class DepositSectionGeneratorTest {
         assertThat(deposit.count()).isEqualTo(payment.count());
         assertThat(deposit.unitAmount()).isEqualTo(payment.unitAmount());
         assertThat(deposit.amount()).isEqualTo(expectedAmount);
-    }
-
-    private DepositSection createDepositSection(Payment... payments) {
-        return generateDepositSection(new DepositsSectionInputs("deposits", List.of(payments)));
     }
 }
