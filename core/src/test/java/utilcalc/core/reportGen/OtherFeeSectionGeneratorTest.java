@@ -3,14 +3,11 @@ package utilcalc.core.reportGen;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static utilcalc.core.reportGen.OtherFeeSectionGenerator.generateOtherFeeSection;
+import static utilcalc.core.reportGen.TestDataFactory.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.OtherFeeInputs;
-import utilcalc.core.model.input.ServiceCost;
 import utilcalc.core.model.output.OtherFee;
 import utilcalc.core.model.output.OtherFeeSection;
 
@@ -177,17 +174,5 @@ class OtherFeeSectionGeneratorTest {
                         "ServiceCosts do not connect seamlessly or they overlap: "
                                 + "ServiceCost[dateRange=DateRange[startDate=2024-01-01, endDateExclusive=2024-12-15], annualCost=8775] and "
                                 + "ServiceCost[dateRange=DateRange[startDate=2025-01-01, endDateExclusive=2026-01-01], annualCost=8000]");
-    }
-
-    private static OtherFeeInputs createOtherFeeInputs(ServiceCost... serviceCosts) {
-        return new OtherFeeInputs("Other fees", List.of(serviceCosts));
-    }
-
-    private static ServiceCost createServiceCost(DateRange dateRange, String annualCost) {
-        return new ServiceCost(dateRange, new BigDecimal(annualCost));
-    }
-
-    private static DateRange createDateRange(String start, String end) {
-        return new DateRange(LocalDate.parse(start), LocalDate.parse(end));
     }
 }

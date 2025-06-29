@@ -8,6 +8,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
@@ -40,27 +42,39 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
     }
 
     public BigDecimal getMonthCount() {
+        return splitIntoMonthFractions().values().stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(10, RoundingMode.HALF_UP);
+    }
+
+    public Map<YearMonth, BigDecimal> getCountsByMonth() {
+        return splitIntoMonthFractions();
+    }
+
+    private Map<YearMonth, BigDecimal> splitIntoMonthFractions() {
+        Map<YearMonth, BigDecimal> result = new HashMap<>();
         YearMonth startMonth = YearMonth.from(startDate);
         YearMonth endMonth = YearMonth.from(endDateExclusive);
 
         if (startMonth.equals(endMonth)) {
-            return calculateDaysInMonthFraction(startDate, endDateExclusive);
+            result.put(startMonth, calculateDaysInMonthFraction(startDate, endDateExclusive));
+            return result;
         }
 
         LocalDate startMonthEnd = startMonth.atEndOfMonth().plusDays(1);
-        BigDecimal partialStart = calculateDaysInMonthFraction(startDate, startMonthEnd);
+        result.put(startMonth, calculateDaysInMonthFraction(startDate, startMonthEnd));
 
-        LocalDate endMonthStart = endMonth.atDay(1);
-        BigDecimal partialEnd = calculateDaysInMonthFraction(endMonthStart, endDateExclusive);
+        YearMonth current = startMonth.plusMonths(1);
+        while (current.isBefore(endMonth)) {
+            result.put(current, BigDecimal.ONE);
+            current = current.plusMonths(1);
+        }
 
-        long fullMonths =
-                ChronoUnit.MONTHS.between(
-                        YearMonth.from(startMonthEnd), YearMonth.from(endMonthStart));
+        if (!endDateExclusive.equals(endMonth.atDay(1))) {
+            result.put(endMonth, calculateDaysInMonthFraction(endMonth.atDay(1), endDateExclusive));
+        }
 
-        return BigDecimal.valueOf(fullMonths)
-                .add(partialStart)
-                .add(partialEnd)
-                .setScale(10, RoundingMode.HALF_UP);
+        return result;
     }
 
     private static BigDecimal calculateDaysInMonthFraction(LocalDate from, LocalDate toExclusive) {
