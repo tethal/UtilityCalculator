@@ -61,8 +61,13 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
             return result;
         }
 
-        LocalDate startMonthEnd = startMonth.atEndOfMonth().plusDays(1);
-        result.put(startMonth, calculateDaysInMonthFraction(startDate, startMonthEnd));
+        BigDecimal firstMonthCount =
+                startDate.equals(startMonth.atDay(1))
+                        ? BigDecimal.ONE
+                        : calculateDaysInMonthFraction(
+                                startDate, startMonth.atEndOfMonth().plusDays(1));
+
+        result.put(startMonth, firstMonthCount);
 
         YearMonth current = startMonth.plusMonths(1);
         while (current.isBefore(endMonth)) {

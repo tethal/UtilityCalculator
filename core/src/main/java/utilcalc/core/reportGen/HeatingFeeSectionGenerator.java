@@ -71,16 +71,9 @@ final class HeatingFeeSectionGenerator {
         YearMonth endYm = YearMonth.from(reportDateRange.endDateExclusive().minusDays(1));
 
         while (!ym.isAfter(endYm)) {
-            final YearMonth finalYm = ym;
-
-            ServiceCost cost =
-                    Optional.ofNullable(serviceCostsByMonth.get(ym))
-                            .orElseThrow(
-                                    () ->
-                                            new NoSuchElementException(
-                                                    "No ServiceCost for " + finalYm));
-
+            ServiceCost cost = serviceCostsByMonth.get(ym);
             BigDecimal monthCount = countsByMonth.get(ym);
+
             heatingFees.add(calculateHeatingFee(ym, monthCount, cost));
             ym = ym.plusMonths(1);
         }
