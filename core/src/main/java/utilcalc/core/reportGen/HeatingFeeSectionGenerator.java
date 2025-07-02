@@ -41,10 +41,17 @@ final class HeatingFeeSectionGenerator {
         List<ServiceCost> partialServiceCost =
                 splitServiceCostsByReport(reportDateRange, heatingFeeInputs.heatingFees());
 
-        Map<YearMonth, BigDecimal> countsByMonth = calculateCountsByMonth(partialServiceCost);
-        Map<YearMonth, ServiceCost> serviceCostByMonth = mapServiceCostsByMonth(partialServiceCost);
+        List<ServiceCost> monthlyServiceCost = splitServiceCostsByMonths(partialServiceCost);
+
         List<HeatingFee> heatingFees =
-                generateHeatingFees(reportDateRange, countsByMonth, serviceCostByMonth);
+                monthlyServiceCost.stream()
+                        .map(
+                                serviceCost ->
+                                        calculateHeatingFee(
+                                                YearMonth.from(serviceCost.dateRange().startDate()),
+                                                serviceCost.dateRange().getMonthCount(),
+                                                serviceCost.annualCost()))
+                        .collect(Collectors.toList());
 
         BigDecimal totalAmount =
                 heatingFees.stream()
@@ -54,37 +61,9 @@ final class HeatingFeeSectionGenerator {
         return new HeatingFeeSection(name, totalAmount, heatingFees);
     }
 
-    private static Map<YearMonth, BigDecimal> calculateCountsByMonth(List<ServiceCost> costs) {
-        return costs.stream()
-                .map(c -> c.dateRange().getCountsByMonth())
-                .flatMap(m -> m.entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, BigDecimal::add));
-    }
-
-    private static List<HeatingFee> generateHeatingFees(
-            DateRange reportDateRange,
-            Map<YearMonth, BigDecimal> countsByMonth,
-            Map<YearMonth, ServiceCost> serviceCostsByMonth) {
-
-        List<HeatingFee> heatingFees = new ArrayList<>();
-        YearMonth ym = YearMonth.from(reportDateRange.startDate());
-        YearMonth endYm = YearMonth.from(reportDateRange.endDateExclusive().minusDays(1));
-
-        while (!ym.isAfter(endYm)) {
-            ServiceCost cost = serviceCostsByMonth.get(ym);
-            BigDecimal monthCount = countsByMonth.get(ym);
-
-            heatingFees.add(calculateHeatingFee(ym, monthCount, cost));
-            ym = ym.plusMonths(1);
-        }
-
-        return heatingFees;
-    }
-
     private static HeatingFee calculateHeatingFee(
-            YearMonth yearMonth, BigDecimal monthCount, ServiceCost serviceCost) {
+            YearMonth yearMonth, BigDecimal monthCount, BigDecimal annualCost) {
         int displayDecimalPlaces = 2;
-        BigDecimal annualCost = serviceCost.annualCost();
         BigDecimal coefficient = COEFFICIENTS.get(yearMonth.getMonth());
         BigDecimal feeAmount =
                 annualCost

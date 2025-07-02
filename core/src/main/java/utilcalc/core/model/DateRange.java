@@ -8,9 +8,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
     public DateRange {
@@ -42,22 +40,12 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
     }
 
     public BigDecimal getMonthCount() {
-        return splitIntoMonthFractions().values().stream()
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(10, RoundingMode.HALF_UP);
-    }
-
-    public Map<YearMonth, BigDecimal> getCountsByMonth() {
-        return splitIntoMonthFractions();
-    }
-
-    private Map<YearMonth, BigDecimal> splitIntoMonthFractions() {
-        Map<YearMonth, BigDecimal> result = new HashMap<>();
         YearMonth startMonth = YearMonth.from(startDate);
         YearMonth endMonth = YearMonth.from(endDateExclusive);
+        BigDecimal result = BigDecimal.ZERO;
 
         if (startMonth.equals(endMonth)) {
-            result.put(startMonth, calculateDaysInMonthFraction(startDate, endDateExclusive));
+            result = result.add(calculateDaysInMonthFraction(startDate, endDateExclusive));
             return result;
         }
 
@@ -67,16 +55,33 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
                         : calculateDaysInMonthFraction(
                                 startDate, startMonth.atEndOfMonth().plusDays(1));
 
-        result.put(startMonth, firstMonthCount);
+        result = result.add(firstMonthCount);
 
         YearMonth current = startMonth.plusMonths(1);
         while (current.isBefore(endMonth)) {
-            result.put(current, BigDecimal.ONE);
+            result = result.add(BigDecimal.ONE);
             current = current.plusMonths(1);
         }
 
         if (!endDateExclusive.equals(endMonth.atDay(1))) {
-            result.put(endMonth, calculateDaysInMonthFraction(endMonth.atDay(1), endDateExclusive));
+            result = result.add(calculateDaysInMonthFraction(endMonth.atDay(1), endDateExclusive));
+        }
+
+        return result;
+    }
+
+    public List<DateRange> splitByMonths() {
+        List<DateRange> result = new ArrayList<>();
+        LocalDate currentStart = startDate;
+
+        while (currentStart.isBefore(endDateExclusive)) {
+            YearMonth currentYM = YearMonth.from(currentStart);
+            LocalDate monthEnd = currentYM.plusMonths(1).atDay(1);
+            LocalDate currentEnd =
+                    monthEnd.isBefore(endDateExclusive) ? monthEnd : endDateExclusive;
+
+            result.add(new DateRange(currentStart, currentEnd));
+            currentStart = currentEnd;
         }
 
         return result;
