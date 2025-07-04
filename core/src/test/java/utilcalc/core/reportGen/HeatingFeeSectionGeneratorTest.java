@@ -1,6 +1,8 @@
 package utilcalc.core.reportGen;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static utilcalc.core.reportGen.HeatingFeeSectionGenerator.calculateHeatingFee;
 import static utilcalc.core.reportGen.HeatingFeeSectionGenerator.generateHeatingFeeSection;
 import static utilcalc.core.reportGen.TestDataFactory.*;
 
@@ -115,6 +117,55 @@ public class HeatingFeeSectionGeneratorTest {
     }
 
     @Test
+    void heatingFee_withTwoServiceCostsSplittingMonth_should_haveCorrectHeatingFeeProperties() {
+        DateRange heatingFee1DateRange = createDateRange("2024-01-01", "2024-06-15");
+        DateRange heatingFee2DateRange = createDateRange("2024-06-15", "2025-01-01");
+
+        HeatingFeeSection heatingFeeSection =
+                generateHeatingFeeSection(
+                        createDateRange("2024-01-01", "2025-01-01"),
+                        createHeatingFeeInputs(
+                                createServiceCost(heatingFee1DateRange, "8772"),
+                                createServiceCost(heatingFee2DateRange, "8000")));
+
+        assertThat(heatingFeeSection.name()).isEqualTo("Heating fees");
+        assertThat(heatingFeeSection.totalAmount()).isEqualTo("8463.20");
+        assertThat(heatingFeeSection.fees()).hasSize(13);
+
+        List<ExpectedFee> expectedFees =
+                List.of(
+                        new ExpectedFee("2024-01", "0.19", "1666.68", "8772"),
+                        new ExpectedFee("2024-02", "0.16", "1403.52", "8772"),
+                        new ExpectedFee("2024-03", "0.14", "1228.08", "8772"),
+                        new ExpectedFee("2024-04", "0.09", "789.48", "8772"),
+                        new ExpectedFee("2024-05", "0.02", "175.44", "8772"),
+                        new ExpectedFee("2024-06", "0.0", "0.00", "8772"),
+                        new ExpectedFee("2024-06", "0.0", "0.00", "8000"),
+                        new ExpectedFee("2024-07", "0.0", "0.00", "8000"),
+                        new ExpectedFee("2024-08", "0.0", "0.00", "8000"),
+                        new ExpectedFee("2024-09", "0.01", "80.00", "8000"),
+                        new ExpectedFee("2024-10", "0.08", "640.00", "8000"),
+                        new ExpectedFee("2024-11", "0.14", "1120.00", "8000"),
+                        new ExpectedFee("2024-12", "0.17", "1360.00", "8000"));
+
+        List<HeatingFee> actualFees = heatingFeeSection.fees();
+
+        assertThat(actualFees).hasSize(expectedFees.size());
+
+        for (int i = 0; i < expectedFees.size(); i++) {
+            HeatingFee actual = actualFees.get(i);
+            ExpectedFee expected = expectedFees.get(i);
+
+            assertThat(actualFees.get(5).monthCount()).isEqualTo("0.47");
+            assertThat(actualFees.get(6).monthCount()).isEqualTo("0.53");
+            assertThat(actual.yearMonth()).isEqualTo(expected.month);
+            assertThat(actual.annualCost()).isEqualTo(expected.annualCost);
+            assertThat(actual.coefficient()).isEqualTo(expected.coefficient);
+            assertThat(actual.feeAmount()).isEqualTo(expected.feeAmount);
+        }
+    }
+
+    @Test
     void heatingFee_withPartialMonthReportDateRange_should_haveCorrectHeatingFeeProperties() {
         DateRange heatingFeeSectionDateRange = createDateRange("2024-01-15", "2024-01-25");
 
@@ -135,6 +186,17 @@ public class HeatingFeeSectionGeneratorTest {
         assertThat(heatingFee.annualCost()).isEqualTo("8772");
         assertThat(heatingFee.coefficient()).isEqualTo("0.19");
         assertThat(heatingFee.feeAmount()).isEqualTo("537.64");
+    }
+
+    @Test
+    void multipleMonthServiceCost_should_throw_illegalArgumentException() {
+        assertThatThrownBy(
+                        () ->
+                                calculateHeatingFee(
+                                        createServiceCost(
+                                                createDateRange("2024-01-01", "2024-02-02"),
+                                                "8000")))
+                .hasMessage("Date range of service cost must be within a single month");
     }
 
     record ExpectedFee(String month, String coefficient, String feeAmount, String annualCost) {}

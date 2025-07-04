@@ -4,10 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -87,66 +84,6 @@ public class DateRangeTest {
     void oneDayInterval_should_haveCorrectMonthCount() {
         assertThat(createInterval("2024-01-01", "2024-01-02").getMonthCount())
                 .isEqualTo("0.0322580645");
-    }
-
-    @Test
-    void full2024Interval_should_haveCorrectCountsByMonth() {
-        Map<YearMonth, BigDecimal> countsByMonth =
-                Map.ofEntries(
-                        Map.entry(YearMonth.parse("2024-01"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-02"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-03"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-04"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-05"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-06"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-07"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-08"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-09"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-10"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-11"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-12"), BigDecimal.ONE));
-
-        assertThat(createInterval("2024-01-01", "2025-01-01").getCountsByMonth())
-                .isEqualTo(countsByMonth);
-    }
-
-    @Test
-    void partialMonthInterval_should_haveCorrectCountsByMonth() {
-        Map<YearMonth, BigDecimal> countsByMonth =
-                Map.ofEntries(
-                        Map.entry(YearMonth.parse("2024-01"), new BigDecimal("0.3225806452")));
-        assertThat(createInterval("2024-01-15", "2024-01-25").getCountsByMonth())
-                .isEqualTo(countsByMonth);
-    }
-
-    @Test
-    void twoPartialMonthsInterval_should_haveCorrectCountsByMonth() {
-        Map<YearMonth, BigDecimal> countsByMonth =
-                Map.ofEntries(
-                        Map.entry(YearMonth.parse("2024-01"), new BigDecimal("0.5483870968")),
-                        Map.entry(YearMonth.parse("2024-02"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-03"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-04"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-05"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-06"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-07"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-08"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-09"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-10"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-11"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2024-12"), BigDecimal.ONE),
-                        Map.entry(YearMonth.parse("2025-01"), new BigDecimal("0.4516129032")));
-        assertThat(createInterval("2024-01-15", "2025-01-15").getCountsByMonth())
-                .isEqualTo(countsByMonth);
-    }
-
-    @Test
-    void oneDayInterval_should_haveCorrectCountsByMonth() {
-        Map<YearMonth, BigDecimal> countsByMonth =
-                Map.ofEntries(
-                        Map.entry(YearMonth.parse("2024-01"), new BigDecimal("0.0322580645")));
-        assertThat(createInterval("2024-01-01", "2024-01-02").getCountsByMonth())
-                .isEqualTo(countsByMonth);
     }
 
     @Test
