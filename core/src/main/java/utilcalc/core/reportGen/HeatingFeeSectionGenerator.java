@@ -45,12 +45,7 @@ final class HeatingFeeSectionGenerator {
 
         List<HeatingFee> heatingFees =
                 monthlyServiceCost.stream()
-                        .map(
-                                serviceCost ->
-                                        calculateHeatingFee(
-                                                YearMonth.from(serviceCost.dateRange().startDate()),
-                                                serviceCost.dateRange().getMonthCount(),
-                                                serviceCost.annualCost()))
+                        .map(HeatingFeeSectionGenerator::calculateHeatingFee)
                         .collect(Collectors.toList());
 
         BigDecimal totalAmount =
@@ -61,9 +56,18 @@ final class HeatingFeeSectionGenerator {
         return new HeatingFeeSection(name, totalAmount, heatingFees);
     }
 
-    private static HeatingFee calculateHeatingFee(
-            YearMonth yearMonth, BigDecimal monthCount, BigDecimal annualCost) {
+    static HeatingFee calculateHeatingFee(ServiceCost serviceCost) {
+        DateRange serviceCostDateRange = serviceCost.dateRange();
+        if (!serviceCostDateRange.isSingleMonth()) {
+            throw new IllegalArgumentException(
+                    "Date range of service cost must be within a single month");
+        }
+
         int displayDecimalPlaces = 2;
+        BigDecimal monthCount = serviceCost.dateRange().getMonthCount();
+        BigDecimal annualCost = serviceCost.annualCost();
+        YearMonth yearMonth = YearMonth.from(serviceCost.dateRange().startDate());
+
         BigDecimal coefficient = COEFFICIENTS.get(yearMonth.getMonth());
         BigDecimal feeAmount =
                 annualCost

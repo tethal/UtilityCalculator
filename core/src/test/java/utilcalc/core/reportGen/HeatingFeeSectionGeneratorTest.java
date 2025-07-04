@@ -1,6 +1,8 @@
 package utilcalc.core.reportGen;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static utilcalc.core.reportGen.HeatingFeeSectionGenerator.calculateHeatingFee;
 import static utilcalc.core.reportGen.HeatingFeeSectionGenerator.generateHeatingFeeSection;
 import static utilcalc.core.reportGen.TestDataFactory.*;
 
@@ -184,6 +186,17 @@ public class HeatingFeeSectionGeneratorTest {
         assertThat(heatingFee.annualCost()).isEqualTo("8772");
         assertThat(heatingFee.coefficient()).isEqualTo("0.19");
         assertThat(heatingFee.feeAmount()).isEqualTo("537.64");
+    }
+
+    @Test
+    void multipleMonthServiceCost_should_throw_illegalArgumentException() {
+        assertThatThrownBy(
+                        () ->
+                                calculateHeatingFee(
+                                        createServiceCost(
+                                                createDateRange("2024-01-01", "2024-02-02"),
+                                                "8000")))
+                .hasMessage("Date range of service cost must be within a single month");
     }
 
     record ExpectedFee(String month, String coefficient, String feeAmount, String annualCost) {}

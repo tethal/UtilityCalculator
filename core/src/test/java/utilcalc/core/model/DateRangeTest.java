@@ -64,7 +64,8 @@ public class DateRangeTest {
 
     @Test
     void full2024Interval_should_haveCorrectMonthCount() {
-        assertThat(createInterval("2024-01-01", "2025-01-01").getMonthCount()).isEqualTo("12");
+        assertThat(createInterval("2024-01-01", "2025-01-01").getMonthCount())
+                .isEqualTo("12.0000000000");
     }
 
     @Test
