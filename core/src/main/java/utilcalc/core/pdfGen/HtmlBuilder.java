@@ -16,6 +16,9 @@ public final class HtmlBuilder {
                     h1 { font-size: 20pt; }
                     p { font-size: 12pt; margin: 4pt 0; }
                     .italic { font-style: italic; font-size: 10pt; }
+                    .indent-10 { margin-left: 10pt; }
+                    .indent-20 { margin-left: 20pt; }
+                    .indent-30 { margin-left: 30pt; }
                 </style>
             </head>
             <body>
@@ -38,16 +41,11 @@ public final class HtmlBuilder {
     }
 
     public HtmlBuilder pItalicIndented(String text, int indentPx) {
-        sb.append("<p class=\"italic\" style=\"margin-left:")
+        sb.append("<p class=\"italic indent-")
                 .append(indentPx)
                 .append("pt;\">")
                 .append(escape(text))
                 .append("</p>\n");
-        return this;
-    }
-
-    public HtmlBuilder raw(String rawHtml) {
-        sb.append(rawHtml);
         return this;
     }
 

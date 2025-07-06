@@ -1,9 +1,3 @@
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-    }
-}
 rootProject.name = 'UtilityCalculator'
 
 include 'core'

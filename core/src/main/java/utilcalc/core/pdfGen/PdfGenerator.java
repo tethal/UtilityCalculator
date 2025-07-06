@@ -1,54 +1,47 @@
 package utilcalc.core.pdfGen;
 
+import com.lowagie.text.pdf.BaseFont;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.utils.ReportFormatter;
-import com.lowagie.text.pdf.BaseFont;
 
 public final class PdfGenerator {
 
     private PdfGenerator() {}
 
     public static byte[] generatePdf(Report report) throws IOException {
+        String htmlContent = buildHtml(report);
+
+        ITextRenderer renderer = new ITextRenderer();
+        registerFonts(renderer);
+
+        renderer.setDocumentFromString(htmlContent);
+        renderer.layout();
+
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            String htmlContent = buildHtml(report);
-
-            ITextRenderer renderer = new ITextRenderer();
-            registerFonts(renderer);
-
-            renderer.setDocumentFromString(htmlContent);
-            renderer.layout();
             renderer.createPDF(outputStream);
-
             return outputStream.toByteArray();
-        } catch (Exception e) {
-            throw new IOException("Failed to generate PDF", e);
         }
     }
 
     private static void registerFonts(ITextRenderer renderer) throws IOException {
-        try (InputStream fontStream = PdfGenerator.class.getResourceAsStream("/fonts/DejaVuSans.ttf")) {
+        try (InputStream fontStream =
+                PdfGenerator.class.getResourceAsStream("/fonts/DejaVuSans.ttf")) {
             if (fontStream == null) {
-                throw new IOException("Font DejaVuSans.ttf nebyl nalezen v resources.");
+                throw new IOException("Font DejaVuSans.ttf not found in resources.");
             }
 
             File tempFontFile = File.createTempFile("dejavusans", ".ttf");
             tempFontFile.deleteOnExit();
 
-            try (FileOutputStream out = new FileOutputStream(tempFontFile)) {
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = fontStream.read(buffer)) != -1) {
-                    out.write(buffer, 0, length);
-                }
-            }
+            Files.copy(fontStream, tempFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            renderer.getFontResolver().addFont(
-                    tempFontFile.getAbsolutePath(),
-                    BaseFont.IDENTITY_H,
-                    BaseFont.EMBEDDED
-            );
+            renderer.getFontResolver()
+                    .addFont(
+                            tempFontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         }
     }
 
