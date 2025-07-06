@@ -4,7 +4,7 @@ import com.lowagie.text.pdf.BaseFont;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.openpdf.pdf.ITextRenderer;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.utils.ReportFormatter;
 
@@ -17,7 +17,6 @@ public final class PdfGenerator {
 
         ITextRenderer renderer = new ITextRenderer();
         registerFonts(renderer);
-
         renderer.setDocumentFromString(htmlContent);
         renderer.layout();
 
