@@ -27,13 +27,14 @@ public final class PdfGenerator {
     }
 
     private static void registerFonts(ITextRenderer renderer) throws IOException {
-        try (InputStream fontStream =
-                PdfGenerator.class.getResourceAsStream("/fonts/DejaVuSans.ttf")) {
+        String fontResourcePath = "/liberation/LiberationSans-Regular.ttf";
+
+        try (InputStream fontStream = PdfGenerator.class.getResourceAsStream(fontResourcePath)) {
             if (fontStream == null) {
-                throw new IOException("Font DejaVuSans.ttf not found in resources.");
+                throw new IOException("Font " + fontResourcePath + " not found in classpath.");
             }
 
-            File tempFontFile = File.createTempFile("dejavusans", ".ttf");
+            File tempFontFile = File.createTempFile("liberationsans", ".ttf");
             tempFontFile.deleteOnExit();
 
             Files.copy(fontStream, tempFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

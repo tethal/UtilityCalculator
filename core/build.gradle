@@ -3,6 +3,7 @@ dependencies {
 
     implementation 'com.github.librepdf:openpdf:2.2.3'
     implementation 'com.github.librepdf:openpdf-html:2.2.3'
+    implementation 'com.github.librepdf:openpdf-fonts-extra:2.2.3'
     implementation 'org.slf4j:slf4j-api:2.0.16'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
