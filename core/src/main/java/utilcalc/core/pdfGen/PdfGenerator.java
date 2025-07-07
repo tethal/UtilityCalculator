@@ -50,7 +50,7 @@ public final class PdfGenerator {
         HtmlBuilder html = new HtmlBuilder();
 
         html.h1("Vyúčtování poplatků za služby a energie")
-                .p("Období: " + formatter.formatPeriod(report.startDate(), report.endDate()));
+                .p("Období: " + formatter.formatPeriod(report.dateRange()));
 
         for (String line : report.tenant()) {
             html.p(line);

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.*;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.reportGen.ReportGen;
@@ -30,10 +31,12 @@ class PdfGeneratorTest {
                                         BigDecimal.valueOf(2),
                                         BigDecimal.valueOf(250))));
 
+        DateRange dateRange =
+                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31));
+
         ReportInputs inputs =
                 new ReportInputs(
-                        LocalDate.of(2024, 1, 1),
-                        LocalDate.of(2024, 12, 31),
+                        dateRange,
                         List.of("Jan Nájemník"),
                         List.of("Karel Vlastník"),
                         "Praha",
