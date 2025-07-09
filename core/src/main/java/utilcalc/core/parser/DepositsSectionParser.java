@@ -12,6 +12,7 @@ import org.tomlj.TomlTable;
 import utilcalc.core.model.input.DepositsSectionInputs;
 import utilcalc.core.model.input.Payment;
 import utilcalc.core.model.input.SectionInputs;
+import utilcalc.core.utils.Util;
 
 class DepositsSectionParser {
 
@@ -26,7 +27,8 @@ class DepositsSectionParser {
 
     private static final Set<String> SECTION_KNOWN_FIELDS = Set.of(DESCRIPTION, COUNT, AMOUNT);
 
-    static SectionInputs parse(TomlArray depositPayments) {
+    static SectionInputs parse(Object untypedDepositPayments) {
+        TomlArray depositPayments = Util.castOrThrow(untypedDepositPayments, TomlArray.class);
         List<Payment> payments =
                 IntStream.range(0, depositPayments.size())
                         .mapToObj(depositPayments::getTable)
