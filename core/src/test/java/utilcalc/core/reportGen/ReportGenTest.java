@@ -7,6 +7,7 @@ import static utilcalc.core.reportGen.TestDataFactory.*;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import utilcalc.core.model.input.MeterReading;
 import utilcalc.core.model.input.ReportInputs;
 import utilcalc.core.model.input.SectionInputs;
 import utilcalc.core.model.input.ServiceCost;
@@ -99,6 +100,29 @@ class ReportGenTest {
 
         assertThat(report.sections().getFirst().name()).isEqualTo("Heating fees");
         assertThat(report.sections().getFirst().totalAmount()).isEqualTo("8772.00");
+    }
+
+    @Test
+    void valid_ColdWaterSectionInputs_should_generate_valid_ColdWaterSection() {
+        MeterReading meterReading1 = createMeterReading("1", "2024-01-01", "100");
+        MeterReading meterReading2 = createMeterReading("1", "2024-06-01", "150");
+        MeterReading meterReading3 = createMeterReading("1", "2025-01-01", "60");
+
+        ReportInputs reportInputs =
+                validReportInputWithSections(
+                        createColdWaterSectionInputs(
+                                List.of(
+                                        createWaterTariff(
+                                                createDateRange("2024-01-01", "2024-05-01"), "90"),
+                                        createWaterTariff(
+                                                createDateRange("2024-05-01", "2025-01-01"),
+                                                "100")),
+                                List.of(meterReading1, meterReading2, meterReading3)));
+
+        Report report = generateReport(reportInputs);
+
+        assertThat(report.sections().getFirst().name()).isEqualTo("Cold water");
+        assertThat(report.sections().getFirst().totalAmount()).isEqualTo("10600.00");
     }
 
     private record InvalidSectionInput(String name, List<ServiceCost> serviceCosts)
