@@ -23,7 +23,7 @@ class ParserTest {
         assertThat(inputs.reportPlace()).isEqualTo("V Praze");
         assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2025, 5, 20));
         assertThat(inputs.sources()).containsExactly("vyúčtování SVJ za rok 2024");
-        assertThat(inputs.sections()).hasSize(3);
+        assertThat(inputs.sections()).hasSize(4);
 
         DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
         assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
@@ -61,6 +61,25 @@ class ParserTest {
                         new ServiceCost(
                                 new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
                                 BigDecimal.valueOf(3200)));
+
+        ColdWaterSectionInputs coldWater = (ColdWaterSectionInputs) inputs.sections().get(3);
+        assertThat(coldWater.name()).isEqualTo("Studená voda");
+        assertThat(coldWater.readings())
+                .hasSize(3)
+                .containsExactly(
+                        new MeterReading(
+                                "1", LocalDate.of(2021, 10, 14), BigDecimal.valueOf(184.4)),
+                        new MeterReading("2", LocalDate.of(2021, 12, 31), BigDecimal.valueOf(8.6)),
+                        new MeterReading("2", LocalDate.of(2022, 4, 30), BigDecimal.valueOf(21)));
+        assertThat(coldWater.priceList())
+                .hasSize(2)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                BigDecimal.valueOf(103.4076)),
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                BigDecimal.valueOf(108.13)));
     }
 
     @Test
@@ -97,6 +116,14 @@ class ParserTest {
         "missing_annual_cost_other_fees_section,Missing required bigDecimal field: annual_cost",
         "missing_start_date_other_fees_section,Missing required date field: start_date",
         "missing_end_date_other_fees_section,Missing required date field: end_date",
+        "missing_meter_id_cold_water_reading_section,Missing required string field: meter_id",
+        "missing_reading_date_cold_water_reading_section,Missing required date field: reading_date",
+        "missing_state_cold_water_reading_section,Missing required bigDecimal field: state",
+        "missing_start_date_cold_water_tariff_section,Missing required date field: start_date",
+        "missing_end_date_cold_water_tariff_section,Missing required date field: end_date",
+        "missing_unit_amount_cold_water_tariff_section,Missing required bigDecimal field: unit_amount",
+        "missing_tariff_array_cold_water_section,Missing required array field: tariff",
+        "missing_reading_array_cold_water_section,Missing required array field: reading"
     })
     @ParameterizedTest
     void missing_required_field_should_throw_ParsingException(String textCase, String message) {
@@ -136,6 +163,12 @@ class ParserTest {
         "wrong_data_type_annual_cost_other_fees_section,Invalid data type: Value of 'annual_cost' is a string",
         "wrong_data_type_start_date_other_fees_section,Invalid data type: Value of 'start_date' is a string",
         "wrong_data_type_end_date_other_fees_section,Invalid data type: Value of 'end_date' is a string",
+        "wrong_data_type_meter_id_cold_water_reading_section,Invalid data type: Value of 'meter_id' is a integer",
+        "wrong_data_type_reading_date_cold_water_reading_section,Invalid data type: Value of 'reading_date' is a integer",
+        "wrong_data_type_state_cold_water_reading_section,Invalid data type: Value of 'state' is a local date",
+        "wrong_data_type_start_date_cold_water_tariff_section,Invalid data type: Value of 'start_date' is a integer",
+        "wrong_data_type_end_date_cold_water_tariff_section,Invalid data type: Value of 'end_date' is a string",
+        "wrong_data_type_unit_amount_cold_water_tariff_section,Invalid data type: Value of 'unit_amount' is a local date"
     })
     @ParameterizedTest
     void invalid_field_data_type_should_throw_ParsingException(String textCase, String message) {

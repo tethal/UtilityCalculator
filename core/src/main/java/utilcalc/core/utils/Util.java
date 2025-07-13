@@ -46,4 +46,15 @@ public final class Util {
             throw new IllegalArgumentException(name + " must not be a negative value");
         }
     }
+
+    public static <T> T castOrThrow(Object object, Class<T> clazz) {
+        if (clazz.isInstance(object)) {
+            return clazz.cast(object);
+        }
+        throw new IllegalArgumentException(
+                "Expected type "
+                        + clazz.getSimpleName()
+                        + ", but got: "
+                        + (object == null ? "null" : object.getClass().getSimpleName()));
+    }
 }

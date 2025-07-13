@@ -40,3 +40,28 @@ annual_cost = 3000
 start_date = 2022-01-01
 end_date = 2022-12-31
 annual_cost = 3200
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2021-10-14
+state = 184.4
+
+[[cold_water.reading]]
+meter_id = "2"
+reading_date = 2021-12-31
+state = 8.6
+
+[[cold_water.reading]]
+meter_id = "2"
+reading_date = 2022-04-30
+state = 21
+
+[[cold_water.tariff]]
+start_date = 2021-01-01
+end_date = 2021-12-31
+unit_amount = 103.4076
+
+[[cold_water.tariff]]
+start_date = 2022-01-01
+end_date = 2022-12-31
+unit_amount = 108.13
