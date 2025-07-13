@@ -1,14 +1,20 @@
 package utilcalc.core.model.output;
 
-import utilcalc.core.model.DateRange;
-
-import java.math.BigDecimal;
-
+import static utilcalc.core.utils.Util.ensureNonBlank;
 import static utilcalc.core.utils.Util.ensureNonNull;
 
-public record ColdWaterReading(DateRange dateRange, BigDecimal startState, BigDecimal endState, BigDecimal consumption) {
+import java.math.BigDecimal;
+import utilcalc.core.model.DateRange;
+
+public record ColdWaterReading(
+        DateRange dateRange,
+        String meterId,
+        BigDecimal startState,
+        BigDecimal endState,
+        BigDecimal consumption) {
     public ColdWaterReading {
         ensureNonNull(dateRange, "dateRange");
+        ensureNonBlank(meterId, "meterId");
         ensureNonNull(startState, "startState");
         ensureNonNull(endState, "endState");
         ensureNonNull(consumption, "consumption");
