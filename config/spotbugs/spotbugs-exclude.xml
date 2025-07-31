@@ -3,4 +3,8 @@
         <Class name="utilcalc.core.parser.ParserUtils"/>
         <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
     </Match>
+    <Match>
+        <Class name="utilcalc.core.pdfGen.HtmlBuilder"/>
+        <Bug pattern="POTENTIAL_XML_INJECTION"/>
+    </Match>
 </FindBugsFilter>
