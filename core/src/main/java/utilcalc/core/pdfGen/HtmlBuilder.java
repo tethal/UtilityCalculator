@@ -1,5 +1,10 @@
 package utilcalc.core.pdfGen;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import utilcalc.core.model.output.ReportSection;
+
 public final class HtmlBuilder {
 
     private final StringBuilder sb = new StringBuilder();
@@ -40,15 +45,10 @@ public final class HtmlBuilder {
         return this;
     }
 
-    public HtmlBuilder pItalicIndented(String text, int indentLevel) {
-        int[] allowed = {10, 20, 30};
-        if (indentLevel < 1 || indentLevel > 3) {
-            throw new IllegalArgumentException("indentLevel must be 1 (10pt), 2 (20pt) or 3 (30pt)");
-        }
-        int indentPx = allowed[indentLevel - 1];
+    public HtmlBuilder pItalicIndented(String text, int indentPx) {
         sb.append("<p class=\"italic indent-")
                 .append(indentPx)
-                .append("\">")
+                .append("pt;\">")
                 .append(escape(text))
                 .append("</p>\n");
         return this;
@@ -68,5 +68,36 @@ public final class HtmlBuilder {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    public HtmlBuilder renderSummaryTable(List<ReportSection> sections) {
+        sb.append("<h1>Celkový přehled</h1>");
+        sb.append("<table style=\"border-collapse: collapse; width: 100%;\">");
+        sb.append("<thead><tr>");
+        sb.append(
+                "<th style=\"border: 1px solid black; padding: 5px; text-align: left;\">Popis</th>");
+        sb.append(
+                "<th style=\"border: 1px solid black; padding: 5px; text-align: right;\">Částka</th>");
+        sb.append("</tr></thead>");
+        sb.append("<tbody>");
+
+        for (ReportSection section : sections) {
+            sb.append("<tr>");
+            sb.append("<td style=\"border: 1px solid black; padding: 5px;\">")
+                    .append(escape(section.name()))
+                    .append("</td>");
+            sb.append("<td style=\"border: 1px solid black; padding: 5px; text-align: right;\">")
+                    .append(formatMoney(section.totalAmount()))
+                    .append("</td>");
+            sb.append("</tr>");
+        }
+
+        sb.append("</tbody></table>");
+        return this;
+    }
+
+    private String formatMoney(BigDecimal amount) {
+        if (amount == null) return "";
+        return amount.setScale(2, RoundingMode.HALF_UP).toPlainString() + " Kč";
     }
 }

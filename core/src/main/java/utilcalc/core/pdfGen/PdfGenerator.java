@@ -56,10 +56,12 @@ public final class PdfGenerator {
             html.p(line);
         }
 
+        html.renderSummaryTable(report.sections());
+
         if (!report.sources().isEmpty()) {
             html.pItalic("Zdroje:");
             for (String source : report.sources()) {
-                html.pItalicIndented(source, 2);
+                html.pItalicIndented(source, 20);
             }
         }
 
