@@ -2,8 +2,6 @@ package utilcalc.core.pdfGen;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
-import utilcalc.core.model.output.ReportSection;
 
 public final class HtmlBuilder {
 
@@ -24,6 +22,10 @@ public final class HtmlBuilder {
                     .indent-10 { margin-left: 10pt; }
                     .indent-20 { margin-left: 20pt; }
                     .indent-30 { margin-left: 30pt; }
+
+                    table { width: 100%; border-collapse: collapse; margin-top: 10pt; }
+                    th, td { border: 1px solid black; padding: 5px; text-align: left; }
+                    td.money { text-align: right; }
                 </style>
             </head>
             <body>
@@ -54,6 +56,61 @@ public final class HtmlBuilder {
         return this;
     }
 
+    public HtmlBuilder beginTable() {
+        sb.append("<table>\n");
+        return this;
+    }
+
+    public HtmlBuilder endTable() {
+        sb.append("</table>\n");
+        return this;
+    }
+
+    public HtmlBuilder beginThead() {
+        sb.append("<thead>\n");
+        return this;
+    }
+
+    public HtmlBuilder endThead() {
+        sb.append("</thead>\n");
+        return this;
+    }
+
+    public HtmlBuilder beginTBody() {
+        sb.append("<tbody>\n");
+        return this;
+    }
+
+    public HtmlBuilder endTBody() {
+        sb.append("</tbody>\n");
+        return this;
+    }
+
+    public HtmlBuilder beginTr() {
+        sb.append("<tr>\n");
+        return this;
+    }
+
+    public HtmlBuilder endTr() {
+        sb.append("</tr>\n");
+        return this;
+    }
+
+    public HtmlBuilder td(String text) {
+        sb.append("<td>").append(escape(text)).append("</td>\n");
+        return this;
+    }
+
+    public HtmlBuilder tdMoney(BigDecimal amount) {
+        sb.append("<td class=\"money\">").append(escape(formatMoney(amount))).append("</td>\n");
+        return this;
+    }
+
+    public HtmlBuilder th(String text) {
+        sb.append("<th>").append(escape(text)).append("</th>\n");
+        return this;
+    }
+
     public String build() {
         sb.append("</body></html>");
         return sb.toString();
@@ -68,32 +125,6 @@ public final class HtmlBuilder {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
-    }
-
-    public HtmlBuilder renderSummaryTable(List<ReportSection> sections) {
-        sb.append("<h1>Celkový přehled</h1>");
-        sb.append("<table style=\"border-collapse: collapse; width: 100%;\">");
-        sb.append("<thead><tr>");
-        sb.append(
-                "<th style=\"border: 1px solid black; padding: 5px; text-align: left;\">Popis</th>");
-        sb.append(
-                "<th style=\"border: 1px solid black; padding: 5px; text-align: right;\">Částka</th>");
-        sb.append("</tr></thead>");
-        sb.append("<tbody>");
-
-        for (ReportSection section : sections) {
-            sb.append("<tr>");
-            sb.append("<td style=\"border: 1px solid black; padding: 5px;\">")
-                    .append(escape(section.name()))
-                    .append("</td>");
-            sb.append("<td style=\"border: 1px solid black; padding: 5px; text-align: right;\">")
-                    .append(formatMoney(section.totalAmount()))
-                    .append("</td>");
-            sb.append("</tr>");
-        }
-
-        sb.append("</tbody></table>");
-        return this;
     }
 
     private String formatMoney(BigDecimal amount) {
