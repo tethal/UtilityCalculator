@@ -22,18 +22,16 @@ class WaterTariffParser {
     private static final Set<String> WATER_TARIFF_KNOWN_FIELDS =
             Set.of(START_DATE, END_DATE, UNIT_AMOUNT);
 
-    static List<WaterTariff> parse(TomlArray waterTariffs) {
+    static List<WaterTariff> parse(TomlArray waterTariffs, String sectionName) {
         return IntStream.range(0, waterTariffs.size())
                 .mapToObj(waterTariffs::getTable)
-                .map(WaterTariffParser::parseWaterTariff)
+                .map(waterTariffTable -> parseWaterTariff(waterTariffTable, sectionName))
                 .toList();
     }
 
-    private static WaterTariff parseWaterTariff(TomlTable waterTariffTable) {
+    private static WaterTariff parseWaterTariff(TomlTable waterTariffTable, String sectionName) {
         checkThatSectionContainsOnlyKnownFields(
-                waterTariffTable,
-                WATER_TARIFF_KNOWN_FIELDS,
-                ColdWaterSectionParser.TARIFF_SECTION_NAME);
+                waterTariffTable, WATER_TARIFF_KNOWN_FIELDS, sectionName);
         DateRange dateRange = requireDateRange(waterTariffTable, START_DATE, END_DATE);
         BigDecimal pricePerCubicMeter = requireBigDecimal(waterTariffTable, UNIT_AMOUNT);
         return new WaterTariff(dateRange, pricePerCubicMeter);
