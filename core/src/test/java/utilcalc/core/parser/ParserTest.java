@@ -23,7 +23,7 @@ class ParserTest {
         assertThat(inputs.reportPlace()).isEqualTo("V Praze");
         assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2025, 5, 20));
         assertThat(inputs.sources()).containsExactly("vyúčtování SVJ za rok 2024");
-        assertThat(inputs.sections()).hasSize(4);
+        assertThat(inputs.sections()).hasSize(5);
 
         DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
         assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
@@ -80,6 +80,48 @@ class ParserTest {
                         new WaterTariff(
                                 new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
                                 BigDecimal.valueOf(108.13)));
+
+        HotWaterSectionInputs hotWater = (HotWaterSectionInputs) inputs.sections().get(4);
+        assertThat(hotWater.name()).isEqualTo("Teplá voda");
+
+        assertThat(hotWater.readings())
+                .hasSize(3)
+                .containsExactly(
+                        new MeterReading(
+                                "1", LocalDate.of(2021, 10, 14), BigDecimal.valueOf(100.5)),
+                        new MeterReading("2", LocalDate.of(2021, 12, 31), BigDecimal.valueOf(55.0)),
+                        new MeterReading(
+                                "2", LocalDate.of(2022, 4, 30), BigDecimal.valueOf(80.75)));
+
+        assertThat(hotWater.priceList())
+                .hasSize(2)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                BigDecimal.valueOf(145.50)),
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                BigDecimal.valueOf(150.75)));
+
+        assertThat(hotWater.heatingBasicCosts())
+                .hasSize(2)
+                .containsExactly(
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                BigDecimal.valueOf(5000.0)),
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                BigDecimal.valueOf(5200.0)));
+
+        assertThat(hotWater.heatingConsumableTariffs())
+                .hasSize(2)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                BigDecimal.valueOf(120.0)),
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                BigDecimal.valueOf(130.0)));
     }
 
     @Test
@@ -123,7 +165,23 @@ class ParserTest {
         "missing_end_date_cold_water_tariff_section,Missing required date field: end_date",
         "missing_unit_amount_cold_water_tariff_section,Missing required bigDecimal field: unit_amount",
         "missing_tariff_array_cold_water_section,Missing required array field: tariff",
-        "missing_reading_array_cold_water_section,Missing required array field: reading"
+        "missing_reading_array_cold_water_section,Missing required array field: reading",
+        "missing_meter_id_hot_water_reading_section,Missing required string field: meter_id",
+        "missing_reading_date_hot_water_reading_section,Missing required date field: reading_date",
+        "missing_state_hot_water_reading_section,Missing required bigDecimal field: state",
+        "missing_start_date_hot_water_tariff_section,Missing required date field: start_date",
+        "missing_end_date_hot_water_tariff_section,Missing required date field: end_date",
+        "missing_unit_amount_hot_water_tariff_section,Missing required bigDecimal field: unit_amount",
+        "missing_start_date_hot_water_heating_basic_cost_section,Missing required date field: start_date",
+        "missing_end_date_hot_water_heating_basic_cost_section,Missing required date field: end_date",
+        "missing_annual_cost_hot_water_heating_basic_cost_section,Missing required bigDecimal field: annual_cost",
+        "missing_start_date_hot_water_heating_consumable_tariff_section,Missing required date field: start_date",
+        "missing_end_date_hot_water_heating_consumable_tariff_section,Missing required date field: end_date",
+        "missing_unit_amount_hot_water_heating_consumable_tariff_section,Missing required bigDecimal field: unit_amount",
+        "missing_reading_array_hot_water_section,Missing required array field: reading",
+        "missing_tariff_array_hot_water_section,Missing required array field: tariff",
+        "missing_heating_basic_cost_array_hot_water_section,Missing required array field: heating_basic_cost",
+        "missing_heating_consumable_tariff_array_hot_water_section,Missing required array field: heating_consumable_tariff"
     })
     @ParameterizedTest
     void missing_required_field_should_throw_ParsingException(String textCase, String message) {
@@ -168,7 +226,18 @@ class ParserTest {
         "wrong_data_type_state_cold_water_reading_section,Invalid data type: Value of 'state' is a local date",
         "wrong_data_type_start_date_cold_water_tariff_section,Invalid data type: Value of 'start_date' is a integer",
         "wrong_data_type_end_date_cold_water_tariff_section,Invalid data type: Value of 'end_date' is a string",
-        "wrong_data_type_unit_amount_cold_water_tariff_section,Invalid data type: Value of 'unit_amount' is a local date"
+        "wrong_data_type_meter_id_hot_water_reading_section,Invalid data type: Value of 'meter_id' is a integer",
+        "wrong_data_type_reading_date_hot_water_reading_section,Invalid data type: Value of 'reading_date' is a integer",
+        "wrong_data_type_state_hot_water_reading_section,Invalid data type: Value of 'state' is a local date",
+        "wrong_data_type_start_date_hot_water_tariff_section,Invalid data type: Value of 'start_date' is a integer",
+        "wrong_data_type_end_date_hot_water_tariff_section,Invalid data type: Value of 'end_date' is a string",
+        "wrong_data_type_unit_amount_hot_water_tariff_section,Invalid data type: Value of 'unit_amount' is a local date",
+        "wrong_data_type_start_date_hot_water_heating_basic_cost_section,Invalid data type: Value of 'start_date' is a string",
+        "wrong_data_type_end_date_hot_water_heating_basic_cost_section,Invalid data type: Value of 'end_date' is a string",
+        "wrong_data_type_annual_cost_hot_water_heating_basic_cost_section,Invalid data type: Value of 'annual_cost' is a string",
+        "wrong_data_type_start_date_hot_water_heating_consumable_tariff_section,Invalid data type: Value of 'start_date' is a string",
+        "wrong_data_type_end_date_hot_water_heating_consumable_tariff_section,Invalid data type: Value of 'end_date' is a string",
+        "wrong_data_type_unit_amount_hot_water_heating_consumable_tariff_section,Invalid data type: Value of 'unit_amount' is a local date",
     })
     @ParameterizedTest
     void invalid_field_data_type_should_throw_ParsingException(String textCase, String message) {

@@ -43,7 +43,8 @@ public final class HtmlBuilder {
     public HtmlBuilder pItalicIndented(String text, int indentLevel) {
         int[] allowed = {10, 20, 30};
         if (indentLevel < 1 || indentLevel > 3) {
-            throw new IllegalArgumentException("indentLevel must be 1 (10pt), 2 (20pt) or 3 (30pt)");
+            throw new IllegalArgumentException(
+                    "indentLevel must be 1 (10pt), 2 (20pt) or 3 (30pt)");
         }
         int indentPx = allowed[indentLevel - 1];
         sb.append("<p class=\"italic indent-")
