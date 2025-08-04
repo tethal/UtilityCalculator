@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import org.openpdf.pdf.ITextRenderer;
 import utilcalc.core.model.output.Report;
+import utilcalc.core.model.output.ReportSection;
 import utilcalc.core.utils.ReportFormatter;
 
 public final class PdfGenerator {
@@ -56,10 +57,26 @@ public final class PdfGenerator {
             html.p(line);
         }
 
+        html.h1("Celkový přehled")
+                .beginTable()
+                .beginThead()
+                .beginTr()
+                .th("Popis")
+                .th("Částka")
+                .endTr()
+                .endThead()
+                .beginTBody();
+
+        for (ReportSection section : report.sections()) {
+            html.beginTr().td(section.name()).tdMoney(section.totalAmount()).endTr();
+        }
+
+        html.endTBody().endTable();
+
         if (!report.sources().isEmpty()) {
             html.pItalic("Zdroje:");
             for (String source : report.sources()) {
-                html.pItalicIndented(source, 2);
+                html.pItalicIndented(source, 20);
             }
         }
 

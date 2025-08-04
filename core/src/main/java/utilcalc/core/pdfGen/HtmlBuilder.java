@@ -1,5 +1,8 @@
 package utilcalc.core.pdfGen;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public final class HtmlBuilder {
 
     private final StringBuilder sb = new StringBuilder();
@@ -19,6 +22,10 @@ public final class HtmlBuilder {
                     .indent-10 { margin-left: 10pt; }
                     .indent-20 { margin-left: 20pt; }
                     .indent-30 { margin-left: 30pt; }
+
+                    table { width: 100%; border-collapse: collapse; margin-top: 10pt; }
+                    th, td { border: 1px solid black; padding: 5px; text-align: left; }
+                    td.money { text-align: right; }
                 </style>
             </head>
             <body>
@@ -40,17 +47,67 @@ public final class HtmlBuilder {
         return this;
     }
 
-    public HtmlBuilder pItalicIndented(String text, int indentLevel) {
-        int[] allowed = {10, 20, 30};
-        if (indentLevel < 1 || indentLevel > 3) {
-            throw new IllegalArgumentException("indentLevel must be 1 (10pt), 2 (20pt) or 3 (30pt)");
-        }
-        int indentPx = allowed[indentLevel - 1];
+    public HtmlBuilder pItalicIndented(String text, int indentPx) {
         sb.append("<p class=\"italic indent-")
                 .append(indentPx)
-                .append("\">")
+                .append("pt;\">")
                 .append(escape(text))
                 .append("</p>\n");
+        return this;
+    }
+
+    public HtmlBuilder beginTable() {
+        sb.append("<table>\n");
+        return this;
+    }
+
+    public HtmlBuilder endTable() {
+        sb.append("</table>\n");
+        return this;
+    }
+
+    public HtmlBuilder beginThead() {
+        sb.append("<thead>\n");
+        return this;
+    }
+
+    public HtmlBuilder endThead() {
+        sb.append("</thead>\n");
+        return this;
+    }
+
+    public HtmlBuilder beginTBody() {
+        sb.append("<tbody>\n");
+        return this;
+    }
+
+    public HtmlBuilder endTBody() {
+        sb.append("</tbody>\n");
+        return this;
+    }
+
+    public HtmlBuilder beginTr() {
+        sb.append("<tr>\n");
+        return this;
+    }
+
+    public HtmlBuilder endTr() {
+        sb.append("</tr>\n");
+        return this;
+    }
+
+    public HtmlBuilder td(String text) {
+        sb.append("<td>").append(escape(text)).append("</td>\n");
+        return this;
+    }
+
+    public HtmlBuilder tdMoney(BigDecimal amount) {
+        sb.append("<td class=\"money\">").append(escape(formatMoney(amount))).append("</td>\n");
+        return this;
+    }
+
+    public HtmlBuilder th(String text) {
+        sb.append("<th>").append(escape(text)).append("</th>\n");
         return this;
     }
 
@@ -68,5 +125,10 @@ public final class HtmlBuilder {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    private String formatMoney(BigDecimal amount) {
+        if (amount == null) return "";
+        return amount.setScale(2, RoundingMode.HALF_UP).toPlainString() + " Kč";
     }
 }
