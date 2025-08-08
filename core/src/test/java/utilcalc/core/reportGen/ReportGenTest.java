@@ -106,7 +106,8 @@ class ReportGenTest {
     void valid_ColdWaterSectionInputs_should_generate_valid_ColdWaterSection() {
         MeterReading meterReading1 = createMeterReading("1", "2024-01-01", "100");
         MeterReading meterReading2 = createMeterReading("1", "2024-06-01", "150");
-        MeterReading meterReading3 = createMeterReading("1", "2025-01-01", "60");
+        MeterReading meterReading3 = createMeterReading("1", "2024-06-01", "0");
+        MeterReading meterReading4 = createMeterReading("1", "2025-01-01", "60");
 
         ReportInputs reportInputs =
                 validReportInputWithSections(
@@ -117,7 +118,11 @@ class ReportGenTest {
                                         createWaterTariff(
                                                 createDateRange("2024-05-01", "2025-01-01"),
                                                 "100")),
-                                List.of(meterReading1, meterReading2, meterReading3)));
+                                List.of(
+                                        meterReading1,
+                                        meterReading2,
+                                        meterReading3,
+                                        meterReading4)));
 
         Report report = generateReport(reportInputs);
 

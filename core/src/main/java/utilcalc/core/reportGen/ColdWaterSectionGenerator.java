@@ -8,14 +8,13 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.ColdWaterSectionInputs;
 import utilcalc.core.model.input.MeterReading;
 import utilcalc.core.model.input.WaterTariff;
 import utilcalc.core.model.output.ColdWaterFee;
-import utilcalc.core.model.output.ColdWaterReading;
 import utilcalc.core.model.output.ColdWaterSection;
+import utilcalc.core.model.output.WaterReading;
 
 final class ColdWaterSectionGenerator {
 
@@ -24,36 +23,23 @@ final class ColdWaterSectionGenerator {
     static ColdWaterSection generateColdWaterSection(
             DateRange reportDateRange, ColdWaterSectionInputs coldWaterSectionInputs) {
 
-        String name = coldWaterSectionInputs.name();
-        List<MeterReading> inputReadings = coldWaterSectionInputs.readings();
-        List<WaterTariff> inputWaterTariffs =
-                coldWaterSectionInputs.priceList().stream()
-                        .sorted(
-                                Comparator.comparing(
-                                        priceList -> priceList.dateRange().startDate()))
-                        .toList();
+        List<WaterTariff> waterTariffs = coldWaterSectionInputs.priceList();
 
-        List<ColdWaterReading> detailReadings =
-                inputReadings.stream()
+        validateDateRangeCoverage(
+                reportDateRange, waterTariffs, WaterTariff::dateRange, "WaterTariff");
+
+        List<WaterReading> readings =
+                coldWaterSectionInputs.readings().stream()
                         .collect(Collectors.groupingBy(MeterReading::meterId))
                         .values()
                         .stream()
-                        .flatMap(group -> createColdWaterReadings(group).stream())
+                        .flatMap(group -> createColdWaterReadings(reportDateRange, group).stream())
                         .toList();
 
-        validateDateRangeCoverage(
-                reportDateRange, inputWaterTariffs, WaterTariff::dateRange, "WaterTariff");
-
         List<ColdWaterFee> priceList =
-                inputWaterTariffs.stream()
-                        .flatMap(
-                                waterTariff -> {
-                                    List<DateRange> validIntervals =
-                                            extractValidIntervals(waterTariff, detailReadings);
-                                    List<ColdWaterReading> aggregated =
-                                            aggregateReadings(detailReadings, validIntervals);
-                                    return calculateColdWaterFees(waterTariff, aggregated).stream();
-                                })
+                waterTariffs.stream()
+                        .sorted(Comparator.comparing(WaterTariff::dateRange))
+                        .flatMap(waterTariff -> createColdWaterFees(waterTariff, readings).stream())
                         .toList();
 
         BigDecimal totalAmount =
@@ -61,97 +47,129 @@ final class ColdWaterSectionGenerator {
                         .map(ColdWaterFee::periodAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new ColdWaterSection(name, totalAmount, detailReadings, priceList);
+        return new ColdWaterSection(
+                coldWaterSectionInputs.name(), totalAmount, readings, priceList);
     }
 
-    private static List<ColdWaterReading> createColdWaterReadings(List<MeterReading> readings) {
+    // region Cold water readings
+    private static List<WaterReading> createColdWaterReadings(
+            DateRange reportDateRange, List<MeterReading> readings) {
 
-        return IntStream.range(0, readings.size() - 1)
+        List<MeterReading> sortedMeterReadings =
+                readings.stream()
+                        .sorted(Comparator.comparing(MeterReading::readingDate))
+                        .collect(Collectors.toList());
+
+        List<WaterReading> waterReadings =
+                createColdWaterReadingsFromMeterData(sortedMeterReadings);
+
+        WaterReading firstReading = waterReadings.getFirst();
+        WaterReading lastReading = waterReadings.getLast();
+
+        if (reportDateRange.startDate().isBefore(firstReading.dateRange().startDate())) {
+            waterReadings.addFirst(
+                    createMissingColdWaterReading(reportDateRange, firstReading, true));
+        }
+
+        if (reportDateRange
+                .endDateExclusive()
+                .isAfter(lastReading.dateRange().endDateExclusive())) {
+            waterReadings.addLast(
+                    createMissingColdWaterReading(reportDateRange, lastReading, false));
+        }
+
+        return waterReadings;
+    }
+
+    private static WaterReading createMissingColdWaterReading(
+            DateRange reportDateRange, WaterReading reading, boolean isStart) {
+
+        String meterId = reading.meterId();
+        BigDecimal startState = reading.startState();
+        BigDecimal endState = reading.endState();
+        DateRange readingDateRange = reading.dateRange();
+
+        DateRange newDateRange =
+                isStart
+                        ? new DateRange(reportDateRange.startDate(), readingDateRange.startDate())
+                        : new DateRange(
+                                readingDateRange.endDateExclusive(),
+                                reportDateRange.endDateExclusive());
+
+        BigDecimal newConsumption =
+                calculateConsumption(newDateRange, reading).setScale(3, RoundingMode.HALF_UP);
+
+        BigDecimal newStartState =
+                isStart
+                        ? startState.subtract(newConsumption).setScale(3, RoundingMode.HALF_UP)
+                        : endState;
+
+        BigDecimal newEndState =
+                isStart
+                        ? startState
+                        : endState.add(newConsumption).setScale(3, RoundingMode.HALF_UP);
+
+        return new WaterReading(newDateRange, meterId, newStartState, newEndState, newConsumption);
+    }
+
+    private static List<WaterReading> createColdWaterReadingsFromMeterData(
+            List<MeterReading> meterReadings) {
+        return IntStream.range(0, meterReadings.size() - 1)
                 .mapToObj(
-                        i -> {
-                            MeterReading current = readings.get(i);
-                            MeterReading next = readings.get(i + 1);
-
-                            if (!next.readingDate().isAfter(current.readingDate())) {
-                                return null;
-                            }
-
-                            boolean isNewMeter = next.state().compareTo(current.state()) < 0;
-                            BigDecimal startState = isNewMeter ? BigDecimal.ZERO : current.state();
-                            BigDecimal endState = next.state();
-                            BigDecimal consumption =
-                                    isNewMeter ? endState : endState.subtract(startState);
-
-                            DateRange dateRange =
-                                    new DateRange(current.readingDate(), next.readingDate());
-
-                            return new ColdWaterReading(
-                                    dateRange,
-                                    current.meterId(),
-                                    startState,
-                                    endState,
-                                    consumption);
-                        })
+                        i -> createColdWaterReading(meterReadings.get(i), meterReadings.get(i + 1)))
                 .filter(Objects::nonNull)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    private static List<ColdWaterReading> aggregateReadings(
-            List<ColdWaterReading> detailWaterReading, List<DateRange> intervals) {
+    private static WaterReading createColdWaterReading(
+            MeterReading currentReading, MeterReading nextReading) {
+        BigDecimal startReadingState = currentReading.state();
+        BigDecimal nextReadingState = nextReading.state();
+        String meterId = currentReading.meterId();
 
-        return intervals.stream()
+        if (currentReading.readingDate().equals(nextReading.readingDate())) {
+            return null;
+        }
+
+        DateRange range = new DateRange(currentReading.readingDate(), nextReading.readingDate());
+        BigDecimal consumption = nextReadingState.subtract(startReadingState);
+        return new WaterReading(range, meterId, startReadingState, nextReadingState, consumption);
+    }
+
+    // endregion
+
+    // region Cold water fee
+
+    private static List<ColdWaterFee> createColdWaterFees(
+            WaterTariff waterTariff, List<WaterReading> waterReadings) {
+        return extractValidIntervals(waterTariff, waterReadings).stream()
                 .map(
-                        interval -> {
-                            BigDecimal totalConsumption =
-                                    calculateTotalConsumption(detailWaterReading, interval);
-                            return new ColdWaterReading(
-                                    interval,
-                                    "Aggregated",
-                                    BigDecimal.ZERO,
-                                    BigDecimal.ZERO,
-                                    totalConsumption);
-                        })
+                        interval ->
+                                createColdWaterFee(
+                                        waterTariff.pricePerCubicMeter(), waterReadings, interval))
                 .toList();
     }
 
-    private static List<ColdWaterFee> calculateColdWaterFees(
-            WaterTariff waterTariff, List<ColdWaterReading> aggregatedReadings) {
+    private static ColdWaterFee createColdWaterFee(
+            BigDecimal pricePerCubicMeter, List<WaterReading> waterReadings, DateRange interval) {
 
-        return aggregatedReadings.stream()
-                .filter(
-                        reading ->
-                                waterTariff.dateRange().intersect(reading.dateRange()).isPresent())
-                .map(reading -> calculateColdWaterFee(waterTariff, reading))
-                .toList();
-    }
-
-    private static ColdWaterFee calculateColdWaterFee(
-            WaterTariff waterTariff, ColdWaterReading meterReadings) {
-
-        BigDecimal totalQuantity = meterReadings.consumption();
-        BigDecimal roundedQuantity = totalQuantity.setScale(3, RoundingMode.HALF_UP);
+        BigDecimal quantity = calculateQuantity(waterReadings, interval);
         BigDecimal periodAmount =
-                totalQuantity
-                        .multiply(waterTariff.pricePerCubicMeter())
-                        .setScale(2, RoundingMode.HALF_UP);
+                quantity.multiply(pricePerCubicMeter).setScale(2, RoundingMode.HALF_UP);
 
         return new ColdWaterFee(
-                meterReadings.dateRange(),
-                roundedQuantity,
-                waterTariff.pricePerCubicMeter(),
+                interval,
+                quantity.setScale(3, RoundingMode.HALF_UP),
+                pricePerCubicMeter,
                 periodAmount);
     }
 
     private static List<DateRange> extractValidIntervals(
-            WaterTariff waterTariff, List<ColdWaterReading> meterReadings) {
+            WaterTariff waterTariff, List<WaterReading> meterReadings) {
 
         Set<LocalDate> datePoints =
                 meterReadings.stream()
-                        .flatMap(
-                                reading ->
-                                        Stream.of(
-                                                reading.dateRange().startDate(),
-                                                reading.dateRange().endDateExclusive()))
+                        .flatMap(reading -> reading.dateRange().stream())
                         .collect(Collectors.toSet());
 
         datePoints.add(waterTariff.dateRange().startDate());
@@ -166,27 +184,28 @@ final class ColdWaterSectionGenerator {
                 .toList();
     }
 
-    private static BigDecimal calculateTotalConsumption(
-            List<ColdWaterReading> detailWaterReadings, DateRange interval) {
+    private static BigDecimal calculateQuantity(
+            List<WaterReading> detailWaterReadings, DateRange interval) {
         return detailWaterReadings.stream()
                 .map(
                         reading ->
                                 reading.dateRange()
                                         .intersect(interval)
-                                        .map(
-                                                overlap -> {
-                                                    BigDecimal monthlyCost =
-                                                            reading.consumption()
-                                                                    .divide(
-                                                                            reading.dateRange()
-                                                                                    .getMonthCount(),
-                                                                            10,
-                                                                            RoundingMode.HALF_UP);
-                                                    return overlap.getMonthCount()
-                                                            .multiply(monthlyCost)
-                                                            .setScale(10, RoundingMode.HALF_UP);
-                                                })
+                                        .map(overlap -> calculateConsumption(overlap, reading))
                                         .orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // endregion
+
+    private static BigDecimal calculateConsumption(DateRange dateRange, WaterReading reading) {
+        BigDecimal readingConsumption = reading.consumption();
+        BigDecimal monthCount = reading.dateRange().getMonthCount();
+        BigDecimal monthlyConsumption =
+                readingConsumption.divide(monthCount, 10, RoundingMode.HALF_UP);
+
+        return monthlyConsumption
+                .multiply(dateRange.getMonthCount())
+                .setScale(10, RoundingMode.HALF_UP);
     }
 }

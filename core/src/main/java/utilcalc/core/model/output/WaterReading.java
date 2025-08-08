@@ -6,13 +6,13 @@ import static utilcalc.core.utils.Util.ensureNonNull;
 import java.math.BigDecimal;
 import utilcalc.core.model.DateRange;
 
-public record ColdWaterReading(
+public record WaterReading(
         DateRange dateRange,
         String meterId,
         BigDecimal startState,
         BigDecimal endState,
         BigDecimal consumption) {
-    public ColdWaterReading {
+    public WaterReading {
         ensureNonNull(dateRange, "dateRange");
         ensureNonBlank(meterId, "meterId");
         ensureNonNull(startState, "startState");

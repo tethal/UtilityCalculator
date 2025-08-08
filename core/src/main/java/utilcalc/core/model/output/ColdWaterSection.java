@@ -8,7 +8,7 @@ import java.util.List;
 public record ColdWaterSection(
         String name,
         BigDecimal totalAmount,
-        List<ColdWaterReading> readings,
+        List<WaterReading> readings,
         List<ColdWaterFee> priceList)
         implements ReportSection {
 
