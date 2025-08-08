@@ -12,8 +12,8 @@ import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.ColdWaterSectionInputs;
 import utilcalc.core.model.input.MeterReading;
 import utilcalc.core.model.input.WaterTariff;
-import utilcalc.core.model.output.ColdWaterFee;
 import utilcalc.core.model.output.ColdWaterSection;
+import utilcalc.core.model.output.WaterFee;
 import utilcalc.core.model.output.WaterReading;
 
 final class ColdWaterSectionGenerator {
@@ -36,7 +36,7 @@ final class ColdWaterSectionGenerator {
                         .flatMap(group -> createColdWaterReadings(reportDateRange, group).stream())
                         .toList();
 
-        List<ColdWaterFee> priceList =
+        List<WaterFee> priceList =
                 waterTariffs.stream()
                         .sorted(Comparator.comparing(WaterTariff::dateRange))
                         .flatMap(waterTariff -> createColdWaterFees(waterTariff, readings).stream())
@@ -44,7 +44,7 @@ final class ColdWaterSectionGenerator {
 
         BigDecimal totalAmount =
                 priceList.stream()
-                        .map(ColdWaterFee::periodAmount)
+                        .map(WaterFee::periodAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new ColdWaterSection(
@@ -140,7 +140,7 @@ final class ColdWaterSectionGenerator {
 
     // region Cold water fee
 
-    private static List<ColdWaterFee> createColdWaterFees(
+    private static List<WaterFee> createColdWaterFees(
             WaterTariff waterTariff, List<WaterReading> waterReadings) {
         return extractValidIntervals(waterTariff, waterReadings).stream()
                 .map(
@@ -150,14 +150,14 @@ final class ColdWaterSectionGenerator {
                 .toList();
     }
 
-    private static ColdWaterFee createColdWaterFee(
+    private static WaterFee createColdWaterFee(
             BigDecimal pricePerCubicMeter, List<WaterReading> waterReadings, DateRange interval) {
 
         BigDecimal quantity = calculateQuantity(waterReadings, interval);
         BigDecimal periodAmount =
                 quantity.multiply(pricePerCubicMeter).setScale(2, RoundingMode.HALF_UP);
 
-        return new ColdWaterFee(
+        return new WaterFee(
                 interval,
                 quantity.setScale(3, RoundingMode.HALF_UP),
                 pricePerCubicMeter,

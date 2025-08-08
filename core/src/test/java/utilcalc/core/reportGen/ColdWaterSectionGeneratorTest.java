@@ -8,8 +8,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import utilcalc.core.model.input.MeterReading;
 import utilcalc.core.model.input.WaterTariff;
-import utilcalc.core.model.output.ColdWaterFee;
 import utilcalc.core.model.output.ColdWaterSection;
+import utilcalc.core.model.output.WaterFee;
 import utilcalc.core.model.output.WaterReading;
 
 public class ColdWaterSectionGeneratorTest {
@@ -235,14 +235,14 @@ public class ColdWaterSectionGeneratorTest {
         assertThat(coldWaterSection.priceList().size()).isEqualTo(2);
         assertThat(coldWaterSection.totalAmount()).isEqualTo("4750.00");
 
-        ColdWaterFee coldWaterFee1 = coldWaterSection.priceList().getFirst();
+        WaterFee coldWaterFee1 = coldWaterSection.priceList().getFirst();
         assertThat(coldWaterFee1.dateRange())
                 .isEqualTo(createDateRange("2024-01-01", "2024-06-01"));
         assertThat(coldWaterFee1.unitAmount()).isEqualTo("90");
         assertThat(coldWaterFee1.quantity()).isEqualTo("25.000");
         assertThat(coldWaterFee1.periodAmount()).isEqualTo("2250.00");
 
-        ColdWaterFee coldWaterFee2 = coldWaterSection.priceList().getLast();
+        WaterFee coldWaterFee2 = coldWaterSection.priceList().getLast();
         assertThat(coldWaterFee2.dateRange())
                 .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
         assertThat(coldWaterFee2.unitAmount()).isEqualTo("100");
@@ -279,14 +279,14 @@ public class ColdWaterSectionGeneratorTest {
         assertThat(coldWaterSection.priceList().size()).isEqualTo(2);
         assertThat(coldWaterSection.totalAmount()).isEqualTo("12650.00");
 
-        ColdWaterFee coldWaterFee1 = coldWaterSection.priceList().getFirst();
+        WaterFee coldWaterFee1 = coldWaterSection.priceList().getFirst();
         assertThat(coldWaterFee1.dateRange())
                 .isEqualTo(createDateRange("2024-01-01", "2024-06-01"));
         assertThat(coldWaterFee1.unitAmount()).isEqualTo("90");
         assertThat(coldWaterFee1.quantity()).isEqualTo("55.000");
         assertThat(coldWaterFee1.periodAmount()).isEqualTo("4950.00");
 
-        ColdWaterFee coldWaterFee2 = coldWaterSection.priceList().getLast();
+        WaterFee coldWaterFee2 = coldWaterSection.priceList().getLast();
         assertThat(coldWaterFee2.dateRange())
                 .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
         assertThat(coldWaterFee2.unitAmount()).isEqualTo("100");
@@ -318,21 +318,21 @@ public class ColdWaterSectionGeneratorTest {
         assertThat(coldWaterSection.priceList().size()).isEqualTo(3);
         assertThat(coldWaterSection.totalAmount()).isEqualTo("4850.00");
 
-        ColdWaterFee coldWaterFee1 = coldWaterSection.priceList().getFirst();
+        WaterFee coldWaterFee1 = coldWaterSection.priceList().getFirst();
         assertThat(coldWaterFee1.dateRange())
                 .isEqualTo(createDateRange("2024-01-01", "2024-04-01"));
         assertThat(coldWaterFee1.unitAmount()).isEqualTo("90");
         assertThat(coldWaterFee1.quantity()).isEqualTo("15.000");
         assertThat(coldWaterFee1.periodAmount()).isEqualTo("1350.00");
 
-        ColdWaterFee coldWaterFee2 = coldWaterSection.priceList().get(1);
+        WaterFee coldWaterFee2 = coldWaterSection.priceList().get(1);
         assertThat(coldWaterFee2.dateRange())
                 .isEqualTo(createDateRange("2024-04-01", "2024-06-01"));
         assertThat(coldWaterFee2.unitAmount()).isEqualTo("100");
         assertThat(coldWaterFee2.quantity()).isEqualTo("10.000");
         assertThat(coldWaterFee2.periodAmount()).isEqualTo("1000.00");
 
-        ColdWaterFee coldWaterFee3 = coldWaterSection.priceList().getLast();
+        WaterFee coldWaterFee3 = coldWaterSection.priceList().getLast();
         assertThat(coldWaterFee3.dateRange())
                 .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
         assertThat(coldWaterFee3.unitAmount()).isEqualTo("100");

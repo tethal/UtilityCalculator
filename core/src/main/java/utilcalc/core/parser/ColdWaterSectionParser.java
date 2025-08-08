@@ -22,10 +22,8 @@ class ColdWaterSectionParser {
                 ParserUtils.requireArray(coldWaterSections, READING_SECTION_NAME);
         TomlArray tariffSections = ParserUtils.requireArray(coldWaterSections, TARIFF_SECTION_NAME);
 
-        List<MeterReading> meterReadings =
-                MeterReadingParser.parse(readingSections);
-        List<WaterTariff> waterTariffs =
-                WaterTariffParser.parse(tariffSections);
+        List<MeterReading> meterReadings = MeterReadingParser.parse(readingSections);
+        List<WaterTariff> waterTariffs = WaterTariffParser.parse(tariffSections);
         return new ColdWaterSectionInputs(SECTION_INPUTS_NAME, meterReadings, waterTariffs);
     }
 }
