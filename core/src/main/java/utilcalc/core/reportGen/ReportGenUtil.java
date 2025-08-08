@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.ServiceCost;
 
@@ -14,7 +15,8 @@ final class ReportGenUtil {
     static List<ServiceCost> splitServiceCostsByReport(
             DateRange reportDateRange, List<ServiceCost> serviceCosts) {
 
-        validateServiceCostCoverage(reportDateRange, serviceCosts);
+        validateDateRangeCoverage(
+                reportDateRange, serviceCosts, ServiceCost::dateRange, "ServiceCosts");
 
         List<ServiceCost> result = new ArrayList<>();
 
@@ -41,32 +43,38 @@ final class ReportGenUtil {
         return result;
     }
 
-    private static void validateServiceCostCoverage(
-            DateRange reportDateRange, List<ServiceCost> serviceCosts) {
+    static <T> void validateDateRangeCoverage(
+            DateRange reportDateRange,
+            List<T> items,
+            Function<T, DateRange> dateRangeExtractor,
+            String itemName) {
 
-        List<ServiceCost> sortedServiceCosts =
-                serviceCosts.stream()
-                        .sorted(Comparator.comparing(cost -> cost.dateRange().startDate()))
+        List<T> sortedItems =
+                items.stream()
+                        .sorted(
+                                Comparator.comparing(
+                                        item -> dateRangeExtractor.apply(item).startDate()))
                         .toList();
 
-        LocalDate sortedFirstStart = sortedServiceCosts.getFirst().dateRange().startDate();
-        LocalDate sortedLastEnd = sortedServiceCosts.getLast().dateRange().endDateExclusive();
+        LocalDate sortedFirstStart = dateRangeExtractor.apply(sortedItems.getFirst()).startDate();
+        LocalDate sortedLastEnd =
+                dateRangeExtractor.apply(sortedItems.getLast()).endDateExclusive();
 
         if (sortedFirstStart.isAfter(reportDateRange.startDate())
                 || sortedLastEnd.isBefore(reportDateRange.endDateExclusive())) {
             throw new IllegalArgumentException(
-                    "ServiceCosts do not fully cover the report date interval.");
+                    itemName + " do not fully cover the report date interval.");
         }
 
-        for (int i = 0; i < sortedServiceCosts.size() - 1; i++) {
-            LocalDate currentEnd = sortedServiceCosts.get(i).dateRange().endDateExclusive();
-            LocalDate nextStart = sortedServiceCosts.get(i + 1).dateRange().startDate();
+        for (int i = 0; i < sortedItems.size() - 1; i++) {
+            LocalDate currentEnd = dateRangeExtractor.apply(sortedItems.get(i)).endDateExclusive();
+            LocalDate nextStart = dateRangeExtractor.apply(sortedItems.get(i + 1)).startDate();
 
             if (!currentEnd.equals(nextStart)) {
                 throw new IllegalArgumentException(
                         String.format(
-                                "ServiceCosts do not connect seamlessly or they overlap: %s and %s",
-                                sortedServiceCosts.get(i), sortedServiceCosts.get(i + 1)));
+                                "%s do not connect seamlessly or they overlap: %s and %s",
+                                itemName, sortedItems.get(i), sortedItems.get(i + 1)));
             }
         }
     }
