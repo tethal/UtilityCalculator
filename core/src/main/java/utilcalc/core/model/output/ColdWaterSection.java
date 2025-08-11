@@ -6,10 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record ColdWaterSection(
-        String name,
-        BigDecimal totalAmount,
-        List<WaterReading> readings,
-        List<WaterFee> priceList)
+        String name, BigDecimal totalAmount, List<WaterReading> readings, List<WaterFee> priceList)
         implements ReportSection {
 
     public ColdWaterSection {

@@ -21,6 +21,7 @@ class SectionInputsParser {
             case HeatingSectionParser.SECTION_NAME -> HeatingSectionParser.parse(section);
             case OtherFeesSectionParser.SECTION_NAME -> OtherFeesSectionParser.parse(section);
             case ColdWaterSectionParser.SECTION_NAME -> ColdWaterSectionParser.parse(section);
+            case WaterHeatingSectionParser.SECTION_NAME -> WaterHeatingSectionParser.parse(section);
             default -> throw new ParsingException("Unknown section " + sectionName);
         };
     }
