@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import org.openpdf.pdf.ITextRenderer;
+import utilcalc.core.model.output.DepositSection;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.model.output.ReportSection;
 import utilcalc.core.utils.ReportFormatter;
@@ -73,6 +74,13 @@ public final class PdfGenerator {
 
         html.endTBody().endTable();
 
+        for (ReportSection section : report.sections()) {
+            if (section instanceof DepositSection depositSection) {
+                html.h1(section.name());
+                appendDepositsTable(html, depositSection);
+            }
+        }
+
         if (!report.sources().isEmpty()) {
             html.pItalic("Zdroje:");
             for (String source : report.sources()) {
@@ -91,5 +99,20 @@ public final class PdfGenerator {
         }
 
         return html.build();
+    }
+
+    private static void appendDepositsTable(HtmlBuilder html, DepositSection depositSection) {
+        html.beginTable().beginThead().beginTr().th("Popis");
+        html.th("Částka").endTr().endThead().beginTBody();
+
+        for (var deposit : depositSection.deposits()) {
+            html.beginTr().td(deposit.description());
+            html.tdMoney(deposit.amount()).endTr();
+        }
+
+        html.beginTr().td("Celkem");
+        html.tdMoney(depositSection.totalAmount()).endTr();
+
+        html.endTBody().endTable();
     }
 }
