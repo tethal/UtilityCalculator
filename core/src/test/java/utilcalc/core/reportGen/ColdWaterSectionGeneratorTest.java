@@ -108,6 +108,123 @@ public class ColdWaterSectionGeneratorTest {
     }
 
     @Test
+    void
+            coldWaterSection_withOneMeterId_withOutOfReportReadings_should_haveCorrectColdWaterReading() {
+        MeterReading meterReading1 = createMeterReading("kitchen", "2023-12-01", "100");
+        MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
+        MeterReading meterReading3 = createMeterReading("kitchen", "2025-02-01", "150");
+
+        WaterTariff waterTariff =
+                createWaterTariff(createDateRange("2024-01-01", "2025-01-01"), "90");
+
+        ColdWaterSection coldWaterSection =
+                generateColdWaterSection(
+                        createDateRange("2024-01-01", "2025-01-01"),
+                        createColdWaterSectionInputs(
+                                List.of(waterTariff),
+                                List.of(meterReading1, meterReading2, meterReading3)));
+
+        assertThat(coldWaterSection.name()).isEqualTo("Cold water");
+        assertThat(coldWaterSection.readings().size()).isEqualTo(2);
+        assertThat(coldWaterSection.priceList().size()).isEqualTo(2);
+        assertThat(coldWaterSection.totalAmount()).isEqualTo("3843.72");
+
+        WaterReading waterReading1 = coldWaterSection.readings().getFirst();
+        assertThat(waterReading1.meterId()).isEqualTo("kitchen");
+        assertThat(waterReading1.dateRange())
+                .isEqualTo(createDateRange("2024-01-01", "2024-06-01"));
+        assertThat(waterReading1.startState()).isEqualTo("104.167");
+        assertThat(waterReading1.endState()).isEqualTo("125");
+        assertThat(waterReading1.consumption()).isEqualTo("20.833");
+
+        WaterReading waterReading2 = coldWaterSection.readings().getLast();
+        assertThat(waterReading2.meterId()).isEqualTo("kitchen");
+        assertThat(waterReading2.dateRange())
+                .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
+        assertThat(waterReading2.startState()).isEqualTo("125");
+        assertThat(waterReading2.endState()).isEqualTo("146.875");
+        assertThat(waterReading2.consumption()).isEqualTo("21.875");
+    }
+
+    @Test
+    void
+            coldWaterSection_withOneMeterId_withOutOfReportStartReading_should_haveCorrectColdWaterReading() {
+        MeterReading meterReading1 = createMeterReading("kitchen", "2023-12-01", "100");
+        MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
+        MeterReading meterReading3 = createMeterReading("kitchen", "2025-01-01", "150");
+
+        WaterTariff waterTariff =
+                createWaterTariff(createDateRange("2024-01-01", "2025-01-01"), "90");
+
+        ColdWaterSection coldWaterSection =
+                generateColdWaterSection(
+                        createDateRange("2024-01-01", "2025-01-01"),
+                        createColdWaterSectionInputs(
+                                List.of(waterTariff),
+                                List.of(meterReading1, meterReading2, meterReading3)));
+
+        assertThat(coldWaterSection.name()).isEqualTo("Cold water");
+        assertThat(coldWaterSection.readings().size()).isEqualTo(2);
+        assertThat(coldWaterSection.priceList().size()).isEqualTo(2);
+        assertThat(coldWaterSection.totalAmount()).isEqualTo("4124.97");
+
+        WaterReading waterReading1 = coldWaterSection.readings().getFirst();
+        assertThat(waterReading1.meterId()).isEqualTo("kitchen");
+        assertThat(waterReading1.dateRange())
+                .isEqualTo(createDateRange("2024-01-01", "2024-06-01"));
+        assertThat(waterReading1.startState()).isEqualTo("104.167");
+        assertThat(waterReading1.endState()).isEqualTo("125");
+        assertThat(waterReading1.consumption()).isEqualTo("20.833");
+
+        WaterReading waterReading2 = coldWaterSection.readings().getLast();
+        assertThat(waterReading2.meterId()).isEqualTo("kitchen");
+        assertThat(waterReading2.dateRange())
+                .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
+        assertThat(waterReading2.startState()).isEqualTo("125");
+        assertThat(waterReading2.endState()).isEqualTo("150");
+        assertThat(waterReading2.consumption()).isEqualTo("25");
+    }
+
+    @Test
+    void
+            coldWaterSection_withOneMeterId_withOutOfReportEndReading_should_haveCorrectColdWaterReading() {
+        MeterReading meterReading1 = createMeterReading("kitchen", "2024-01-01", "100");
+        MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
+        MeterReading meterReading3 = createMeterReading("kitchen", "2025-02-01", "150");
+
+        WaterTariff waterTariff =
+                createWaterTariff(createDateRange("2024-01-01", "2025-01-01"), "90");
+
+        ColdWaterSection coldWaterSection =
+                generateColdWaterSection(
+                        createDateRange("2024-01-01", "2025-01-01"),
+                        createColdWaterSectionInputs(
+                                List.of(waterTariff),
+                                List.of(meterReading1, meterReading2, meterReading3)));
+
+        assertThat(coldWaterSection.name()).isEqualTo("Cold water");
+        assertThat(coldWaterSection.readings().size()).isEqualTo(2);
+        assertThat(coldWaterSection.priceList().size()).isEqualTo(2);
+        assertThat(coldWaterSection.totalAmount()).isEqualTo("4218.75");
+
+        WaterReading waterReading1 = coldWaterSection.readings().getFirst();
+        assertThat(waterReading1.meterId()).isEqualTo("kitchen");
+        assertThat(waterReading1.dateRange())
+                .isEqualTo(createDateRange("2024-01-01", "2024-06-01"));
+        assertThat(waterReading1.startState()).isEqualTo("100");
+        assertThat(waterReading1.endState()).isEqualTo("125");
+        assertThat(waterReading1.consumption()).isEqualTo("25");
+
+        WaterReading waterReading2 = coldWaterSection.readings().getLast();
+        assertThat(waterReading2.meterId()).isEqualTo("kitchen");
+        assertThat(waterReading2.dateRange())
+                .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
+        assertThat(waterReading2.startState()).isEqualTo("125");
+        assertThat(waterReading2.endState()).isEqualTo("146.875");
+        assertThat(waterReading2.consumption()).isEqualTo("21.875");
+    }
+
+    @Test
     void coldWaterSection_withReplaceMeter_should_haveCorrectColdWaterReading() {
         MeterReading meterReading1 = createMeterReading("kitchen", "2024-01-01", "100");
         MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
@@ -213,7 +330,7 @@ public class ColdWaterSectionGeneratorTest {
     // endregion
     // region Cold water fee tests
     @Test
-    void coldWaterSection_withOneMeterId_withMultipleTariff_should_haveCorrectColdWaterReading() {
+    void coldWaterSection_withOneMeterId_withMultipleTariff_should_haveCorrectColdWaterFee() {
         MeterReading meterReading1 = createMeterReading("kitchen", "2024-01-01", "100");
         MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
         MeterReading meterReading3 = createMeterReading("kitchen", "2025-01-01", "150");
@@ -251,8 +368,44 @@ public class ColdWaterSectionGeneratorTest {
     }
 
     @Test
+    void coldWaterSection_withOneTariff_withOutOfReportReadings_should_haveCorrectColdWaterFee() {
+        MeterReading meterReading1 = createMeterReading("kitchen", "2023-12-01", "100");
+        MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
+        MeterReading meterReading3 = createMeterReading("kitchen", "2025-02-01", "150");
+
+        WaterTariff waterTariff =
+                createWaterTariff(createDateRange("2024-01-01", "2025-01-01"), "90");
+
+        ColdWaterSection coldWaterSection =
+                generateColdWaterSection(
+                        createDateRange("2024-01-01", "2025-01-01"),
+                        createColdWaterSectionInputs(
+                                List.of(waterTariff),
+                                List.of(meterReading1, meterReading2, meterReading3)));
+
+        assertThat(coldWaterSection.name()).isEqualTo("Cold water");
+        assertThat(coldWaterSection.readings().size()).isEqualTo(2);
+        assertThat(coldWaterSection.priceList().size()).isEqualTo(2);
+        assertThat(coldWaterSection.totalAmount()).isEqualTo("3843.72");
+
+        WaterFee coldWaterFee1 = coldWaterSection.priceList().getFirst();
+        assertThat(coldWaterFee1.dateRange())
+                .isEqualTo(createDateRange("2024-01-01", "2024-06-01"));
+        assertThat(coldWaterFee1.unitAmount()).isEqualTo("90");
+        assertThat(coldWaterFee1.quantity()).isEqualTo("20.833");
+        assertThat(coldWaterFee1.periodAmount()).isEqualTo("1874.97");
+
+        WaterFee coldWaterFee2 = coldWaterSection.priceList().getLast();
+        assertThat(coldWaterFee2.dateRange())
+                .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
+        assertThat(coldWaterFee2.unitAmount()).isEqualTo("90");
+        assertThat(coldWaterFee2.quantity()).isEqualTo("21.875");
+        assertThat(coldWaterFee2.periodAmount()).isEqualTo("1968.75");
+    }
+
+    @Test
     void
-            coldWaterSection_withMultipleMeters_withMisingReadings_withMultipleTariff_should_haveCorrectColdWaterReading() {
+            coldWaterSection_withMultipleMeters_withMisingReadings_withMultipleTariff_should_haveCorrectColdWaterFee() {
         MeterReading meterReading1 = createMeterReading("kitchen", "2024-01-01", "100");
         MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
         MeterReading meterReading3 = createMeterReading("bathroom", "2024-01-01", "0");
@@ -296,7 +449,7 @@ public class ColdWaterSectionGeneratorTest {
 
     @Test
     void
-            coldWaterSection_withOneMeterId_withMultipleTariff_withMisingTariffZone_should_haveCorrectColdWaterReading() {
+            coldWaterSection_withOneMeterId_withMultipleTariff_withMisingTariffZone_should_haveCorrectColdWaterFee() {
         MeterReading meterReading1 = createMeterReading("kitchen", "2024-01-01", "100");
         MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
         MeterReading meterReading3 = createMeterReading("kitchen", "2025-01-01", "150");

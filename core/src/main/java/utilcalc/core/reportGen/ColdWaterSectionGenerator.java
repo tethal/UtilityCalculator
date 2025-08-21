@@ -60,68 +60,84 @@ final class ColdWaterSectionGenerator {
                         .sorted(Comparator.comparing(MeterReading::readingDate))
                         .collect(Collectors.toList());
 
-        List<WaterReading> waterReadings =
-                createColdWaterReadingsFromMeterData(sortedMeterReadings);
+        LinkedList<WaterReading> waterReadings =
+                new LinkedList<>(createColdWaterReadingsFromMeterData(sortedMeterReadings));
 
-        WaterReading firstReading = waterReadings.getFirst();
-        WaterReading lastReading = waterReadings.getLast();
+        LocalDate firstReadingStart = waterReadings.getFirst().dateRange().startDate();
+        LocalDate lastReadingEnd = waterReadings.getLast().dateRange().endDateExclusive();
 
-        if (reportDateRange.startDate().isBefore(firstReading.dateRange().startDate())) {
-            waterReadings.addFirst(
-                    createMissingColdWaterReading(reportDateRange, firstReading, true));
-        }
+        LocalDate reportStart = reportDateRange.startDate();
+        LocalDate reportEnd = reportDateRange.endDateExclusive();
 
-        if (reportDateRange
-                .endDateExclusive()
-                .isAfter(lastReading.dateRange().endDateExclusive())) {
-            waterReadings.addLast(
-                    createMissingColdWaterReading(reportDateRange, lastReading, false));
-        }
+        if (reportStart.isBefore(firstReadingStart))
+            addMissingStartWaterReading(reportDateRange, waterReadings, true);
+
+        if (reportStart.isAfter(firstReadingStart))
+            addMissingStartWaterReading(reportDateRange, waterReadings, false);
+
+        if (reportEnd.isBefore(lastReadingEnd))
+            addMissingEndWaterReading(reportDateRange, waterReadings, false);
+
+        if (reportEnd.isAfter(lastReadingEnd))
+            addMissingEndWaterReading(reportDateRange, waterReadings, true);
 
         return waterReadings;
     }
 
-    private static WaterReading createMissingColdWaterReading(
-            DateRange reportDateRange, WaterReading reading, boolean isStart) {
+    private static void addMissingStartWaterReading(
+            DateRange reportDateRange, List<WaterReading> readings, boolean isInnerReading) {
+        WaterReading first = readings.getFirst();
+        WaterReading second = readings.get(1);
+        LocalDate endDateExclusive =
+                isInnerReading ? first.dateRange().startDate() : second.dateRange().startDate();
+        BigDecimal startState = isInnerReading ? first.startState() : second.startState();
 
-        String meterId = reading.meterId();
-        BigDecimal startState = reading.startState();
-        BigDecimal endState = reading.endState();
-        DateRange readingDateRange = reading.dateRange();
-
-        DateRange newDateRange =
-                isStart
-                        ? new DateRange(reportDateRange.startDate(), readingDateRange.startDate())
-                        : new DateRange(
-                                readingDateRange.endDateExclusive(),
-                                reportDateRange.endDateExclusive());
-
+        DateRange newDateRange = new DateRange(reportDateRange.startDate(), endDateExclusive);
         BigDecimal newConsumption =
-                calculateConsumption(newDateRange, reading).setScale(3, RoundingMode.HALF_UP);
-
+                calculateConsumption(newDateRange, first).setScale(3, RoundingMode.HALF_UP);
         BigDecimal newStartState =
-                isStart
-                        ? startState.subtract(newConsumption).setScale(3, RoundingMode.HALF_UP)
-                        : endState;
+                startState.subtract(newConsumption).setScale(3, RoundingMode.HALF_UP);
+        WaterReading newWaterReading =
+                new WaterReading(
+                        newDateRange, first.meterId(), newStartState, startState, newConsumption);
 
-        BigDecimal newEndState =
-                isStart
-                        ? startState
-                        : endState.add(newConsumption).setScale(3, RoundingMode.HALF_UP);
+        if (!isInnerReading) readings.removeFirst();
+        readings.addFirst(newWaterReading);
+    }
 
-        return new WaterReading(newDateRange, meterId, newStartState, newEndState, newConsumption);
+    private static void addMissingEndWaterReading(
+            DateRange reportDateRange, List<WaterReading> readings, boolean isInnerReading) {
+        WaterReading last = readings.getLast();
+        WaterReading penultimate = readings.size() > 1 ? readings.get(readings.size() - 2) : last;
+        LocalDate startDate =
+                isInnerReading
+                        ? last.dateRange().endDateExclusive()
+                        : penultimate.dateRange().endDateExclusive();
+        BigDecimal endState = isInnerReading ? last.endState() : penultimate.endState();
+
+        DateRange newDateRange = new DateRange(startDate, reportDateRange.endDateExclusive());
+        BigDecimal newConsumption =
+                calculateConsumption(newDateRange, last).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal newEndState = endState.add(newConsumption).setScale(3, RoundingMode.HALF_UP);
+        WaterReading newWaterReading =
+                new WaterReading(
+                        newDateRange, last.meterId(), endState, newEndState, newConsumption);
+        if (!isInnerReading) readings.removeLast();
+        readings.addLast(newWaterReading);
     }
 
     private static List<WaterReading> createColdWaterReadingsFromMeterData(
             List<MeterReading> meterReadings) {
         return IntStream.range(0, meterReadings.size() - 1)
                 .mapToObj(
-                        i -> createColdWaterReading(meterReadings.get(i), meterReadings.get(i + 1)))
+                        i ->
+                                calculateColdWaterReading(
+                                        meterReadings.get(i), meterReadings.get(i + 1)))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private static WaterReading createColdWaterReading(
+    private static WaterReading calculateColdWaterReading(
             MeterReading currentReading, MeterReading nextReading) {
         BigDecimal startReadingState = currentReading.state();
         BigDecimal nextReadingState = nextReading.state();
