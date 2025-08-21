@@ -65,3 +65,48 @@ unit_amount = 103.4076
 start_date = 2022-01-01
 end_date = 2022-12-31
 unit_amount = 108.13
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2021-10-14
+state = 100.5
+
+[[hot_water.reading]]
+meter_id = "2"
+reading_date = 2021-12-31
+state = 55.0
+
+[[hot_water.reading]]
+meter_id = "2"
+reading_date = 2022-04-30
+state = 80.75
+
+[[hot_water.tariff]]
+start_date = 2021-01-01
+end_date = 2021-12-31
+unit_amount = 145.50
+
+[[hot_water.tariff]]
+start_date = 2022-01-01
+end_date = 2022-12-31
+unit_amount = 150.75
+
+[[hot_water.heating_basic_cost]]
+start_date = 2021-01-01
+end_date = 2021-12-31
+annual_cost = 5000.0
+
+[[hot_water.heating_basic_cost]]
+start_date = 2022-01-01
+end_date = 2022-12-31
+annual_cost = 5200.0
+
+[[hot_water.heating_consumable_tariff]]
+start_date = 2021-01-01
+end_date = 2021-12-31
+unit_amount = 120.0
+
+[[hot_water.heating_consumable_tariff]]
+start_date = 2022-01-01
+end_date = 2022-12-31
+unit_amount = 130.0
