@@ -1,5 +1,6 @@
 package utilcalc.core.reportGen;
 
+import static utilcalc.core.reportGen.ColdWaterSectionGenerator.generateColdWaterSection;
 import static utilcalc.core.reportGen.DepositSectionGenerator.generateDepositSection;
 import static utilcalc.core.reportGen.HeatingFeeSectionGenerator.generateHeatingFeeSection;
 import static utilcalc.core.reportGen.OtherFeeSectionGenerator.generateOtherFeeSection;
@@ -44,6 +45,8 @@ public final class ReportGen {
             case OtherFeeInputs otherFee -> generateOtherFeeSection(reportDateRange, otherFee);
             case HeatingFeeInputs heatingFee -> generateHeatingFeeSection(
                     reportDateRange, heatingFee);
+            case ColdWaterSectionInputs coldWaterFee -> generateColdWaterSection(
+                    reportDateRange, coldWaterFee);
             default -> throw new IllegalStateException(
                     "Unexpected section: " + sectionInputs.name());
         };

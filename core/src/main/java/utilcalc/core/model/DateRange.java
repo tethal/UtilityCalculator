@@ -9,8 +9,10 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Stream;
 
-public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
+public record DateRange(LocalDate startDate, LocalDate endDateExclusive)
+        implements Comparable<DateRange> {
     public DateRange {
         ensureNonNull(startDate, "startDate");
         ensureNonNull(endDateExclusive, "endDateExclusive");
@@ -76,5 +78,14 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive) {
 
     public boolean isSingleMonth() {
         return YearMonth.from(startDate).equals(YearMonth.from(endDateExclusive.minusDays(1)));
+    }
+
+    @Override
+    public int compareTo(DateRange other) {
+        return this.startDate.compareTo(other.startDate);
+    }
+
+    public Stream<LocalDate> stream() {
+        return Stream.of(startDate, endDateExclusive);
     }
 }

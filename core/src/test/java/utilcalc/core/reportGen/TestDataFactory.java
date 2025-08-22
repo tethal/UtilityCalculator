@@ -69,4 +69,18 @@ public class TestDataFactory {
     public static HeatingFeeInputs createHeatingFeeInputs(ServiceCost... serviceCosts) {
         return new HeatingFeeInputs("Heating fees", List.of(serviceCosts));
     }
+
+    public static ColdWaterSectionInputs createColdWaterSectionInputs(
+            List<WaterTariff> waterTariffs, List<MeterReading> meterReadings) {
+        return new ColdWaterSectionInputs("Cold water", meterReadings, waterTariffs);
+    }
+
+    public static MeterReading createMeterReading(
+            String meterId, String readingDate, String state) {
+        return new MeterReading(meterId, LocalDate.parse(readingDate), new BigDecimal(state));
+    }
+
+    public static WaterTariff createWaterTariff(DateRange dateRange, String pricePerCubicMeter) {
+        return new WaterTariff(dateRange, new BigDecimal(pricePerCubicMeter));
+    }
 }
