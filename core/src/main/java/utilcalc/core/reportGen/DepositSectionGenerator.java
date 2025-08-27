@@ -1,5 +1,6 @@
 package utilcalc.core.reportGen;
 
+import static utilcalc.core.reportGen.ReportGenUtil.calculateAmount;
 import static utilcalc.core.utils.Util.ensureNotNegativeBigDecimalValue;
 
 import java.math.BigDecimal;
@@ -20,11 +21,7 @@ final class DepositSectionGenerator {
         List<Deposit> deposits =
                 payments.stream().map(DepositSectionGenerator::mapPaymentToDeposit).toList();
 
-        BigDecimal totalAmount =
-                deposits.stream()
-                        .map(Deposit::amount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                        .negate();
+        BigDecimal totalAmount = calculateAmount(deposits, Deposit::amount).negate();
 
         return new DepositSection(name, totalAmount, deposits);
     }

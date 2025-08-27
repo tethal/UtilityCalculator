@@ -14,7 +14,8 @@ import utilcalc.core.model.output.WaterReading;
 
 public class ColdWaterSectionGeneratorTest {
 
-    // region Cold water reading tests
+    // region reading tests
+
     @Test
     void coldWaterSection_withOneMeterId_should_haveCorrectColdWaterReading() {
         MeterReading meterReading1 = createMeterReading("kitchen", "2024-01-01", "100");
@@ -328,7 +329,9 @@ public class ColdWaterSectionGeneratorTest {
     }
 
     // endregion
-    // region Cold water fee tests
+
+    // region price list tests
+
     @Test
     void coldWaterSection_withOneMeterId_withMultipleTariff_should_haveCorrectColdWaterFee() {
         MeterReading meterReading1 = createMeterReading("kitchen", "2024-01-01", "100");
