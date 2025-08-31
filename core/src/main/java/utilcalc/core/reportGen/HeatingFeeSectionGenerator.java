@@ -48,10 +48,7 @@ final class HeatingFeeSectionGenerator {
                         .map(HeatingFeeSectionGenerator::calculateHeatingFee)
                         .collect(Collectors.toList());
 
-        BigDecimal totalAmount =
-                heatingFees.stream()
-                        .map(HeatingFee::feeAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalAmount = calculateAmount(heatingFees, HeatingFee::feeAmount);
 
         return new HeatingFeeSection(name, totalAmount, heatingFees);
     }

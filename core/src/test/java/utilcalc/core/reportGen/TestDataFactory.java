@@ -83,4 +83,13 @@ public class TestDataFactory {
     public static WaterTariff createWaterTariff(DateRange dateRange, String pricePerCubicMeter) {
         return new WaterTariff(dateRange, new BigDecimal(pricePerCubicMeter));
     }
+
+    public static HotWaterSectionInputs createHotWaterSectionInputs(
+            List<MeterReading> readings,
+            List<WaterTariff> priceList,
+            List<ServiceCost> heatingBasicCost,
+            List<WaterTariff> heatingConsumableTariffs) {
+        return new HotWaterSectionInputs(
+                "Hot water", readings, priceList, heatingBasicCost, heatingConsumableTariffs);
+    }
 }

@@ -1,5 +1,7 @@
 package utilcalc.core.reportGen;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,6 +11,10 @@ import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.ServiceCost;
 
 final class ReportGenUtil {
+
+    private static final int DISPLAY_DECIMAL_PLACES = 2;
+    private static final int CALCULATION_SCALE = 10;
+    private static final BigDecimal MONTHS_IN_YEAR = BigDecimal.valueOf(12);
 
     private ReportGenUtil() {}
 
@@ -78,4 +84,42 @@ final class ReportGenUtil {
             }
         }
     }
+
+    static <T> BigDecimal calculateAmount(
+            List<T> items, Function<T, BigDecimal> itemsAmountExtractor) {
+        return items.stream().map(itemsAmountExtractor).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    static List<FeeCalculationResult> calculateFees(
+            DateRange reportDateRange, List<ServiceCost> serviceCosts) {
+        return splitServiceCostsByReport(reportDateRange, serviceCosts).stream()
+                .map(ReportGenUtil::calculateFee)
+                .toList();
+    }
+
+    private static FeeCalculationResult calculateFee(ServiceCost serviceCost) {
+        DateRange dateRange = serviceCost.dateRange();
+        BigDecimal monthlyCost =
+                serviceCost
+                        .annualCost()
+                        .divide(MONTHS_IN_YEAR, CALCULATION_SCALE, RoundingMode.HALF_UP);
+        BigDecimal mountCount = dateRange.getMonthCount();
+        BigDecimal feeAmount =
+                mountCount
+                        .multiply(monthlyCost)
+                        .setScale(DISPLAY_DECIMAL_PLACES, RoundingMode.HALF_UP);
+
+        BigDecimal roundMonthlyCost =
+                monthlyCost.setScale(DISPLAY_DECIMAL_PLACES, RoundingMode.HALF_UP);
+        BigDecimal roundMonthCount =
+                mountCount.setScale(DISPLAY_DECIMAL_PLACES, RoundingMode.HALF_UP);
+
+        return new FeeCalculationResult(dateRange, roundMonthCount, roundMonthlyCost, feeAmount);
+    }
+
+    public record FeeCalculationResult(
+            DateRange dateRange,
+            BigDecimal monthCount,
+            BigDecimal monthlyCost,
+            BigDecimal feeAmount) {}
 }
