@@ -163,7 +163,7 @@ class ReportGenTest {
         assertThat(hotWaterSection.readings().size()).isEqualTo(2);
         assertThat(hotWaterSection.priceList().size()).isEqualTo(2);
         assertThat(hotWaterSection.heatingBasicParts().size()).isEqualTo(2);
-        assertThat(hotWaterSection.heatingConsumableParts().size()).isEqualTo(5);
+        assertThat(hotWaterSection.heatingConsumableParts().size()).isEqualTo(3);
         assertThat(hotWaterSection.totalAmount()).isEqualTo("17541.67");
     }
 

@@ -86,7 +86,7 @@ public class HotWaterSectionGeneratorTest {
                                 List.of(heatingConsumableTariffs)));
 
         assertThat(hotWaterSection.name()).isEqualTo("Hot water");
-        assertThat(hotWaterSection.readings().size()).isEqualTo(4); // 8062.47
+        assertThat(hotWaterSection.readings().size()).isEqualTo(4);
         assertThat(hotWaterSection.totalAmount()).isEqualTo("24124.94");
 
         WaterReading waterReading1 = hotWaterSection.readings().getFirst();
@@ -156,7 +156,7 @@ public class HotWaterSectionGeneratorTest {
                 .isEqualTo(createDateRange("2024-01-01", "2024-06-01"));
         assertThat(waterReading1.startState()).isEqualTo("104.167");
         assertThat(waterReading1.endState()).isEqualTo("125");
-        assertThat(waterReading1.consumption()).isEqualTo("20.833"); // 1873.97
+        assertThat(waterReading1.consumption()).isEqualTo("20.833");
 
         WaterReading waterReading2 = hotWaterSection.readings().getLast();
         assertThat(waterReading2.meterId()).isEqualTo("kitchen");
@@ -164,7 +164,7 @@ public class HotWaterSectionGeneratorTest {
                 .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
         assertThat(waterReading2.startState()).isEqualTo("125");
         assertThat(waterReading2.endState()).isEqualTo("146.875");
-        assertThat(waterReading2.consumption()).isEqualTo("21.875"); // 1968.75
+        assertThat(waterReading2.consumption()).isEqualTo("21.875");
     }
 
     @Test
@@ -464,48 +464,32 @@ public class HotWaterSectionGeneratorTest {
                                 List.of(heatingConsumableTariffs1, heatingConsumableTariffs2)));
 
         assertThat(hotWaterSection.name()).isEqualTo("Hot water");
-        assertThat(hotWaterSection.heatingConsumableParts().size()).isEqualTo(5);
+        assertThat(hotWaterSection.heatingConsumableParts().size()).isEqualTo(3);
         assertThat(hotWaterSection.totalAmount()).isEqualTo("17450.00");
 
         WaterHeatingConsumablePart waterHeatingConsumablePart1 =
                 hotWaterSection.heatingConsumableParts().getFirst();
         assertThat(waterHeatingConsumablePart1.dateRange())
-                .isEqualTo(createDateRange("2023-02-01", "2024-01-01"));
-        assertThat(waterHeatingConsumablePart1.unitAmount()).isEqualTo("0.000");
+                .isEqualTo(createDateRange("2024-01-01", "2024-02-01"));
+        assertThat(waterHeatingConsumablePart1.unitAmount()).isEqualTo("5.000");
         assertThat(waterHeatingConsumablePart1.unitCost()).isEqualTo("90");
-        assertThat(waterHeatingConsumablePart1.totalCost()).isEqualTo("0.00");
+        assertThat(waterHeatingConsumablePart1.totalCost()).isEqualTo("450.00");
 
         WaterHeatingConsumablePart waterHeatingConsumablePart2 =
                 hotWaterSection.heatingConsumableParts().get(1);
         assertThat(waterHeatingConsumablePart2.dateRange())
-                .isEqualTo(createDateRange("2024-01-01", "2024-02-01"));
-        assertThat(waterHeatingConsumablePart2.unitAmount()).isEqualTo("5.000");
-        assertThat(waterHeatingConsumablePart2.unitCost()).isEqualTo("90");
-        assertThat(waterHeatingConsumablePart2.totalCost()).isEqualTo("450.00");
+                .isEqualTo(createDateRange("2024-02-01", "2024-06-01"));
+        assertThat(waterHeatingConsumablePart2.unitAmount()).isEqualTo("20.000");
+        assertThat(waterHeatingConsumablePart2.unitCost()).isEqualTo("100");
+        assertThat(waterHeatingConsumablePart2.totalCost()).isEqualTo("2000.00");
 
         WaterHeatingConsumablePart waterHeatingConsumablePart3 =
-                hotWaterSection.heatingConsumableParts().get(2);
+                hotWaterSection.heatingConsumableParts().getLast();
         assertThat(waterHeatingConsumablePart3.dateRange())
-                .isEqualTo(createDateRange("2024-02-01", "2024-06-01"));
-        assertThat(waterHeatingConsumablePart3.unitAmount()).isEqualTo("20.000");
-        assertThat(waterHeatingConsumablePart3.unitCost()).isEqualTo("100");
-        assertThat(waterHeatingConsumablePart3.totalCost()).isEqualTo("2000.00");
-
-        WaterHeatingConsumablePart waterHeatingConsumablePart4 =
-                hotWaterSection.heatingConsumableParts().get(3);
-        assertThat(waterHeatingConsumablePart4.dateRange())
                 .isEqualTo(createDateRange("2024-06-01", "2025-01-01"));
-        assertThat(waterHeatingConsumablePart4.unitAmount()).isEqualTo("25.000");
-        assertThat(waterHeatingConsumablePart4.unitCost()).isEqualTo("100");
-        assertThat(waterHeatingConsumablePart4.totalCost()).isEqualTo("2500.00");
-
-        WaterHeatingConsumablePart waterHeatingConsumablePart5 =
-                hotWaterSection.heatingConsumableParts().get(4);
-        assertThat(waterHeatingConsumablePart5.dateRange())
-                .isEqualTo(createDateRange("2025-01-01", "2025-02-01"));
-        assertThat(waterHeatingConsumablePart5.unitAmount()).isEqualTo("0.000");
-        assertThat(waterHeatingConsumablePart5.unitCost()).isEqualTo("100");
-        assertThat(waterHeatingConsumablePart5.totalCost()).isEqualTo("0.00");
+        assertThat(waterHeatingConsumablePart3.unitAmount()).isEqualTo("25.000");
+        assertThat(waterHeatingConsumablePart3.unitCost()).isEqualTo("100");
+        assertThat(waterHeatingConsumablePart3.totalCost()).isEqualTo("2500.00");
     }
     // endregion
 }

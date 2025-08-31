@@ -175,13 +175,24 @@ final class WaterSectionUtil {
     private static List<DateRange> extractValidIntervals(
             WaterTariff waterTariff, List<WaterReading> meterReadings) {
 
+        LocalDate startDateFirstReading = meterReadings.getFirst().dateRange().startDate();
+        LocalDate endDateLastReading = meterReadings.getLast().dateRange().endDateExclusive();
+
+        LocalDate waterTariffStartDate = waterTariff.dateRange().startDate();
+        LocalDate waterTariffEndDate = waterTariff.dateRange().endDateExclusive();
+
         Set<LocalDate> datePoints =
                 meterReadings.stream()
                         .flatMap(reading -> reading.dateRange().stream())
                         .collect(Collectors.toSet());
 
-        datePoints.add(waterTariff.dateRange().startDate());
-        datePoints.add(waterTariff.dateRange().endDateExclusive());
+        if (waterTariffStartDate.isAfter(startDateFirstReading)) {
+            datePoints.add(waterTariffStartDate);
+        }
+
+        if (waterTariffEndDate.isBefore(endDateLastReading)) {
+            datePoints.add(waterTariffEndDate);
+        }
 
         List<LocalDate> sortedDates = datePoints.stream().sorted().toList();
 
