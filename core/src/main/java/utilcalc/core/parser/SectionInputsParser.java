@@ -1,10 +1,19 @@
 package utilcalc.core.parser;
 
+import java.util.Comparator;
 import java.util.List;
 import org.tomlj.TomlTable;
-import utilcalc.core.model.input.SectionInputs;
+import utilcalc.core.model.input.*;
 
 class SectionInputsParser {
+
+    private static final List<Class<? extends SectionInputs>> SECTION_ORDER =
+            List.of(
+                    ColdWaterSectionInputs.class,
+                    HotWaterSectionInputs.class,
+                    HeatingFeeInputs.class,
+                    OtherFeeInputs.class,
+                    DepositsSectionInputs.class);
 
     private SectionInputsParser() {}
 
@@ -12,6 +21,7 @@ class SectionInputsParser {
         return parseResult.entrySet().stream()
                 .filter(entry -> !Parser.GENERAL_SECTION_NAME.equals(entry.getKey()))
                 .map(entry -> parserSectionInputs(entry.getValue(), entry.getKey()))
+                .sorted(Comparator.comparing(section -> SECTION_ORDER.indexOf(section.getClass())))
                 .toList();
     }
 

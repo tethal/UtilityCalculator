@@ -1,0 +1,16 @@
+Report:
+  dateRange: 2024-01-01...2025-01-01
+  tenant: Marie Černá, Jindřišská 16, 111 50 Praha 1
+  owner: Jan Novák, majitel@example.com
+  placeDate: V Praze, 2025-05-08
+  sources: Vyúčtování služeb od Společenství vlastníků za rok 2024
+  sections:
+    Ostatní poplatky: 39514.30
+    Přijaté zálohy: -36000
+    TOTAL: 3514.30
+
+Ostatní poplatky:
+  2024-01-01...2025-01-01: 12.00 * 3292.86 = 39514.30
+
+Přijaté zálohy:
+  leden - prosinec: 12 * 3000 = 36000
