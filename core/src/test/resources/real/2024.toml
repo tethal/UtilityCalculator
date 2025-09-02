@@ -1,0 +1,63 @@
+[general]
+start_date = 2024-01-01
+end_date = 2024-12-31
+tenant = ["Marie Černá", "Jindřišská 16", "111 50 Praha 1"]
+owner = ["Jan Novák", "majitel@example.com"]
+report_place = "V Praze"
+report_date = 2025-05-08
+sources = ["Vyúčtování služeb od Společenství vlastníků za rok 2024"]
+
+[[deposits]]
+description="leden - prosinec"
+count=12
+amount=3000
+
+[[heating]]
+annual_cost = 12431.84
+start_date = 2024-01-01
+end_date = 2024-12-31
+
+[[other_fees]]
+start_date = 2024-01-01
+end_date = 2024-12-31
+annual_cost = 10362.59
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2024-01-01
+state = 60.7
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2025-01-01
+state = 102.9
+
+[[cold_water.tariff]]
+start_date = 2024-01-01
+end_date = 2024-12-31
+unit_amount = 140.288151659
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2024-01-01
+state = 30.7
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2025-01-01
+state = 51.9
+
+[[hot_water.tariff]]
+start_date = 2024-01-01
+end_date = 2024-12-31
+unit_amount = 122.850943396
+
+[[hot_water.heating_basic_cost]]
+start_date = 2024-01-01
+end_date = 2024-12-31
+annual_cost = 2725.92
+
+[[hot_water.heating_consumable_tariff]]
+start_date = 2024-01-01
+end_date = 2024-12-31
+unit_amount = 257.988

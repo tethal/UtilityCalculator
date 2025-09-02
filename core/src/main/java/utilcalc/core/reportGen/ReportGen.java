@@ -5,8 +5,10 @@ import static utilcalc.core.reportGen.DepositSectionGenerator.generateDepositSec
 import static utilcalc.core.reportGen.HeatingFeeSectionGenerator.generateHeatingFeeSection;
 import static utilcalc.core.reportGen.HotWaterSectionGenerator.generateHotWaterSection;
 import static utilcalc.core.reportGen.OtherFeeSectionGenerator.generateOtherFeeSection;
+import static utilcalc.core.reportGen.ReportGenUtil.calculateAmount;
 import static utilcalc.core.utils.Util.ensureNonNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import utilcalc.core.model.DateRange;
@@ -29,6 +31,8 @@ public final class ReportGen {
                         .map(sectionInputs -> generateReportSection(sectionInputs, reportDateRange))
                         .collect(Collectors.toList());
 
+        BigDecimal total = calculateAmount(reportSections, ReportSection::totalAmount);
+
         return new Report(
                 reportDateRange,
                 reportInputs.tenant(),
@@ -36,7 +40,8 @@ public final class ReportGen {
                 reportInputs.reportPlace(),
                 reportInputs.reportDate(),
                 reportInputs.sources(),
-                reportSections);
+                reportSections,
+                total);
     }
 
     private static ReportSection generateReportSection(

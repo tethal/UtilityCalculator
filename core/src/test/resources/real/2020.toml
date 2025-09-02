@@ -1,0 +1,64 @@
+[general]
+start_date = 2020-01-01
+end_date = 2020-12-31
+tenant = ["Marie Černá", "Jindřišská 16", "111 50 Praha 1"]
+owner = ["Jan Novák", "majitel@example.com"]
+report_place = "V Praze"
+report_date = 2021-05-02
+sources = ["Vyúčtování služeb od Společenství vlastníků za rok 2020"]
+
+[[deposits]]
+description="celkem"
+count=1
+amount=40000
+
+[[heating]]
+annual_cost = 7727.3
+start_date = 2020-01-01
+end_date = 2020-12-31
+
+[[other_fees]]
+start_date = 2020-01-01
+end_date = 2020-12-31
+annual_cost = 9133
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2020-01-01
+state = 0
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2021-01-01
+state = 36.3
+
+
+[[cold_water.tariff]]
+start_date = 2020-01-01
+end_date = 2020-12-31
+unit_amount = 86.5161
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2020-01-01
+state = 0
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2021-01-01
+state = 25.9
+
+[[hot_water.tariff]]
+start_date = 2020-01-01
+end_date = 2020-12-31
+unit_amount = 86.343526
+
+[[hot_water.heating_basic_cost]]
+start_date = 2020-01-01
+end_date = 2020-12-31
+annual_cost = 1755
+
+[[hot_water.heating_consumable_tariff]]
+start_date = 2020-01-01
+end_date = 2020-12-31
+unit_amount = 128.698362

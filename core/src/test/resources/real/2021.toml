@@ -1,0 +1,114 @@
+[general]
+start_date = 2021-01-01
+end_date = 2022-04-30
+tenant = ["Marie Černá", "Jindřišská 16", "111 50 Praha 1"]
+owner = ["Jan Novák", "majitel@example.com"]
+report_place = "V Praze"
+report_date = 2022-05-22
+sources = ["Vyúčtování služeb od Společenství vlastníků za rok 2021", "Příloha č. 3 k vyhlášce č.269/2015 Sb.", "Měsíční předpis záloh pro rok 2022 od Společenství vlastníků", "https://www.pvk.cz/vse-o-vode/cena-vodneho-a-stocneho/vyvoj-vodneho-a-stocneho-v-praze/",]
+
+[[deposits]]
+description="celkem"
+count=1
+amount=43500
+
+[[heating]]
+annual_cost = 8712.9
+start_date = 2021-01-01
+end_date = 2021-12-31
+
+[[heating]]
+annual_cost = 8472
+start_date = 2022-01-01
+end_date = 2022-12-31
+
+[[other_fees]]
+start_date = 2021-01-01
+end_date = 2021-12-31
+annual_cost = 8772
+
+[[other_fees]]
+start_date = 2022-01-01
+end_date = 2022-12-31
+annual_cost = 8508
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2021-01-01
+state = 158.1
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2021-10-15
+state = 184.4
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2021-10-15
+state = 0
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2022-01-01
+state = 8.6
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2022-05-01
+state = 21
+
+
+[[cold_water.tariff]]
+start_date = 2021-01-01
+end_date = 2021-12-31
+unit_amount = 103.4076
+
+[[cold_water.tariff]]
+start_date = 2022-01-01
+end_date = 2022-12-31
+unit_amount = 108.13
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2021-01-01
+state = 96.6
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2021-10-15
+state = 106.5
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2021-10-15
+state = 0
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2022-01-01
+state = 5.5
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2022-05-01
+state = 13.3
+
+[[hot_water.tariff]]
+start_date = 2021-01-01
+end_date = 2021-12-31
+unit_amount = 81.495360
+
+[[hot_water.tariff]]
+start_date = 2022-01-01
+end_date = 2022-12-31
+unit_amount = 108.13
+
+[[hot_water.heating_basic_cost]]
+start_date = 2021-01-01
+end_date = 2022-12-31
+annual_cost = 1769.52
+
+[[hot_water.heating_consumable_tariff]]
+start_date = 2021-01-01
+end_date = 2022-12-31
+unit_amount = 150.998035

@@ -1,0 +1,69 @@
+[general]
+start_date = 2019-05-01
+end_date = 2019-12-31
+tenant = ["Marie Černá", "Jindřišská 16", "111 50 Praha 1"]
+owner = ["Jan Novák", "majitel@example.com"]
+report_place = "V Praze"
+report_date = 2020-05-01
+sources = ["Vyúčtování služeb od Společenství vlastníků za rok 2019"]
+
+[[deposits]]
+description="duben - srpen"
+count=5
+amount=4000
+
+[[deposits]]
+description="zari - listopad"
+count=3
+amount=5000
+
+[[heating]]
+annual_cost = 7855.5
+start_date = 2019-01-01
+end_date = 2019-12-31
+
+[[other_fees]]
+start_date = 2019-01-01
+end_date = 2019-12-31
+annual_cost = 8196
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2019-05-01
+state = 86
+
+[[cold_water.reading]]
+meter_id = "1"
+reading_date = 2020-01-01
+state = 122
+
+
+[[cold_water.tariff]]
+start_date = 2019-01-01
+end_date = 2019-12-31
+unit_amount = 82.3025
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2019-05-01
+state = 50
+
+[[hot_water.reading]]
+meter_id = "1"
+reading_date = 2020-01-01
+state = 71
+
+[[hot_water.tariff]]
+start_date = 2019-01-01
+end_date = 2019-12-31
+unit_amount = 83.512789
+
+[[hot_water.heating_basic_cost]]
+start_date = 2019-01-01
+end_date = 2019-12-31
+annual_cost = 1666.5
+
+[[hot_water.heating_consumable_tariff]]
+start_date = 2019-01-01
+end_date = 2019-12-31
+unit_amount = 135.97404
