@@ -30,6 +30,18 @@ public class HeatingFeeSectionGeneratorTest {
     }
 
     @Test
+    void heatingFee_withDecimalPlaces_should_haveCorrectSum() {
+        HeatingFeeSection heatingFeeSection =
+                generateHeatingFeeSection(
+                        createDateRange("2024-01-01", "2025-01-01"),
+                        createHeatingFeeInputs(
+                                createServiceCost(
+                                        createDateRange("2024-01-01", "2025-01-01"), "12431.84")));
+
+        assertThat(heatingFeeSection.totalAmount()).isEqualTo("12431.84");
+    }
+
+    @Test
     void heatingFee_withOneServiceCost_should_haveCorrectHeatingFeeProperties() {
         HeatingFeeSection heatingFeeSection =
                 generateHeatingFeeSection(

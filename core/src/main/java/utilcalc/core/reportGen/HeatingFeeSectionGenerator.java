@@ -7,7 +7,6 @@ import java.math.RoundingMode;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.stream.Collectors;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.HeatingFeeInputs;
 import utilcalc.core.model.input.ServiceCost;
@@ -15,6 +14,8 @@ import utilcalc.core.model.output.HeatingFee;
 import utilcalc.core.model.output.HeatingFeeSection;
 
 final class HeatingFeeSectionGenerator {
+    private static final int DISPLAY_DECIMAL_PLACES = 2;
+    private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
     private static final Map<Month, BigDecimal> COEFFICIENTS =
             new EnumMap<>(
                     Map.ofEntries(
@@ -46,11 +47,13 @@ final class HeatingFeeSectionGenerator {
         List<HeatingFee> heatingFees =
                 monthlyServiceCost.stream()
                         .map(HeatingFeeSectionGenerator::calculateHeatingFee)
-                        .collect(Collectors.toList());
+                        .toList();
 
-        BigDecimal totalAmount = calculateAmount(heatingFees, HeatingFee::feeAmount);
+        BigDecimal totalAmount =
+                calculateAmount(heatingFees, HeatingFee::feeAmount)
+                        .setScale(DISPLAY_DECIMAL_PLACES, ROUNDING_MODE);
 
-        return new HeatingFeeSection(name, totalAmount, heatingFees);
+        return new HeatingFeeSection(name, totalAmount, toRoundedFees(heatingFees));
     }
 
     static HeatingFee calculateHeatingFee(ServiceCost serviceCost) {
@@ -60,21 +63,26 @@ final class HeatingFeeSectionGenerator {
                     "Date range of service cost must be within a single month");
         }
 
-        int displayDecimalPlaces = 2;
         BigDecimal monthCount = serviceCost.dateRange().getMonthCount();
         BigDecimal annualCost = serviceCost.annualCost();
         YearMonth yearMonth = YearMonth.from(serviceCost.dateRange().startDate());
 
         BigDecimal coefficient = COEFFICIENTS.get(yearMonth.getMonth());
-        BigDecimal feeAmount =
-                annualCost
-                        .multiply(monthCount)
-                        .multiply(coefficient)
-                        .setScale(displayDecimalPlaces, RoundingMode.HALF_UP);
+        BigDecimal feeAmount = annualCost.multiply(monthCount).multiply(coefficient);
 
-        BigDecimal roundedMonthCount =
-                monthCount.setScale(displayDecimalPlaces, RoundingMode.HALF_UP);
+        return new HeatingFee(yearMonth, annualCost, monthCount, coefficient, feeAmount);
+    }
 
-        return new HeatingFee(yearMonth, annualCost, roundedMonthCount, coefficient, feeAmount);
+    private static List<HeatingFee> toRoundedFees(List<HeatingFee> heatingFees) {
+        return heatingFees.stream().map(HeatingFeeSectionGenerator::toRoundedFee).toList();
+    }
+
+    private static HeatingFee toRoundedFee(HeatingFee heatingFee) {
+        return new HeatingFee(
+                heatingFee.yearMonth(),
+                heatingFee.annualCost(),
+                heatingFee.monthCount().setScale(DISPLAY_DECIMAL_PLACES, ROUNDING_MODE),
+                heatingFee.coefficient(),
+                heatingFee.feeAmount().setScale(DISPLAY_DECIMAL_PLACES, ROUNDING_MODE));
     }
 }
