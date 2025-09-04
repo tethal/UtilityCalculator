@@ -2,9 +2,11 @@ package utilcalc.core.pdfGen;
 
 import com.lowagie.text.pdf.BaseFont;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import org.openpdf.pdf.ITextRenderer;
+import utilcalc.core.model.output.DepositSection;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.model.output.ReportSection;
 import utilcalc.core.utils.ReportFormatter;
@@ -73,6 +75,13 @@ public final class PdfGenerator {
 
         html.endTBody().endTable();
 
+        for (ReportSection section : report.sections()) {
+            if (section instanceof DepositSection depositSection) {
+                html.h1(section.name());
+                appendDepositsTable(html, depositSection);
+            }
+        }
+
         if (!report.sources().isEmpty()) {
             html.pItalic("Zdroje:");
             for (String source : report.sources()) {
@@ -91,5 +100,36 @@ public final class PdfGenerator {
         }
 
         return html.build();
+    }
+
+    private static void appendDepositsTable(HtmlBuilder html, DepositSection depositSection) {
+        boolean unitCount =
+                depositSection.deposits().stream()
+                        .anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
+
+        html.beginTable().beginThead().beginTr().th("Popis");
+        if (unitCount) {
+            html.th("Množství").th("Jednotková cena");
+        }
+        html.th("Částka").endTr().endThead().beginTBody();
+
+        for (var deposit : depositSection.deposits()) {
+            html.beginTr().td(deposit.description());
+
+            if (unitCount) {
+                html.td(deposit.count().toPlainString());
+                html.tdMoney(deposit.unitAmount());
+            }
+
+            html.tdMoney(deposit.amount()).endTr();
+        }
+
+        html.beginTr().td("Celkem");
+        if (unitCount) {
+            html.td("").td("");
+        }
+        html.tdMoney(depositSection.totalAmount()).endTr();
+
+        html.endTBody().endTable();
     }
 }

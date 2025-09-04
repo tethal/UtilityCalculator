@@ -23,13 +23,14 @@ class PdfGeneratorTest {
                         "Přijaté zálohy",
                         List.of(
                                 new Payment(
-                                        "Záloha na vodu",
-                                        BigDecimal.valueOf(3),
-                                        BigDecimal.valueOf(180)),
+                                        "leden - duben",
+                                        BigDecimal.valueOf(4),
+                                        BigDecimal.valueOf(3000)),
+                                new Payment("květen", BigDecimal.ONE, BigDecimal.valueOf(3500)),
                                 new Payment(
-                                        "Záloha na elektřinu",
-                                        BigDecimal.valueOf(2),
-                                        BigDecimal.valueOf(250))));
+                                        "červen - prosinec",
+                                        BigDecimal.valueOf(7),
+                                        BigDecimal.valueOf(4000))));
 
         ServiceCost serviceCost =
                 new ServiceCost(
