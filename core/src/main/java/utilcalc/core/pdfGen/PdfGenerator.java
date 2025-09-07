@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import org.openpdf.pdf.ITextRenderer;
-import utilcalc.core.model.output.DepositSection;
-import utilcalc.core.model.output.Report;
-import utilcalc.core.model.output.ReportSection;
+import utilcalc.core.model.output.*;
 import utilcalc.core.utils.ReportFormatter;
 
 public final class PdfGenerator {
@@ -79,6 +77,9 @@ public final class PdfGenerator {
             if (section instanceof DepositSection depositSection) {
                 html.h1(section.name());
                 appendDepositsTable(html, depositSection);
+            } else if (section instanceof OtherFeeSection otherFeeSection) {
+                html.h1(section.name());
+                appendOtherFeeTable(html, otherFeeSection, formatter);
             }
         }
 
@@ -129,6 +130,33 @@ public final class PdfGenerator {
             html.td("").td("");
         }
         html.tdMoney(depositSection.totalAmount()).endTr();
+
+        html.endTBody().endTable();
+    }
+
+    private static void appendOtherFeeTable(
+            HtmlBuilder html, OtherFeeSection otherFeeSection, ReportFormatter formatter) {
+        html.beginTable()
+                .beginThead()
+                .beginTr()
+                .th("Období")
+                .th("Množství")
+                .th("Jednotková cena")
+                .th("Částka")
+                .endTr()
+                .endThead()
+                .beginTBody();
+
+        for (OtherFee fee : otherFeeSection.fees()) {
+            html.beginTr()
+                    .td(formatter.formatPeriod(fee.dateRange()))
+                    .td(fee.monthCount().toPlainString())
+                    .tdMoney(fee.monthlyCost())
+                    .tdMoney(fee.feeAmount())
+                    .endTr();
+        }
+
+        html.beginTr().td("Celkem").td("").td("").tdMoney(otherFeeSection.totalAmount()).endTr();
 
         html.endTBody().endTable();
     }

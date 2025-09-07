@@ -32,16 +32,23 @@ class PdfGeneratorTest {
                                         BigDecimal.valueOf(7),
                                         BigDecimal.valueOf(4000))));
 
-        ServiceCost serviceCost =
-                new ServiceCost(
-                        DateRange.fromInclusive(
-                                LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31)),
-                        BigDecimal.valueOf(1200));
-
-        SectionInputs otherFees = new OtherFeeInputs("Ostatní poplatky", List.of(serviceCost));
+        SectionInputs otherFees =
+                new OtherFeeInputs(
+                        "Ostatní poplatky",
+                        List.of(
+                                new ServiceCost(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2024, 1, 1),
+                                                LocalDate.of(2024, 12, 31)),
+                                        BigDecimal.valueOf(8772)),
+                                new ServiceCost(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2025, 1, 1),
+                                                LocalDate.of(2025, 12, 31)),
+                                        BigDecimal.valueOf(8000))));
 
         DateRange dateRange =
-                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31));
+                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 12, 31));
 
         ReportInputs inputs =
                 new ReportInputs(
