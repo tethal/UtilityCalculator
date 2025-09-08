@@ -2,6 +2,7 @@ package utilcalc.core.model.output;
 
 import static utilcalc.core.utils.Util.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import utilcalc.core.model.DateRange;
@@ -13,7 +14,8 @@ public record Report(
         String reportPlace,
         LocalDate reportDate,
         List<String> sources,
-        List<ReportSection> sections) {
+        List<ReportSection> sections,
+        BigDecimal total) {
 
     public Report {
         ensureNonNull(dateRange, "dateRange");
@@ -22,6 +24,7 @@ public record Report(
         ensureNonBlank(reportPlace, "reportPlace");
         ensureNonNull(reportDate, "reportDate");
         ensureNoNullElements(sections, "sections");
+        ensureNonNull(total, "total");
 
         tenant = List.copyOf(tenant);
         owner = List.copyOf(owner);

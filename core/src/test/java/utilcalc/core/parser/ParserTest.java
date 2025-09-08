@@ -9,12 +9,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.*;
+import utilcalc.core.util.TestHelpers;
 
 class ParserTest {
 
     @Test
     void valid_input_should_return_valid_ReportInputs_class() {
-        ReportInputs inputs = Parser.parse(ParserTestHelper.getTestCaseContent("valid"));
+        ReportInputs inputs = Parser.parse(TestHelpers.getTestCaseContent("valid"));
 
         assertThat(inputs.dateRange().startDate()).isEqualTo(LocalDate.of(2024, 2, 15));
         assertThat(inputs.dateRange().endDateExclusive()).isEqualTo(LocalDate.of(2025, 1, 1));
@@ -25,44 +26,7 @@ class ParserTest {
         assertThat(inputs.sources()).containsExactly("vyúčtování SVJ za rok 2024");
         assertThat(inputs.sections()).hasSize(5);
 
-        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
-        assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
-        assertThat(deposits.payments())
-                .hasSize(3)
-                .containsExactly(
-                        new Payment(
-                                "leden - duben", BigDecimal.valueOf(4), BigDecimal.valueOf(3000)),
-                        new Payment("květen", BigDecimal.valueOf(1), BigDecimal.valueOf(3500)),
-                        new Payment(
-                                "červen - prosinec",
-                                BigDecimal.valueOf(7),
-                                BigDecimal.valueOf(3500)));
-
-        HeatingFeeInputs heating = (HeatingFeeInputs) inputs.sections().get(1);
-        assertThat(heating.name()).isEqualTo("Vytápění");
-        assertThat(heating.heatingFees())
-                .hasSize(2)
-                .containsExactly(
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(10992)),
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(10992)));
-
-        OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(2);
-        assertThat(otherFee.name()).isEqualTo("Ostatní poplatky");
-        assertThat(otherFee.otherFees())
-                .hasSize(2)
-                .containsExactly(
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(3000)),
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(3200)));
-
-        ColdWaterSectionInputs coldWater = (ColdWaterSectionInputs) inputs.sections().get(3);
+        ColdWaterSectionInputs coldWater = (ColdWaterSectionInputs) inputs.sections().getFirst();
         assertThat(coldWater.name()).isEqualTo("Studená voda");
         assertThat(coldWater.readings())
                 .hasSize(3)
@@ -81,7 +45,7 @@ class ParserTest {
                                 new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
                                 BigDecimal.valueOf(108.13)));
 
-        HotWaterSectionInputs hotWater = (HotWaterSectionInputs) inputs.sections().get(4);
+        HotWaterSectionInputs hotWater = (HotWaterSectionInputs) inputs.sections().get(1);
         assertThat(hotWater.name()).isEqualTo("Teplá voda");
 
         assertThat(hotWater.readings())
@@ -122,11 +86,48 @@ class ParserTest {
                         new WaterTariff(
                                 new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
                                 BigDecimal.valueOf(130.0)));
+
+        HeatingFeeInputs heating = (HeatingFeeInputs) inputs.sections().get(2);
+        assertThat(heating.name()).isEqualTo("Vytápění");
+        assertThat(heating.heatingFees())
+                .hasSize(2)
+                .containsExactly(
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                BigDecimal.valueOf(10992)),
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                BigDecimal.valueOf(10992)));
+
+        OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(3);
+        assertThat(otherFee.name()).isEqualTo("Ostatní poplatky");
+        assertThat(otherFee.otherFees())
+                .hasSize(2)
+                .containsExactly(
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                BigDecimal.valueOf(3000)),
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                BigDecimal.valueOf(3200)));
+
+        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().get(4);
+        assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
+        assertThat(deposits.payments())
+                .hasSize(3)
+                .containsExactly(
+                        new Payment(
+                                "leden - duben", BigDecimal.valueOf(4), BigDecimal.valueOf(3000)),
+                        new Payment("květen", BigDecimal.valueOf(1), BigDecimal.valueOf(3500)),
+                        new Payment(
+                                "červen - prosinec",
+                                BigDecimal.valueOf(7),
+                                BigDecimal.valueOf(3500)));
     }
 
     @Test
     void invalid_syntax_should_throw_ParsingException() {
-        assertThatThrownBy(() -> Parser.parse(ParserTestHelper.getTestCaseContent("bad_syntax")))
+        assertThatThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent("bad_syntax")))
                 .isInstanceOf(ParsingException.class)
                 .hasMessageContaining("Syntax error: ");
     }
@@ -136,7 +137,7 @@ class ParserTest {
         assertThatThrownBy(
                         () ->
                                 Parser.parse(
-                                        ParserTestHelper.getTestCaseContent(
+                                        TestHelpers.getTestCaseContent(
                                                 "unknown_field_in_general_section")))
                 .isInstanceOf(ParsingException.class)
                 .hasMessage("Section general contains unknown fields: [unknown, second_unknown]");
@@ -185,7 +186,7 @@ class ParserTest {
     })
     @ParameterizedTest
     void missing_required_field_should_throw_ParsingException(String textCase, String message) {
-        assertThatThrownBy(() -> Parser.parse(ParserTestHelper.getTestCaseContent(textCase)))
+        assertThatThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)))
                 .isInstanceOf(ParsingException.class)
                 .hasMessage(message);
     }
@@ -194,14 +195,14 @@ class ParserTest {
     @ParameterizedTest
     void missing_optional_section_should_not_throw_ParsingException(String textCase) {
         assertThatNoException()
-                .isThrownBy(() -> Parser.parse(ParserTestHelper.getTestCaseContent(textCase)));
+                .isThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)));
     }
 
     @CsvSource({"missing_sources_general_section", "missing_count_deposits_section"})
     @ParameterizedTest
     void missing_optional_field_should_not_throw_ParsingException(String textCase) {
         assertThatNoException()
-                .isThrownBy(() -> Parser.parse(ParserTestHelper.getTestCaseContent(textCase)));
+                .isThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)));
     }
 
     @CsvSource({
@@ -241,7 +242,7 @@ class ParserTest {
     })
     @ParameterizedTest
     void invalid_field_data_type_should_throw_ParsingException(String textCase, String message) {
-        assertThatThrownBy(() -> Parser.parse(ParserTestHelper.getTestCaseContent(textCase)))
+        assertThatThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)))
                 .isInstanceOf(ParsingException.class)
                 .hasMessage(message);
     }
