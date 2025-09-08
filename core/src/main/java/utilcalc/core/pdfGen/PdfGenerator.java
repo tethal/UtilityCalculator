@@ -74,19 +74,14 @@ public final class PdfGenerator {
         html.endTBody().endTable();
 
         for (ReportSection section : report.sections()) {
+            html.h1(section.name());
+
             switch (section) {
-                case DepositSection depositSection -> {
-                    html.h1(section.name());
-                    appendDepositsTable(html, depositSection);
-                }
-                case OtherFeeSection otherFeeSection -> {
-                    html.h1(section.name());
-                    appendOtherFeeTable(html, otherFeeSection, formatter);
-                }
-                case HeatingFeeSection heatingFeeSection -> {
-                    html.h1(section.name());
-                    appendHeatingFeeTable(html, heatingFeeSection);
-                }
+                case DepositSection depositSection -> appendDepositsTable(html, depositSection);
+                case OtherFeeSection otherFeeSection -> appendOtherFeeTable(
+                        html, otherFeeSection, formatter);
+                case HeatingFeeSection heatingFeeSection -> appendHeatingFeeTable(
+                        html, heatingFeeSection);
                 default -> throw new IllegalArgumentException(
                         "Unsupported section type: " + section.getClass().getSimpleName());
             }
