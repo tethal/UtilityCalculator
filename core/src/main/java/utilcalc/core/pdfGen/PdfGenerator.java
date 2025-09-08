@@ -80,6 +80,9 @@ public final class PdfGenerator {
             } else if (section instanceof OtherFeeSection otherFeeSection) {
                 html.h1(section.name());
                 appendOtherFeeTable(html, otherFeeSection, formatter);
+            } else if (section instanceof HeatingFeeSection heatingFeeSection) {
+                html.h1(section.name());
+                appendHeatingFeeTable(html, heatingFeeSection);
             }
         }
 
@@ -157,6 +160,31 @@ public final class PdfGenerator {
         }
 
         html.beginTr().td("Celkem").td("").td("").tdMoney(otherFeeSection.totalAmount()).endTr();
+
+        html.endTBody().endTable();
+    }
+
+    private static void appendHeatingFeeTable(
+            HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
+        html.beginTable()
+                .beginThead()
+                .beginTr()
+                .th("Měsíc")
+                .th("Koeficient")
+                .th("Částka")
+                .endTr()
+                .endThead()
+                .beginTBody();
+
+        for (HeatingFee fee : heatingFeeSection.fees()) {
+            html.beginTr()
+                    .td(String.valueOf(fee.yearMonth()))
+                    .td(String.valueOf(fee.coefficient()))
+                    .tdMoney(fee.feeAmount())
+                    .endTr();
+        }
+
+        html.beginTr().th("Celkem").td("").tdMoney(heatingFeeSection.totalAmount()).endTr();
 
         html.endTBody().endTable();
     }
