@@ -74,15 +74,21 @@ public final class PdfGenerator {
         html.endTBody().endTable();
 
         for (ReportSection section : report.sections()) {
-            if (section instanceof DepositSection depositSection) {
-                html.h1(section.name());
-                appendDepositsTable(html, depositSection);
-            } else if (section instanceof OtherFeeSection otherFeeSection) {
-                html.h1(section.name());
-                appendOtherFeeTable(html, otherFeeSection, formatter);
-            } else if (section instanceof HeatingFeeSection heatingFeeSection) {
-                html.h1(section.name());
-                appendHeatingFeeTable(html, heatingFeeSection);
+            switch (section) {
+                case DepositSection depositSection -> {
+                    html.h1(section.name());
+                    appendDepositsTable(html, depositSection);
+                }
+                case OtherFeeSection otherFeeSection -> {
+                    html.h1(section.name());
+                    appendOtherFeeTable(html, otherFeeSection, formatter);
+                }
+                case HeatingFeeSection heatingFeeSection -> {
+                    html.h1(section.name());
+                    appendHeatingFeeTable(html, heatingFeeSection);
+                }
+                default -> throw new IllegalArgumentException(
+                        "Unsupported section type: " + section.getClass().getSimpleName());
             }
         }
 
@@ -170,6 +176,7 @@ public final class PdfGenerator {
                 .beginThead()
                 .beginTr()
                 .th("Měsíc")
+                .th("Roční náklady")
                 .th("Koeficient")
                 .th("Částka")
                 .endTr()
@@ -179,12 +186,13 @@ public final class PdfGenerator {
         for (HeatingFee fee : heatingFeeSection.fees()) {
             html.beginTr()
                     .td(String.valueOf(fee.yearMonth()))
+                    .tdMoney(fee.annualCost())
                     .td(String.valueOf(fee.coefficient()))
                     .tdMoney(fee.feeAmount())
                     .endTr();
         }
 
-        html.beginTr().th("Celkem").td("").tdMoney(heatingFeeSection.totalAmount()).endTr();
+        html.beginTr().th("Celkem").td("").td("").tdMoney(heatingFeeSection.totalAmount()).endTr();
 
         html.endTBody().endTable();
     }
