@@ -47,6 +47,21 @@ class PdfGeneratorTest {
                                                 LocalDate.of(2025, 12, 31)),
                                         BigDecimal.valueOf(8000))));
 
+        SectionInputs heatingFees =
+                new HeatingFeeInputs(
+                        "Vytápění",
+                        List.of(
+                                new ServiceCost(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2024, 1, 1),
+                                                LocalDate.of(2024, 12, 31)),
+                                        BigDecimal.valueOf(8772)),
+                                new ServiceCost(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2025, 1, 1),
+                                                LocalDate.of(2025, 12, 31)),
+                                        BigDecimal.valueOf(8000))));
+
         DateRange dateRange =
                 DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 12, 31));
 
@@ -58,7 +73,7 @@ class PdfGeneratorTest {
                         "Praha",
                         LocalDate.now(),
                         List.of("Faktury, podklady měření"),
-                        List.of(deposits, otherFees));
+                        List.of(deposits, otherFees, heatingFees));
 
         Report report = ReportGen.generateReport(inputs);
 
