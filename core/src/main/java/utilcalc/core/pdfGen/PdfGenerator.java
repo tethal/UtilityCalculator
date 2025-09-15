@@ -197,12 +197,15 @@ public final class PdfGenerator {
 
     public static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
         ReportFormatter formatter = html.getFormatter();
+        boolean showMeterId = section.readings().size() > 1;
 
-        html.beginTable()
-                .beginThead()
-                .beginTr()
-                .th("ID vodoměru")
-                .th("Období")
+        html.beginTable().beginThead().beginTr();
+
+        if (showMeterId) {
+            html.th("ID vodoměru");
+        }
+
+        html.th("Období")
                 .th("Počáteční stav (m³)")
                 .th("Konečný stav (m³)")
                 .th("Spotřeba (m³)")
@@ -211,9 +214,13 @@ public final class PdfGenerator {
                 .beginTBody();
 
         for (WaterReading reading : section.readings()) {
-            html.beginTr()
-                    .td(reading.meterId())
-                    .td(formatter.formatPeriod(reading.dateRange()))
+            html.beginTr();
+
+            if (showMeterId) {
+                html.td(reading.meterId());
+            }
+
+            html.td(formatter.formatPeriod(reading.dateRange()))
                     .tdNumber(reading.startState())
                     .tdNumber(reading.endState())
                     .tdNumber(reading.consumption())
@@ -226,8 +233,8 @@ public final class PdfGenerator {
                 .beginThead()
                 .beginTr()
                 .th("Období")
-                .th("Jednotková cena (Kč/m³)")
                 .th("Množství (m³)")
+                .th("Jednotková cena (Kč/m³)")
                 .th("Částka (Kč)")
                 .endTr()
                 .endThead()
@@ -236,8 +243,8 @@ public final class PdfGenerator {
         for (WaterFee fee : section.priceList()) {
             html.beginTr()
                     .td(formatter.formatPeriod(fee.dateRange()))
-                    .tdNumber(fee.unitAmount())
                     .tdNumber(fee.quantity())
+                    .tdNumber(fee.unitAmount())
                     .tdMoney(fee.periodAmount())
                     .endTr();
         }
