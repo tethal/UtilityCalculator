@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import org.openpdf.pdf.ITextRenderer;
 import utilcalc.core.model.output.*;
-import utilcalc.core.utils.ReportFormatter;
 
 public final class PdfGenerator {
 
