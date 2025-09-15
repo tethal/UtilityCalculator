@@ -1,13 +1,18 @@
 package utilcalc.core.pdfGen;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public final class HtmlBuilder {
 
     private final StringBuilder sb = new StringBuilder();
+    private final ReportFormatter formatter;
 
     public HtmlBuilder() {
+        this(new ReportFormatter());
+    }
+
+    public HtmlBuilder(ReportFormatter formatter) {
+        this.formatter = formatter;
         sb.append(
                 """
             <!DOCTYPE html>
@@ -30,6 +35,10 @@ public final class HtmlBuilder {
             </head>
             <body>
         """);
+    }
+
+    public ReportFormatter getFormatter() {
+        return this.formatter;
     }
 
     public HtmlBuilder h1(String text) {
@@ -101,8 +110,17 @@ public final class HtmlBuilder {
         return this;
     }
 
+    public HtmlBuilder tdNumber(BigDecimal number) {
+        sb.append("<td class=\"money\">")
+                .append(escape(formatter.formatNumber(number)))
+                .append("</td>\n");
+        return this;
+    }
+
     public HtmlBuilder tdMoney(BigDecimal amount) {
-        sb.append("<td class=\"money\">").append(escape(formatMoney(amount))).append("</td>\n");
+        sb.append("<td class=\"money\">")
+                .append(escape(formatter.formatMoney(amount)))
+                .append("</td>\n");
         return this;
     }
 
@@ -125,10 +143,5 @@ public final class HtmlBuilder {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
-    }
-
-    private String formatMoney(BigDecimal amount) {
-        if (amount == null) return "";
-        return amount.setScale(2, RoundingMode.HALF_UP).toPlainString() + " Kč";
     }
 }
