@@ -46,8 +46,8 @@ public final class PdfGenerator {
     }
 
     private static String buildHtml(Report report) {
-        ReportFormatter formatter = new ReportFormatter();
         HtmlBuilder html = new HtmlBuilder();
+        ReportFormatter formatter = html.getFormatter();
 
         html.h1("Vyúčtování poplatků za služby a energie")
                 .p("Období: " + formatter.formatPeriod(report.dateRange()));
@@ -77,8 +77,7 @@ public final class PdfGenerator {
 
             switch (section) {
                 case DepositSection depositSection -> appendDepositsTable(html, depositSection);
-                case OtherFeeSection otherFeeSection -> appendOtherFeeTable(
-                        html, otherFeeSection, formatter);
+                case OtherFeeSection otherFeeSection -> appendOtherFeeTable(html, otherFeeSection);
                 case HeatingFeeSection heatingFeeSection -> appendHeatingFeeTable(
                         html, heatingFeeSection);
                 default -> throw new IllegalArgumentException(
@@ -121,7 +120,7 @@ public final class PdfGenerator {
             html.beginTr().td(deposit.description());
 
             if (unitCount) {
-                html.td(deposit.count().toPlainString());
+                html.tdNumber(deposit.count());
                 html.tdMoney(deposit.unitAmount());
             }
 
@@ -137,8 +136,9 @@ public final class PdfGenerator {
         html.endTBody().endTable();
     }
 
-    private static void appendOtherFeeTable(
-            HtmlBuilder html, OtherFeeSection otherFeeSection, ReportFormatter formatter) {
+    private static void appendOtherFeeTable(HtmlBuilder html, OtherFeeSection otherFeeSection) {
+        ReportFormatter formatter = html.getFormatter();
+
         html.beginTable()
                 .beginThead()
                 .beginTr()
@@ -153,7 +153,7 @@ public final class PdfGenerator {
         for (OtherFee fee : otherFeeSection.fees()) {
             html.beginTr()
                     .td(formatter.formatPeriod(fee.dateRange()))
-                    .td(fee.monthCount().toPlainString())
+                    .tdNumber(fee.monthCount())
                     .tdMoney(fee.monthlyCost())
                     .tdMoney(fee.feeAmount())
                     .endTr();
@@ -166,6 +166,8 @@ public final class PdfGenerator {
 
     private static void appendHeatingFeeTable(
             HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
+        ReportFormatter formatter = html.getFormatter();
+
         html.beginTable()
                 .beginThead()
                 .beginTr()
@@ -179,9 +181,9 @@ public final class PdfGenerator {
 
         for (HeatingFee fee : heatingFeeSection.fees()) {
             html.beginTr()
-                    .td(String.valueOf(fee.yearMonth()))
+                    .td(formatter.formatYearMonth(fee.yearMonth()))
                     .tdMoney(fee.annualCost())
-                    .td(String.valueOf(fee.coefficient()))
+                    .tdNumber(fee.coefficient())
                     .tdMoney(fee.feeAmount())
                     .endTr();
         }
