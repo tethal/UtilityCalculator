@@ -197,7 +197,10 @@ public final class PdfGenerator {
 
     public static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
         ReportFormatter formatter = html.getFormatter();
-        boolean showMeterId = section.readings().size() > 1;
+
+        long distinctMeterCount =
+                section.readings().stream().map(WaterReading::meterId).distinct().count();
+        boolean showMeterId = distinctMeterCount > 1;
 
         html.beginTable().beginThead().beginTr();
 
