@@ -23,7 +23,7 @@ public final class TestHelpers {
             writeOutput(name + ".expected", actual);
             return;
         }
-        if (expected.get().equals(actual)) {
+        if (expected.get().replaceAll("\r\n", "\n").equals(actual)) {
             deleteOutput(name + ".actual");
             return;
         }
