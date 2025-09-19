@@ -76,8 +76,4 @@ subprojects {
         dependsOn tasks.named('spotbugsTest')
         dependsOn tasks.named('spotlessCheck')
     }
-
-    tasks.named('build') {
-        dependsOn 'spotlessApply'
-    }
 }
