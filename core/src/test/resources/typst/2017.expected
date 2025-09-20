@@ -1,0 +1,112 @@
+#set page(paper: "a4")
+#set text(font: "Roboto", size: 12pt)
+#let total(value) = (table.cell(fill: rgb(128,192,255), value))
+
+#align(center, text(17pt)[*Vyúčtování poplatků za služby a energie*])
+#align(center, [Období: 1. 8. 2017 – 31. 3. 2018])
+Marie Černá \
+Jindřišská 16 \
+111 50 Praha 1 \
+
+= Celkový přehled
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em), 
+  align: (left, right), 
+  [Studená voda], [4 574,17 Kč], 
+  [Teplá voda], [8 834,87 Kč], 
+  [Vytápění], [8 759,28 Kč], 
+  [Ostatní poplatky], [6 538,00 Kč], 
+  [Přijaté zálohy], [-32 000,00 Kč], 
+  table.cell(colspan: 1, [*Přeplatek*]), total([*3 293,68 Kč*]), 
+)
+Zdroje: \
+Vyúčtování služeb od Společenství vlastníků za rok 2019 \
+
+= Studená voda
+== Odečty
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em, 8.5em, 8.5em), 
+  align: (left, right, right, right), 
+  table.header[*Období*][*Počáteční stav*][*Konečný stav*][*Spotřeba*],
+  [1. 8. 2017 – 31. 3. 2018], [2,68 m#super[3]], [55,77 m#super[3]], [53,09 m#super[3]], 
+)
+== Náklady
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em, 8.5em, 8.5em), 
+  align: (left, right, right, right), 
+  table.header[*Období*][*Množství*][*Sazba*][*Cena*],
+  [1. 8. 2017 – 31. 12. 2017], [33,181 m#super[3]], [85,42 Kč/m#super[3]], [2 834,34 Kč], 
+  [1. 1. 2018 – 31. 3. 2018], [19,909 m#super[3]], [87,39 Kč/m#super[3]], [1 739,83 Kč], 
+  table.cell(colspan: 3, [*CELKEM*]), total([*4 574,17 Kč*]), 
+)
+
+= Teplá voda
+== Odečty
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em, 8.5em, 8.5em), 
+  align: (left, right, right, right), 
+  table.header[*Období*][*Počáteční stav*][*Konečný stav*][*Spotřeba*],
+  [1. 8. 2017 – 31. 3. 2018], [0,673 m#super[3]], [36,45 m#super[3]], [35,777 m#super[3]], 
+)
+== Náklady
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em, 8.5em, 8.5em), 
+  align: (left, right, right, right), 
+  table.header[*Popis*][*Množství*][*Sazba*][*Cena*],
+  [Studená voda \
+1. 8. 2017 – 31. 12. 2017], [22,361 m#super[3]], [85,42 Kč/m#super[3]], [1 910,04 Kč], 
+  [Studená voda \
+1. 1. 2018 – 31. 3. 2018], [13,416 m#super[3]], [87,39 Kč/m#super[3]], [1 172,46 Kč], 
+  [Ohřev základní složka \
+1. 8. 2017 – 31. 3. 2018], [8 měsíců], [128,58 Kč/měsíc], [1 028,67 Kč], 
+  [Ohřev spotřební složka \
+1. 8. 2017 – 31. 3. 2018], [35,777 m#super[3]], [132,03 Kč/m#super[3]], [4 723,70 Kč], 
+  table.cell(colspan: 3, [*CELKEM*]), total([*8 834,87 Kč*]), 
+)
+
+= Vytápění
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em, 8.5em, 8.5em), 
+  align: (left, right, right, right), 
+  table.header[*Období*][*Koeficient*][*Sazba*][*Cena*],
+  [srpen 2017], [0 %], [10 344,00 Kč/rok], [0,00 Kč], 
+  [září 2017], [1 %], [10 344,00 Kč/rok], [103,44 Kč], 
+  [říjen 2017], [8 %], [10 344,00 Kč/rok], [827,52 Kč], 
+  [listopad 2017], [14 %], [10 344,00 Kč/rok], [1 448,16 Kč], 
+  [prosinec 2017], [17 %], [10 344,00 Kč/rok], [1 758,48 Kč], 
+  [leden 2018], [19 %], [9 432,00 Kč/rok], [1 792,08 Kč], 
+  [únor 2018], [16 %], [9 432,00 Kč/rok], [1 509,12 Kč], 
+  [březen 2018], [14 %], [9 432,00 Kč/rok], [1 320,48 Kč], 
+  table.cell(colspan: 3, [*CELKEM*]), total([*8 759,28 Kč*]), 
+)
+
+= Ostatní poplatky
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em, 8.5em, 8.5em), 
+  align: (left, right, right, right), 
+  table.header[*Období*][*Množství*][*Sazba*][*Cena*],
+  [1. 8. 2017 – 31. 12. 2017], [5 měsíců], [800,00 Kč/měsíc], [4 000,00 Kč], 
+  [1. 1. 2018 – 31. 3. 2018], [3 měsíce], [846,00 Kč/měsíc], [2 538,00 Kč], 
+  table.cell(colspan: 3, [*CELKEM*]), total([*6 538,00 Kč*]), 
+)
+
+= Přijaté zálohy
+#table(
+  inset: (x:5pt, y: 10pt),
+  columns: (1fr, 8.5em, 8.5em, 8.5em), 
+  align: (left, right, right, right), 
+  table.header[*Popis*][*Množství*][*Záloha*][*Částka*],
+  [Zalohy], [8 měsíců], [4 000,00 Kč/měsíc], [32 000,00 Kč], 
+  table.cell(colspan: 3, [*CELKEM*]), total([*32 000,00 Kč*]), 
+)
+V Praze, 20. 3. 2018 \
+ \
+Jan Novák \
+majitel\@example.com \

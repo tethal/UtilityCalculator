@@ -1,17 +1,18 @@
 package utilcalc.core.pdfGen;
 
 import java.math.BigDecimal;
+import utilcalc.core.utils.ValueFormatter;
 
 public final class HtmlBuilder {
 
     private final StringBuilder sb = new StringBuilder();
-    private final ReportFormatter formatter;
+    private final ValueFormatter formatter;
 
     public HtmlBuilder() {
-        this(new ReportFormatter());
+        this(new ValueFormatter());
     }
 
-    public HtmlBuilder(ReportFormatter formatter) {
+    public HtmlBuilder(ValueFormatter formatter) {
         this.formatter = formatter;
         sb.append(
                 """
@@ -37,7 +38,7 @@ public final class HtmlBuilder {
         """);
     }
 
-    public ReportFormatter getFormatter() {
+    public ValueFormatter getFormatter() {
         return this.formatter;
     }
 
