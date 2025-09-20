@@ -80,6 +80,8 @@ public final class PdfGenerator {
                 case OtherFeeSection otherFeeSection -> appendOtherFeeTable(html, otherFeeSection);
                 case HeatingFeeSection heatingFeeSection -> appendHeatingFeeTable(
                         html, heatingFeeSection);
+                case ColdWaterSection coldWaterSection -> appendColdWaterTable(
+                        html, coldWaterSection);
                 default -> throw new IllegalArgumentException(
                         "Unsupported section type: " + section.getClass().getSimpleName());
             }
@@ -191,5 +193,67 @@ public final class PdfGenerator {
         html.beginTr().th("Celkem").td("").td("").tdMoney(heatingFeeSection.totalAmount()).endTr();
 
         html.endTBody().endTable();
+    }
+
+    public static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
+        ReportFormatter formatter = html.getFormatter();
+
+        long distinctMeterCount =
+                section.readings().stream().map(WaterReading::meterId).distinct().count();
+        boolean showMeterId = distinctMeterCount > 1;
+
+        html.beginTable().beginThead().beginTr();
+
+        if (showMeterId) {
+            html.th("ID vodoměru");
+        }
+
+        html.th("Období")
+                .th("Počáteční stav (m³)")
+                .th("Konečný stav (m³)")
+                .th("Spotřeba (m³)")
+                .endTr()
+                .endThead()
+                .beginTBody();
+
+        for (WaterReading reading : section.readings()) {
+            html.beginTr();
+
+            if (showMeterId) {
+                html.td(reading.meterId());
+            }
+
+            html.td(formatter.formatPeriod(reading.dateRange()))
+                    .tdNumber(reading.startState())
+                    .tdNumber(reading.endState())
+                    .tdNumber(reading.consumption())
+                    .endTr();
+        }
+
+        html.endTBody().endTable();
+
+        html.beginTable()
+                .beginThead()
+                .beginTr()
+                .th("Období")
+                .th("Množství (m³)")
+                .th("Jednotková cena (Kč/m³)")
+                .th("Částka (Kč)")
+                .endTr()
+                .endThead()
+                .beginTBody();
+
+        for (WaterFee fee : section.priceList()) {
+            html.beginTr()
+                    .td(formatter.formatPeriod(fee.dateRange()))
+                    .tdNumber(fee.quantity())
+                    .tdNumber(fee.unitAmount())
+                    .tdMoney(fee.periodAmount())
+                    .endTr();
+        }
+
+        html.endTBody().endTable();
+
+        html.p("Celková částka: " + formatter.formatMoney(section.totalAmount()));
     }
 }
