@@ -50,7 +50,12 @@ public final class TestHelpers {
     }
 
     private static Path getPathInSrc(String name) {
-        return getProjectRoot().resolve("core").resolve("src").resolve("test").resolve("resources").resolve(name);
+        return getProjectRoot()
+                .resolve("core")
+                .resolve("src")
+                .resolve("test")
+                .resolve("resources")
+                .resolve(name);
     }
 
     private static Path getProjectRoot() {
