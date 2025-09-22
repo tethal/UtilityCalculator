@@ -45,7 +45,7 @@ public final class PdfGenerator {
         }
     }
 
-    private static String buildHtml(Report report) {
+    public static String buildHtml(Report report) {
         HtmlBuilder html = new HtmlBuilder();
         ReportFormatter formatter = html.getFormatter();
 
