@@ -83,6 +83,7 @@ public final class PdfGenerator {
                         html, heatingFeeSection);
                 case ColdWaterSection coldWaterSection -> appendColdWaterTable(
                         html, coldWaterSection);
+                case HotWaterSection hotWaterSection -> appendHotWaterTable(html, hotWaterSection);
                 default -> throw new IllegalArgumentException(
                         "Unsupported section type: " + section.getClass().getSimpleName());
             }
@@ -256,5 +257,81 @@ public final class PdfGenerator {
         html.endTBody().endTable();
 
         html.p("Celková částka: " + formatter.formatMoney(section.totalAmount()));
+    }
+
+    public static void appendHotWaterTable(HtmlBuilder html, HotWaterSection section) {
+        ReportFormatter formatter = html.getFormatter();
+
+        long distinctMeterCount =
+                section.readings().stream().map(WaterReading::meterId).distinct().count();
+        boolean showMeterId = distinctMeterCount > 1;
+
+        html.beginTable().beginThead().beginTr();
+        if (showMeterId) {
+            html.th("ID vodoměru");
+        }
+        html.th("Období")
+                .th("Počáteční stav (m³)")
+                .th("Konečný stav (m³)")
+                .th("Spotřeba (m³)")
+                .endTr()
+                .endThead()
+                .beginTBody();
+
+        for (WaterReading reading : section.readings()) {
+            html.beginTr();
+            if (showMeterId) {
+                html.td(reading.meterId());
+            }
+            html.td(formatter.formatPeriod(reading.dateRange()))
+                    .tdNumber(reading.startState())
+                    .tdNumber(reading.endState())
+                    .tdNumber(reading.consumption())
+                    .endTr();
+        }
+        html.endTBody().endTable();
+
+        html.h1("Náklady");
+        html.beginTable()
+                .beginThead()
+                .beginTr()
+                .th("Popis")
+                .th("Množství")
+                .th("Sazba")
+                .th("Cena")
+                .endTr()
+                .endThead()
+                .beginTBody();
+
+        for (WaterFee fee : section.priceList()) {
+            html.beginTr()
+                    .td("Studená voda " + formatter.formatPeriod(fee.dateRange()))
+                    .tdNumber(fee.quantity())
+                    .tdNumber(fee.unitAmount())
+                    .tdMoney(fee.periodAmount())
+                    .endTr();
+        }
+
+        for (WaterHeatingBasicPart part : section.heatingBasicParts()) {
+            html.beginTr()
+                    .td("Ohřev základní složka " + formatter.formatPeriod(part.dateRange()))
+                    .tdNumber(part.numberOfMonths())
+                    .tdMoney(part.monthlyCost())
+                    .tdMoney(part.totalAmount())
+                    .endTr();
+        }
+
+        for (WaterHeatingConsumablePart part : section.heatingConsumableParts()) {
+            html.beginTr()
+                    .td("Ohřev spotřební složka " + formatter.formatPeriod(part.dateRange()))
+                    .tdNumber(part.unitAmount())
+                    .tdMoney(part.unitCost())
+                    .tdMoney(part.totalCost())
+                    .endTr();
+        }
+
+        html.beginTr().td("Celkem").td("").td("").tdMoney(section.totalAmount()).endTr();
+
+        html.endTBody().endTable();
     }
 }
