@@ -4,6 +4,7 @@ import static utilcalc.core.utils.FileUtil.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import utilcalc.cli.model.AppConfiguration;
@@ -47,7 +48,7 @@ public class ApplicationRunner {
         try {
             return switch (format) {
                 case PDF -> PdfGenerator.generatePdf(report);
-                case HTML -> PdfGenerator.buildHtml(report).getBytes();
+                case HTML -> PdfGenerator.buildHtml(report).getBytes(StandardCharsets.UTF_8);
             };
         } catch (Exception e) {
             throw new RuntimeException("Failed to export report as " + format.getValue(), e);
