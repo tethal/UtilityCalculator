@@ -74,19 +74,15 @@ public final class ValueFormatter {
 
     public String formatMonths(BigDecimal value) {
         String numberStr = formatNumber(value);
-        if (value.abs().compareTo(BigDecimal.ONE) == 0) {
+        value = value.abs();
+        if (value.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0) {
+            return numberStr + " měsíce";
+        }
+        if (value.compareTo(BigDecimal.ONE) == 0) {
             return numberStr + " měsíc";
         }
-        char lastChar = numberStr.charAt(numberStr.length() - 1);
-        if (lastChar >= '2' && lastChar <= '4') {
-            if (numberStr.length() >= 2) {
-                char secondLastChar = numberStr.charAt(numberStr.length() - 2);
-                if (secondLastChar != '1') {
-                    return numberStr + " měsíce";
-                }
-            } else {
-                return numberStr + " měsíce";
-            }
+        if (value.compareTo(new BigDecimal("5")) < 0) {
+            return numberStr + " měsíce";
         }
         return numberStr + " měsíců";
     }

@@ -61,7 +61,7 @@ Příloha č. 3 k vyhlášce č.269/2015 Sb. \
   [Studená voda \
 15. 2. 2023 – 31. 12. 2023], [16,7 m#super[3]], [105,30 Kč/m#super[3]], [1 758,51 Kč], 
   [Ohřev základní složka \
-15. 2. 2023 – 31. 12. 2023], [10,5 měsíců], [215,74 Kč/měsíc], [2 265,27 Kč], 
+15. 2. 2023 – 31. 12. 2023], [10,5 měsíce], [215,74 Kč/měsíc], [2 265,27 Kč], 
   [Ohřev spotřební složka \
 15. 2. 2023 – 31. 12. 2023], [16,7 m#super[3]], [242,66 Kč/m#super[3]], [4 052,42 Kč], 
   table.cell(colspan: 3, [*CELKEM*]), total([*8 076,20 Kč*]), 
@@ -93,7 +93,7 @@ Příloha č. 3 k vyhlášce č.269/2015 Sb. \
   columns: (1fr, 8.5em, 8.5em, 8.5em), 
   align: (left, right, right, right), 
   table.header[*Období*][*Množství*][*Sazba*][*Cena*],
-  [15. 2. 2023 – 31. 12. 2023], [10,5 měsíců], [859,67 Kč/měsíc], [9 026,50 Kč], 
+  [15. 2. 2023 – 31. 12. 2023], [10,5 měsíce], [859,67 Kč/měsíc], [9 026,50 Kč], 
   table.cell(colspan: 3, [*CELKEM*]), total([*9 026,50 Kč*]), 
 )
 
