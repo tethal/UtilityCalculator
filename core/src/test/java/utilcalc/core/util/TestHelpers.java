@@ -14,6 +14,10 @@ public final class TestHelpers {
         return readFile(getResourcePath("/toml/%s.toml".formatted(name)));
     }
 
+    public static String getNewTestCaseContent(String name) {
+        return readFile(getResourcePath("/custom/%s.uc".formatted(name)));
+    }
+
     public static void goldenTest(String name, UnaryOperator<String> action) {
         String src = readFile(getResourcePath("/%s.toml".formatted(name)));
         Optional<String> expected =
