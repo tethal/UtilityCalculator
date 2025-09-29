@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import org.openpdf.pdf.ITextRenderer;
 import utilcalc.core.model.output.*;
+import utilcalc.core.utils.ValueFormatter;
 
 public final class PdfGenerator {
 
@@ -47,7 +48,7 @@ public final class PdfGenerator {
 
     private static String buildHtml(Report report) {
         HtmlBuilder html = new HtmlBuilder();
-        ReportFormatter formatter = html.getFormatter();
+        ValueFormatter formatter = html.getFormatter();
 
         html.h1("Vyúčtování poplatků za služby a energie")
                 .p("Období: " + formatter.formatPeriod(report.dateRange()));
@@ -139,7 +140,7 @@ public final class PdfGenerator {
     }
 
     private static void appendOtherFeeTable(HtmlBuilder html, OtherFeeSection otherFeeSection) {
-        ReportFormatter formatter = html.getFormatter();
+        ValueFormatter formatter = html.getFormatter();
 
         html.beginTable()
                 .beginThead()
@@ -168,7 +169,7 @@ public final class PdfGenerator {
 
     private static void appendHeatingFeeTable(
             HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
-        ReportFormatter formatter = html.getFormatter();
+        ValueFormatter formatter = html.getFormatter();
 
         html.beginTable()
                 .beginThead()
@@ -196,7 +197,7 @@ public final class PdfGenerator {
     }
 
     public static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
-        ReportFormatter formatter = html.getFormatter();
+        ValueFormatter formatter = html.getFormatter();
 
         long distinctMeterCount =
                 section.readings().stream().map(WaterReading::meterId).distinct().count();

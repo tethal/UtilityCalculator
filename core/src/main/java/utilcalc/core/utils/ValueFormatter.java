@@ -1,4 +1,4 @@
-package utilcalc.core.pdfGen;
+package utilcalc.core.utils;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -10,28 +10,29 @@ import java.util.Currency;
 import java.util.Locale;
 import utilcalc.core.model.DateRange;
 
-public final class ReportFormatter {
+public final class ValueFormatter {
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
     private final DateTimeFormatter dateFormatter;
     private final NumberFormat numberFormat;
     private final NumberFormat moneyFormat;
     private final Locale locale;
 
-    public ReportFormatter() {
+    public ValueFormatter() {
         this(Locale.forLanguageTag("cs-CZ"), Currency.getInstance("CZK"));
     }
 
-    public ReportFormatter(Locale locale) {
+    public ValueFormatter(Locale locale) {
         this(locale, Currency.getInstance("CZK"));
     }
 
-    public ReportFormatter(Locale locale, Currency currency) {
+    public ValueFormatter(Locale locale, Currency currency) {
         this.locale = locale;
         this.dateFormatter = DateTimeFormatter.ofPattern("d. M. yyyy", locale);
 
         this.numberFormat = NumberFormat.getNumberInstance(locale);
-        this.numberFormat.setMinimumFractionDigits(2);
-        this.numberFormat.setMaximumFractionDigits(2);
+        this.numberFormat.setMinimumFractionDigits(0);
+        this.numberFormat.setMaximumFractionDigits(5);
         this.numberFormat.setGroupingUsed(true);
 
         this.moneyFormat = NumberFormat.getCurrencyInstance(locale);
@@ -65,5 +66,24 @@ public final class ReportFormatter {
 
     public String formatNumber(BigDecimal number) {
         return number != null ? numberFormat.format(number) : "";
+    }
+
+    public String formatPercent(BigDecimal value) {
+        return value.multiply(ONE_HUNDRED).intValueExact() + " %";
+    }
+
+    public String formatMonths(BigDecimal value) {
+        String numberStr = formatNumber(value);
+        value = value.abs();
+        if (value.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0) {
+            return numberStr + " měsíce";
+        }
+        if (value.compareTo(BigDecimal.ONE) == 0) {
+            return numberStr + " měsíc";
+        }
+        if (value.compareTo(new BigDecimal("5")) < 0) {
+            return numberStr + " měsíce";
+        }
+        return numberStr + " měsíců";
     }
 }
