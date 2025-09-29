@@ -5,6 +5,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import org.openpdf.pdf.ITextRenderer;
 import utilcalc.core.model.output.*;
 import utilcalc.core.utils.ValueFormatter;
@@ -200,9 +201,7 @@ public final class PdfGenerator {
     public static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
         ValueFormatter formatter = html.getFormatter();
 
-        long distinctMeterCount =
-                section.readings().stream().map(WaterReading::meterId).distinct().count();
-        boolean showMeterId = distinctMeterCount > 1;
+        boolean showMeterId = shouldShowMeterId(section.readings());
 
         html.beginTable().beginThead().beginTr();
 
@@ -262,9 +261,7 @@ public final class PdfGenerator {
     public static void appendHotWaterTable(HtmlBuilder html, HotWaterSection section) {
         ReportFormatter formatter = html.getFormatter();
 
-        long distinctMeterCount =
-                section.readings().stream().map(WaterReading::meterId).distinct().count();
-        boolean showMeterId = distinctMeterCount > 1;
+        boolean showMeterId = shouldShowMeterId(section.readings());
 
         html.beginTable().beginThead().beginTr();
         if (showMeterId) {
@@ -333,5 +330,9 @@ public final class PdfGenerator {
         html.beginTr().td("Celkem").td("").td("").tdMoney(section.totalAmount()).endTr();
 
         html.endTBody().endTable();
+    }
+
+    private static boolean shouldShowMeterId(List<WaterReading> readings) {
+        return readings.stream().map(WaterReading::meterId).distinct().count() > 1;
     }
 }
