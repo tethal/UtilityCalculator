@@ -58,18 +58,11 @@ public final class PdfGenerator {
             html.p(line);
         }
 
-        html.h1("Celkový přehled")
-                .beginTable()
-                .beginThead()
-                .beginTr()
-                .th("Popis")
-                .th("Částka")
-                .endTr()
-                .endThead()
-                .beginTBody();
+        html.h1("Celkový přehled");
+        html.beginTable("Popis", "Částka");
 
         for (ReportSection section : report.sections()) {
-            html.beginTr().td(section.name()).tdMoney(section.totalAmount()).endTr();
+            html.beginTr().tdText(section.name()).tdMoney(section.totalAmount()).endTr();
         }
 
         html.endTBody().endTable();
@@ -110,229 +103,148 @@ public final class PdfGenerator {
         return html.build();
     }
 
+    private static void waterReadings(HtmlBuilder html, List<WaterReading> readings) {
+        boolean showMeterId = readings.stream().map(WaterReading::meterId).distinct().count() > 1;
+
+        html.h2("Odečty");
+
+        html.beginTable("Období", "Počáteční stav", "Konečný stav", "Spotřeba");
+
+        for (WaterReading r : readings) {
+            html.beginTr();
+
+            html.beginTd().appendDateRange(r.dateRange());
+            if (showMeterId) {
+                html.lineBreak().append(r.meterId());
+            }
+            html.endTd();
+
+            html.tdCubicMeter(r.startState());
+            html.tdCubicMeter(r.endState());
+            html.tdCubicMeter(r.consumption());
+
+            html.endTr();
+        }
+
+        html.endTBody().endTable();
+    }
+
     private static void appendDepositsTable(HtmlBuilder html, DepositSection depositSection) {
         boolean unitCount =
                 depositSection.deposits().stream()
                         .anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
 
-        html.beginTable().beginThead().beginTr().th("Popis");
         if (unitCount) {
-            html.th("Množství").th("Jednotková cena");
+            html.beginTable("Popis", "Množství", "Záloha", "Částka");
+        } else {
+            html.beginTable("Popis", "Částka");
         }
-        html.th("Částka").endTr().endThead().beginTBody();
 
         for (var deposit : depositSection.deposits()) {
-            html.beginTr().td(deposit.description());
+            html.beginTr().tdText(deposit.description());
 
             if (unitCount) {
-                html.tdNumber(deposit.count());
-                html.tdMoney(deposit.unitAmount());
+                html.tdMonths(deposit.count());
+                html.tdCzkPerMonth(deposit.unitAmount());
             }
 
             html.tdMoney(deposit.amount()).endTr();
         }
 
-        html.beginTr().td("Celkem");
-        if (unitCount) {
-            html.td("").td("");
-        }
-        html.tdMoney(depositSection.totalAmount()).endTr();
+        html.totalRow(unitCount ? 3 : 1, "Celkem", depositSection.totalAmount().abs());
 
         html.endTBody().endTable();
     }
 
     private static void appendOtherFeeTable(HtmlBuilder html, OtherFeeSection otherFeeSection) {
-        ValueFormatter formatter = html.getFormatter();
-
-        html.beginTable()
-                .beginThead()
-                .beginTr()
-                .th("Období")
-                .th("Množství")
-                .th("Jednotková cena")
-                .th("Částka")
-                .endTr()
-                .endThead()
-                .beginTBody();
+        html.beginTable("Období", "Množství", "Sazba", "Cena");
 
         for (OtherFee fee : otherFeeSection.fees()) {
             html.beginTr()
-                    .td(formatter.formatPeriod(fee.dateRange()))
-                    .tdNumber(fee.monthCount())
-                    .tdMoney(fee.monthlyCost())
+                    .tdDateRange(fee.dateRange())
+                    .tdMonths(fee.monthCount())
+                    .tdCzkPerMonth(fee.monthlyCost())
                     .tdMoney(fee.feeAmount())
                     .endTr();
         }
 
-        html.beginTr().td("Celkem").td("").td("").tdMoney(otherFeeSection.totalAmount()).endTr();
+        html.totalRow(3, "Celkem", otherFeeSection.totalAmount());
 
         html.endTBody().endTable();
     }
 
     private static void appendHeatingFeeTable(
             HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
-        ValueFormatter formatter = html.getFormatter();
-
-        html.beginTable()
-                .beginThead()
-                .beginTr()
-                .th("Měsíc")
-                .th("Roční náklady")
-                .th("Koeficient")
-                .th("Částka")
-                .endTr()
-                .endThead()
-                .beginTBody();
+        html.beginTable("Období", "Koeficient", "Sazba", "Cena");
 
         for (HeatingFee fee : heatingFeeSection.fees()) {
             html.beginTr()
-                    .td(formatter.formatYearMonth(fee.yearMonth()))
-                    .tdMoney(fee.annualCost())
-                    .tdNumber(fee.coefficient())
+                    .tdYearMonth(fee.yearMonth())
+                    .tdNumberWithPercent(fee.monthCount(), fee.coefficient())
+                    .tdCzkPerYear(fee.annualCost())
                     .tdMoney(fee.feeAmount())
                     .endTr();
         }
 
-        html.beginTr().th("Celkem").td("").td("").tdMoney(heatingFeeSection.totalAmount()).endTr();
+        html.totalRow(3, "Celkem", heatingFeeSection.totalAmount());
 
         html.endTBody().endTable();
     }
 
     public static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
-        ValueFormatter formatter = html.getFormatter();
+        waterReadings(html, section.readings());
 
-        boolean showMeterId = shouldShowMeterId(section.readings());
-
-        html.beginTable().beginThead().beginTr();
-
-        if (showMeterId) {
-            html.th("ID vodoměru");
-        }
-
-        html.th("Období")
-                .th("Počáteční stav (m³)")
-                .th("Konečný stav (m³)")
-                .th("Spotřeba (m³)")
-                .endTr()
-                .endThead()
-                .beginTBody();
-
-        for (WaterReading reading : section.readings()) {
-            html.beginTr();
-
-            if (showMeterId) {
-                html.td(reading.meterId());
-            }
-
-            html.td(formatter.formatPeriod(reading.dateRange()))
-                    .tdNumber(reading.startState())
-                    .tdNumber(reading.endState())
-                    .tdNumber(reading.consumption())
-                    .endTr();
-        }
-
-        html.endTBody().endTable();
-
-        html.beginTable()
-                .beginThead()
-                .beginTr()
-                .th("Období")
-                .th("Množství (m³)")
-                .th("Jednotková cena (Kč/m³)")
-                .th("Částka (Kč)")
-                .endTr()
-                .endThead()
-                .beginTBody();
+        html.h2("Náklady");
+        html.beginTable("Období", "Množství", "Sazba", "Cena");
 
         for (WaterFee fee : section.priceList()) {
             html.beginTr()
-                    .td(formatter.formatPeriod(fee.dateRange()))
-                    .tdNumber(fee.quantity())
-                    .tdNumber(fee.unitAmount())
+                    .tdDateRange(fee.dateRange())
+                    .tdCubicMeter(fee.quantity())
+                    .tdCzkPerCubicMeter(fee.unitAmount())
                     .tdMoney(fee.periodAmount())
                     .endTr();
         }
 
+        html.totalRow(3, "Celkem", section.totalAmount());
         html.endTBody().endTable();
-
-        html.p("Celková částka: " + formatter.formatMoney(section.totalAmount()));
     }
 
     public static void appendHotWaterTable(HtmlBuilder html, HotWaterSection section) {
-        ReportFormatter formatter = html.getFormatter();
+        waterReadings(html, section.readings());
 
-        boolean showMeterId = shouldShowMeterId(section.readings());
-
-        html.beginTable().beginThead().beginTr();
-        if (showMeterId) {
-            html.th("ID vodoměru");
-        }
-        html.th("Období")
-                .th("Počáteční stav (m³)")
-                .th("Konečný stav (m³)")
-                .th("Spotřeba (m³)")
-                .endTr()
-                .endThead()
-                .beginTBody();
-
-        for (WaterReading reading : section.readings()) {
-            html.beginTr();
-            if (showMeterId) {
-                html.td(reading.meterId());
-            }
-            html.td(formatter.formatPeriod(reading.dateRange()))
-                    .tdNumber(reading.startState())
-                    .tdNumber(reading.endState())
-                    .tdNumber(reading.consumption())
-                    .endTr();
-        }
-        html.endTBody().endTable();
-
-        html.h1("Náklady");
-        html.beginTable()
-                .beginThead()
-                .beginTr()
-                .th("Popis")
-                .th("Množství")
-                .th("Sazba")
-                .th("Cena")
-                .endTr()
-                .endThead()
-                .beginTBody();
+        html.h2("Náklady");
+        html.beginTable("Popis", "Množství", "Sazba", "Cena");
 
         for (WaterFee fee : section.priceList()) {
             html.beginTr()
-                    .td("Studená voda " + formatter.formatPeriod(fee.dateRange()))
-                    .tdNumber(fee.quantity())
-                    .tdNumber(fee.unitAmount())
+                    .tdDateRangeWithTitle("Studená voda ", fee.dateRange())
+                    .tdCubicMeter(fee.quantity())
+                    .tdCzkPerCubicMeter(fee.unitAmount())
                     .tdMoney(fee.periodAmount())
                     .endTr();
         }
 
         for (WaterHeatingBasicPart part : section.heatingBasicParts()) {
             html.beginTr()
-                    .td("Ohřev základní složka " + formatter.formatPeriod(part.dateRange()))
-                    .tdNumber(part.numberOfMonths())
-                    .tdMoney(part.monthlyCost())
+                    .tdDateRangeWithTitle("Ohřev základní složka ", part.dateRange())
+                    .tdMonths(part.numberOfMonths())
+                    .tdCzkPerMonth(part.monthlyCost())
                     .tdMoney(part.totalAmount())
                     .endTr();
         }
 
         for (WaterHeatingConsumablePart part : section.heatingConsumableParts()) {
             html.beginTr()
-                    .td("Ohřev spotřební složka " + formatter.formatPeriod(part.dateRange()))
-                    .tdNumber(part.unitAmount())
-                    .tdMoney(part.unitCost())
+                    .tdDateRangeWithTitle("Ohřev spotřební složka ", part.dateRange())
+                    .tdCubicMeter(part.unitAmount())
+                    .tdCzkPerCubicMeter(part.unitCost())
                     .tdMoney(part.totalCost())
                     .endTr();
         }
 
-        html.beginTr().td("Celkem").td("").td("").tdMoney(section.totalAmount()).endTr();
+        html.totalRow(3, "Celkem", section.totalAmount());
 
         html.endTBody().endTable();
-    }
-
-    private static boolean shouldShowMeterId(List<WaterReading> readings) {
-        return readings.stream().map(WaterReading::meterId).distinct().count() > 1;
     }
 }
