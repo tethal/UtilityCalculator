@@ -94,6 +94,52 @@ class PdfGeneratorTest {
                                                 LocalDate.of(2025, 12, 31)),
                                         BigDecimal.valueOf(55))));
 
+        SectionInputs hotWaterFees =
+                new HotWaterSectionInputs(
+                        "Teplá voda",
+                        List.of(
+                                new MeterReading(
+                                        "Vodoměr T1",
+                                        LocalDate.of(2024, 1, 1),
+                                        BigDecimal.valueOf(300)),
+                                new MeterReading(
+                                        "Vodoměr T1",
+                                        LocalDate.of(2024, 1, 31),
+                                        BigDecimal.valueOf(330))),
+                        List.of(
+                                new WaterTariff(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2024, 1, 1),
+                                                LocalDate.of(2024, 12, 31)),
+                                        BigDecimal.valueOf(50)),
+                                new WaterTariff(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2025, 1, 1),
+                                                LocalDate.of(2025, 12, 31)),
+                                        BigDecimal.valueOf(55))),
+                        List.of(
+                                new ServiceCost(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2024, 1, 1),
+                                                LocalDate.of(2024, 12, 31)),
+                                        BigDecimal.valueOf(200)),
+                                new ServiceCost(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2025, 1, 1),
+                                                LocalDate.of(2025, 12, 31)),
+                                        BigDecimal.valueOf(220))),
+                        List.of(
+                                new WaterTariff(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2024, 1, 1),
+                                                LocalDate.of(2024, 12, 31)),
+                                        BigDecimal.valueOf(90)),
+                                new WaterTariff(
+                                        DateRange.fromInclusive(
+                                                LocalDate.of(2025, 1, 1),
+                                                LocalDate.of(2025, 12, 31)),
+                                        BigDecimal.valueOf(95))));
+
         DateRange dateRange =
                 DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 12, 31));
 
@@ -105,7 +151,7 @@ class PdfGeneratorTest {
                         "Praha",
                         LocalDate.now(),
                         List.of("Faktury, podklady měření"),
-                        List.of(deposits, otherFees, heatingFees, coldWaterFees));
+                        List.of(deposits, otherFees, heatingFees, coldWaterFees, hotWaterFees));
 
         Report report = ReportGen.generateReport(inputs);
 
