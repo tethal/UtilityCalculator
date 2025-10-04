@@ -38,6 +38,8 @@ public class Parser {
                 case TENANT -> tenant.addAll(reader.readAllUntilNextGroup());
                 case OWNER -> owner.addAll(reader.readAllUntilNextGroup());
                 case SOURCES -> sources.addAll(reader.readAllUntilNextGroup());
+                case DepositsSectionParser.SECTION_NAME -> sections.add(
+                        DepositsSectionParser.parse(header, reader.readAllUntilNextGroup()));
 
                     // TODO ostatní sekce
 

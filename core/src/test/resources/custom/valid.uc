@@ -12,3 +12,6 @@ V Praze, 2025-05-08
 
 [zdroje]
     Vyúčtování služeb od Společenství vlastníků za rok 2024
+
+[zalohy]
+    leden - prosinec: 12 x 3000

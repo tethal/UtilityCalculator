@@ -37,4 +37,11 @@ public final class ParserUtil {
     }
 
     record GroupHeader(String name, String title) {}
+
+    static String titleOrDefault(GroupHeader header, String defaultValue) {
+        if (header.title() != null) {
+            return header.title();
+        }
+        return defaultValue;
+    }
 }

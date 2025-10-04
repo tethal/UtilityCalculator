@@ -2,6 +2,7 @@ package utilcalc.core.parser.newparser;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import utilcalc.core.model.input.*;
@@ -22,6 +23,15 @@ class ParserTest {
         assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2025, 5, 8));
         assertThat(inputs.sources())
                 .containsExactly("Vyúčtování služeb od Společenství vlastníků za rok 2024");
-        assertThat(inputs.sections()).hasSize(0);
+        assertThat(inputs.sections()).hasSize(1);
+        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
+        assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
+        assertThat(deposits.payments())
+                .hasSize(1)
+                .containsExactly(
+                        new Payment(
+                                "leden - prosinec",
+                                BigDecimal.valueOf(12),
+                                BigDecimal.valueOf(3000)));
     }
 }
