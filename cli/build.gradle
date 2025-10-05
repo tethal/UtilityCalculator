@@ -1,8 +1,8 @@
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core:3.27.3'
     implementation project(':core')
-    implementation 'commons-io:commons-io:2.20.0'
 }
 
 test {
