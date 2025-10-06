@@ -65,7 +65,7 @@ public final class PdfGenerator {
             html.beginTr().tdText(section.name()).tdMoney(section.totalAmount()).endTr();
         }
 
-        html.endTBody().endTable();
+        html.endTable();
 
         for (ReportSection section : report.sections()) {
             html.h1(section.name());
@@ -126,7 +126,7 @@ public final class PdfGenerator {
             html.endTr();
         }
 
-        html.endTBody().endTable();
+        html.endTable();
     }
 
     private static void appendDepositsTable(HtmlBuilder html, DepositSection depositSection) {
@@ -153,7 +153,7 @@ public final class PdfGenerator {
 
         html.totalRow(unitCount ? 3 : 1, "Celkem", depositSection.totalAmount().abs());
 
-        html.endTBody().endTable();
+        html.endTable();
     }
 
     private static void appendOtherFeeTable(HtmlBuilder html, OtherFeeSection otherFeeSection) {
@@ -170,7 +170,7 @@ public final class PdfGenerator {
 
         html.totalRow(3, "Celkem", otherFeeSection.totalAmount());
 
-        html.endTBody().endTable();
+        html.endTable();
     }
 
     private static void appendHeatingFeeTable(
@@ -188,10 +188,10 @@ public final class PdfGenerator {
 
         html.totalRow(3, "Celkem", heatingFeeSection.totalAmount());
 
-        html.endTBody().endTable();
+        html.endTable();
     }
 
-    public static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
+    private static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
         waterReadings(html, section.readings());
 
         html.h2("Náklady");
@@ -207,10 +207,10 @@ public final class PdfGenerator {
         }
 
         html.totalRow(3, "Celkem", section.totalAmount());
-        html.endTBody().endTable();
+        html.endTable();
     }
 
-    public static void appendHotWaterTable(HtmlBuilder html, HotWaterSection section) {
+    private static void appendHotWaterTable(HtmlBuilder html, HotWaterSection section) {
         waterReadings(html, section.readings());
 
         html.h2("Náklady");
@@ -245,6 +245,6 @@ public final class PdfGenerator {
 
         html.totalRow(3, "Celkem", section.totalAmount());
 
-        html.endTBody().endTable();
+        html.endTable();
     }
 }

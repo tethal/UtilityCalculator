@@ -112,6 +112,7 @@ public final class HtmlBuilder {
     }
 
     public HtmlBuilder endTable() {
+        endTBody();
         sb.append("</table>\n");
         return this;
     }
@@ -161,17 +162,15 @@ public final class HtmlBuilder {
     }
 
     public HtmlBuilder tdText(String text) {
-        return beginTd().append(text).endTd();
+        return appendTag("td", text);
     }
 
     public HtmlBuilder tdMoney(BigDecimal amount) {
-        sb.append("<td class=\"money\">").append(formatter.formatMoney(amount)).append("</td>\n");
-        return this;
+        return appendTag("td", formatter.formatMoney(amount), "money");
     }
 
     public HtmlBuilder th(String text) {
-        sb.append("<th>").append(escape(text)).append("</th>\n");
-        return this;
+        return appendTag("th", text);
     }
 
     public HtmlBuilder tdCubicMeter(BigDecimal value) {
@@ -196,7 +195,7 @@ public final class HtmlBuilder {
         return tdText(formatter.formatMoney(value) + "/rok");
     }
 
-    public HtmlBuilder tdDateRange(utilcalc.core.model.DateRange value) {
+    public HtmlBuilder tdDateRange(DateRange value) {
         return tdText(formatter.formatPeriod(value));
     }
 
