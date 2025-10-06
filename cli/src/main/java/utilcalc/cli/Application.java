@@ -41,7 +41,7 @@ public class Application {
                     };
 
             prepareOutputDirectory(appConfig.outputPath);
-            writeOutput(appConfig.outputPath(), exportBytes);
+            Files.write(appConfig.outputPath(), exportBytes);
         } catch (Exception e) {
             System.err.println(e);
             System.exit(1);
@@ -91,17 +91,6 @@ public class Application {
     private static void prepareOutputDirectory(Path outputPath) throws IOException {
         Path parentDirectory = outputPath.getParent();
         if (parentDirectory != null) Files.createDirectories(parentDirectory);
-    }
-
-    private static void writeOutput(Path outputPath, byte[] bytes) {
-        if (bytes == null) {
-            throw new IllegalArgumentException("Exported bytes must not be null");
-        }
-        try {
-            Files.write(outputPath, bytes);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write output file: " + outputPath, e);
-        }
     }
 
     record AppConfiguration(String exportFormat, Path inputPath, Path outputPath) {
