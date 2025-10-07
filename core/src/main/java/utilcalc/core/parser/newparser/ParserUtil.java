@@ -1,6 +1,5 @@
 package utilcalc.core.parser.newparser;
 
-import java.time.LocalDate;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.parser.ParsingException;
 
@@ -14,16 +13,6 @@ public final class ParserUtil {
     static DateRange parseRange(String text) {
         return DateRangeParser.parse(text);
     }
-
-    static StringDatePair parseStringDatePair(String line) {
-        String[] parts = line.split(",", 2);
-        if (parts.length != 2) {
-            throw new ParsingException("Expected two parts separated by ',', got: " + line);
-        }
-        return new StringDatePair(parts[0].strip(), LocalDate.parse(parts[1].strip()));
-    }
-
-    record StringDatePair(String string, LocalDate date) {}
 
     static GroupHeader parseGroupHeader(String line) {
         if (!line.startsWith(GROUP_HEADER_START_CHAR) || !line.endsWith(GROUP_HEADER_END_CHAR)) {

@@ -40,6 +40,10 @@ public class Parser {
                 case SOURCES -> sources.addAll(reader.readAllUntilNextGroup());
                 case DepositsSectionParser.SECTION_NAME -> sections.add(
                         DepositsSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case HeatingSectionParser.SECTION_NAME -> sections.add(
+                        HeatingSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case OtherFeesSectionParser.SECTION_NAME -> sections.add(
+                        OtherFeesSectionParser.parse(header, reader.readAllUntilNextGroup()));
 
                     // TODO ostatní sekce
 
@@ -50,4 +54,14 @@ public class Parser {
         return new ReportInputs(
                 dateRange, tenant, owner, reportPlace, reportDate, sources, sections);
     }
+
+    private static StringDatePair parseStringDatePair(String line) {
+        String[] parts = line.split(",", 2);
+        if (parts.length != 2) {
+            throw new ParsingException("Expected two parts separated by ',', got: " + line);
+        }
+        return new StringDatePair(parts[0].strip(), LocalDate.parse(parts[1].strip()));
+    }
+
+    private record StringDatePair(String string, LocalDate date) {}
 }
