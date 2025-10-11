@@ -15,7 +15,6 @@ import utilcalc.core.pdfGen.PdfGenerator;
 
 public class Application {
     private static final String DEFAULT_EXPORT_FORMAT = "pdf";
-    private static final String INPUT_FORMAT = "toml";
 
     public static void main(String[] args) {
 
@@ -59,7 +58,7 @@ public class Application {
 
     static AppConfiguration parseSingleArgument(String argument) {
         Path inputPath = Path.of(argument);
-        Path outputPath = Path.of(argument.replace(getExtension(argument), DEFAULT_EXPORT_FORMAT));
+        Path outputPath = createOutputPath(inputPath, DEFAULT_EXPORT_FORMAT);
         return new AppConfiguration(DEFAULT_EXPORT_FORMAT, inputPath, outputPath);
     }
 
@@ -71,13 +70,26 @@ public class Application {
         if (args[0].startsWith("--")) {
             exportFormat = args[0].replace("--", "");
             inputPath = Path.of(args[1]);
-            outputPath = Path.of(args[1].replace(INPUT_FORMAT, exportFormat));
+            outputPath = createOutputPath(inputPath, exportFormat);
         } else {
             exportFormat = getExtension(args[1]);
             inputPath = Path.of(args[0]);
             outputPath = Path.of(args[1]);
         }
         return new AppConfiguration(exportFormat, inputPath, outputPath);
+    }
+
+    private static Path createOutputPath(Path inputPath, String newExtension) {
+        Path fullFileName = inputPath.getFileName();
+        if (fullFileName == null) {
+            throw new IllegalArgumentException("Path does not contain a file name: " + inputPath);
+        }
+        int dotIndex = fullFileName.toString().lastIndexOf('.');
+        if (dotIndex < 0) {
+            throw new IllegalArgumentException("Invalid input file:" + fullFileName);
+        }
+        String fileName = fullFileName.toString().substring(0, dotIndex + 1);
+        return inputPath.resolveSibling(fileName + newExtension);
     }
 
     private static String getExtension(String path) {
