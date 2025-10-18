@@ -44,9 +44,10 @@ public class Parser {
                         HeatingSectionParser.parse(header, reader.readAllUntilNextGroup()));
                 case OtherFeesSectionParser.SECTION_NAME -> sections.add(
                         OtherFeesSectionParser.parse(header, reader.readAllUntilNextGroup()));
-
-                    // TODO ostatní sekce
-
+                case ColdWaterSectionParser.SECTION_NAME -> sections.add(
+                        ColdWaterSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case HotWaterSectionParser.SECTION_NAME -> sections.add(
+                        HotWaterSectionParser.parse(header, reader.readAllUntilNextGroup()));
                 default -> throw new ParsingException("Unknown group: " + header.name());
             }
         }
