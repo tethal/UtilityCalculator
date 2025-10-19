@@ -12,6 +12,10 @@ class ServiceCostsParser {
         return lines.stream().map(ServiceCostsParser::parseServiceCostLine).toList();
     }
 
+    static ServiceCost parseSingleLine(String line) {
+        return parseServiceCostLine(line);
+    }
+
     private static ServiceCost parseServiceCostLine(String line) {
         String[] parts = line.split(":", 2);
         if (parts.length != 2) {

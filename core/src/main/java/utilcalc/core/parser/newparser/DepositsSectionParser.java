@@ -32,8 +32,8 @@ class DepositsSectionParser {
                     throw new ParsingException(
                             "Invalid payment format (missing RHS after x): " + line);
                 }
-                count = ExprParser.parse(countAndAmount[0].trim());
-                unitAmount = ExprParser.parse(countAndAmount[1].trim());
+                count = ExprParser.parse(countAndAmount[0].strip());
+                unitAmount = ExprParser.parse(countAndAmount[1].strip());
             } else {
                 count = BigDecimal.ONE;
                 unitAmount = ExprParser.parse(paymentLine.amountPart());
