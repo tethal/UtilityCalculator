@@ -1,24 +1,21 @@
 package utilcalc.core.parser;
 
+import static utilcalc.core.parser.ParserUtil.titleOrDefault;
+
 import java.util.List;
-import org.tomlj.TomlArray;
 import utilcalc.core.model.input.HeatingFeeInputs;
 import utilcalc.core.model.input.SectionInputs;
 import utilcalc.core.model.input.ServiceCost;
-import utilcalc.core.utils.Util;
 
 class HeatingSectionParser {
 
     private HeatingSectionParser() {}
 
-    static final String SECTION_NAME = "heating";
-    private static final String SECTION_INPUTS_NAME = "Vytápění";
+    static final String SECTION_NAME = "vytapeni";
+    private static final String SECTION_INPUTS_TITLE = "Vytápění";
 
-    static SectionInputs parse(Object untypedHeatingServiceCosts) {
-        TomlArray heatingServiceCosts =
-                Util.castOrThrow(untypedHeatingServiceCosts, TomlArray.class);
-        List<ServiceCost> serviceCosts =
-                ServiceCostsParser.parse(heatingServiceCosts, SECTION_NAME);
-        return new HeatingFeeInputs(SECTION_INPUTS_NAME, serviceCosts);
+    static SectionInputs parse(ParserUtil.GroupHeader header, List<String> lines) {
+        List<ServiceCost> serviceCosts = ServiceCostsParser.parse(lines);
+        return new HeatingFeeInputs(titleOrDefault(header, SECTION_INPUTS_TITLE), serviceCosts);
     }
 }

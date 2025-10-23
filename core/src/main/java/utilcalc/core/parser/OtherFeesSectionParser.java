@@ -1,24 +1,21 @@
 package utilcalc.core.parser;
 
+import static utilcalc.core.parser.ParserUtil.titleOrDefault;
+
 import java.util.List;
-import org.tomlj.TomlArray;
 import utilcalc.core.model.input.OtherFeeInputs;
 import utilcalc.core.model.input.SectionInputs;
 import utilcalc.core.model.input.ServiceCost;
-import utilcalc.core.utils.Util;
 
 class OtherFeesSectionParser {
 
     private OtherFeesSectionParser() {}
 
-    static final String SECTION_NAME = "other_fees";
-    private static final String SECTION_INPUTS_NAME = "Ostatní poplatky";
+    static final String SECTION_NAME = "ostatni poplatky";
+    private static final String SECTION_INPUTS_TITLE = "Ostatní poplatky";
 
-    static SectionInputs parse(Object untypedOtherFeesServiceCosts) {
-        TomlArray otherFeesServiceCosts =
-                Util.castOrThrow(untypedOtherFeesServiceCosts, TomlArray.class);
-        List<ServiceCost> serviceCosts =
-                ServiceCostsParser.parse(otherFeesServiceCosts, SECTION_NAME);
-        return new OtherFeeInputs(SECTION_INPUTS_NAME, serviceCosts);
+    static SectionInputs parse(ParserUtil.GroupHeader header, List<String> lines) {
+        List<ServiceCost> serviceCosts = ServiceCostsParser.parse(lines);
+        return new OtherFeeInputs(titleOrDefault(header, SECTION_INPUTS_TITLE), serviceCosts);
     }
 }

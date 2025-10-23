@@ -1,42 +1,51 @@
 package utilcalc.core.parser;
 
-import static utilcalc.core.parser.ParserUtils.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.IntStream;
-import org.tomlj.TomlArray;
-import org.tomlj.TomlTable;
 import utilcalc.core.model.input.MeterReading;
 
 class MeterReadingParser {
 
     private MeterReadingParser() {}
 
-    private static final String METER_ID = "meter_id";
-    private static final String READING_DATE = "reading_date";
-    private static final String STATE = "state";
+    static List<MeterReading> parseLine(String line, String defaultMeterId) {
+        // Syntax: 2024-01-01: SV1 @ 14.5, SV2 @ 55.6
+        String[] parts = line.split(":", 2);
+        if (parts.length != 2) {
+            throw new ParsingException("Invalid meter reading line (missing ':'): " + line);
+        }
 
-    private static final Set<String> METER_READING_KNOWN_FIELDS =
-            Set.of(METER_ID, READING_DATE, STATE);
+        String header = parts[0].strip();
+        LocalDate date = parseLocalDate(header);
 
-    static List<MeterReading> parse(TomlArray meterReadings) {
-        return IntStream.range(0, meterReadings.size())
-                .mapToObj(meterReadings::getTable)
-                .map(MeterReadingParser::parseMeterReading)
-                .toList();
+        String readingsPart = parts[1].strip();
+        String[] readingTokens = readingsPart.split(",");
+
+        List<MeterReading> readings = new ArrayList<>();
+        for (String token : readingTokens) {
+            String[] idAndValue = token.strip().split("@");
+            String meterId;
+            BigDecimal state;
+
+            if (idAndValue.length == 1) {
+                meterId = defaultMeterId;
+                state = ExprParser.parse(idAndValue[0].strip());
+            } else if (idAndValue.length == 2) {
+                meterId = idAndValue[0].strip();
+                state = ExprParser.parse(idAndValue[1].strip());
+            } else {
+                throw new ParsingException("Invalid reading expression: " + token);
+            }
+
+            readings.add(new MeterReading(meterId, date, state));
+        }
+
+        return readings;
     }
 
-    private static MeterReading parseMeterReading(TomlTable meterReadingTable) {
-        checkThatSectionContainsOnlyKnownFields(
-                meterReadingTable,
-                METER_READING_KNOWN_FIELDS,
-                ColdWaterSectionParser.READING_SECTION_NAME);
-        String meterId = requireString(meterReadingTable, METER_ID);
-        LocalDate readingDate = requireLocalDate(meterReadingTable, READING_DATE);
-        BigDecimal state = requireBigDecimal(meterReadingTable, STATE);
-        return new MeterReading(meterId, readingDate, state);
+    private static LocalDate parseLocalDate(String text) {
+        return LocalDate.parse(text);
     }
 }

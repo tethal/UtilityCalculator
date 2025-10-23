@@ -1,30 +1,37 @@
 package utilcalc.core.parser;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.tomlj.TomlArray;
-import org.tomlj.TomlTable;
 import utilcalc.core.model.input.*;
-import utilcalc.core.utils.Util;
 
 class ColdWaterSectionParser {
 
     private ColdWaterSectionParser() {}
 
-    static final String SECTION_NAME = "cold_water";
-    static final String READING_SECTION_NAME = "reading";
-    static final String TARIFF_SECTION_NAME = "tariff";
-    private static final String SECTION_INPUTS_NAME = "Studená voda";
+    static final String SECTION_NAME = "studena voda";
+    private static final String SECTION_INPUTS_TITLE = "Studená voda";
 
-    static SectionInputs parse(Object untypedColdWaterSections) {
-        TomlTable coldWaterSections = Util.castOrThrow(untypedColdWaterSections, TomlTable.class);
+    static SectionInputs parse(ParserUtil.GroupHeader header, List<String> lines) {
+        List<MeterReading> meterReadings = new ArrayList<>();
+        List<WaterTariff> waterTariffs = new ArrayList<>();
 
-        TomlArray readingSections =
-                ParserUtils.requireArray(coldWaterSections, READING_SECTION_NAME);
-        TomlArray tariffSections = ParserUtils.requireArray(coldWaterSections, TARIFF_SECTION_NAME);
+        for (String line : lines) {
+            if (line.startsWith("O")) {
+                // O 2024-01-01: TV1 @ 14.5, TV2 @ 55.6
+                String withoutPrefix = line.substring(1).strip();
+                meterReadings.addAll(MeterReadingParser.parseLine(withoutPrefix, "SV"));
+            } else if (line.startsWith("SV")) {
+                // SV 2024: 5920.16 / 42.2
+                String withoutPrefix = line.substring(2).strip();
+                waterTariffs.add(WaterTariffParser.parseLine(withoutPrefix));
+            } else {
+                throw new ParsingException("Unknown line type in [studena voda]: " + line);
+            }
+        }
 
-        List<MeterReading> meterReadings = MeterReadingParser.parse(readingSections);
-        List<WaterTariff> waterTariffs =
-                WaterTariffParser.parse(tariffSections, TARIFF_SECTION_NAME);
-        return new ColdWaterSectionInputs(SECTION_INPUTS_NAME, meterReadings, waterTariffs);
+        return new ColdWaterSectionInputs(
+                ParserUtil.titleOrDefault(header, SECTION_INPUTS_TITLE),
+                meterReadings,
+                waterTariffs);
     }
 }

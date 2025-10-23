@@ -1,8 +1,0 @@
-[general]
-start_date = 2024-02-15
-end_date = 148854
-tenant = ["Jméno nájemníka", "Adresa nemovitosti"]
-owner = ["Jméno majitele", "majitel@example.com"]
-report_place = "V Praze"
-report_date = 2025-05-20
-sources = ["vyúčtování SVJ za rok 2024"]

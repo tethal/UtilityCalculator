@@ -1,48 +1,57 @@
 package utilcalc.core.parser;
 
-import static utilcalc.core.parser.ParserUtils.*;
-import static utilcalc.core.parser.ParserUtils.requireBigDecimal;
+import static utilcalc.core.parser.ParserUtil.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.IntStream;
-import org.tomlj.TomlArray;
-import org.tomlj.TomlTable;
 import utilcalc.core.model.input.DepositsSectionInputs;
 import utilcalc.core.model.input.Payment;
 import utilcalc.core.model.input.SectionInputs;
-import utilcalc.core.utils.Util;
 
 class DepositsSectionParser {
 
     private DepositsSectionParser() {}
 
-    static final String SECTION_NAME = "deposits";
-    private static final String SECTION_INPUTS_NAME = "Přijaté zálohy";
+    static final String SECTION_NAME = "zalohy";
+    private static final String SECTION_INPUTS_TITLE = "Přijaté zálohy";
 
-    private static final String DESCRIPTION = "description";
-    private static final String COUNT = "count";
-    private static final String AMOUNT = "amount";
+    static SectionInputs parse(GroupHeader header, List<String> lines) {
+        List<Payment> payments = new ArrayList<>();
 
-    private static final Set<String> SECTION_KNOWN_FIELDS = Set.of(DESCRIPTION, COUNT, AMOUNT);
+        for (String line : lines) {
+            PaymentLine paymentLine = parsePaymentLine(line);
 
-    static SectionInputs parse(Object untypedDepositPayments) {
-        TomlArray depositPayments = Util.castOrThrow(untypedDepositPayments, TomlArray.class);
-        List<Payment> payments =
-                IntStream.range(0, depositPayments.size())
-                        .mapToObj(depositPayments::getTable)
-                        .map(DepositsSectionParser::parsePayment)
-                        .toList();
+            BigDecimal count;
+            BigDecimal unitAmount;
 
-        return new DepositsSectionInputs(SECTION_INPUTS_NAME, payments);
+            if (paymentLine.amountPart().contains("x")) {
+                String[] countAndAmount = paymentLine.amountPart().split("x", 2);
+                if (countAndAmount.length != 2) {
+                    throw new ParsingException(
+                            "Invalid payment format (missing RHS after x): " + line);
+                }
+                count = ExprParser.parse(countAndAmount[0].strip());
+                unitAmount = ExprParser.parse(countAndAmount[1].strip());
+            } else {
+                count = BigDecimal.ONE;
+                unitAmount = ExprParser.parse(paymentLine.amountPart());
+            }
+
+            payments.add(new Payment(paymentLine.description(), count, unitAmount));
+        }
+
+        return new DepositsSectionInputs(titleOrDefault(header, SECTION_INPUTS_TITLE), payments);
     }
 
-    private static Payment parsePayment(TomlTable payment) {
-        checkThatSectionContainsOnlyKnownFields(payment, SECTION_KNOWN_FIELDS, SECTION_NAME);
-        String description = requireString(payment, DESCRIPTION);
-        BigDecimal count = requireBigDecimal(payment, COUNT, () -> BigDecimal.ONE);
-        BigDecimal amount = requireBigDecimal(payment, AMOUNT);
-        return new Payment(description, count, amount);
+    private static PaymentLine parsePaymentLine(String line) {
+        String[] parts = line.split(":", 2);
+        if (parts.length != 2) {
+            throw new ParsingException("Invalid payment line: " + line);
+        }
+
+        return new PaymentLine(parts[0].strip(), parts[1].strip());
     }
+
+    record PaymentLine(String description, String amountPart) {}
 }
