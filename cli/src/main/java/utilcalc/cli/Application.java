@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import utilcalc.core.model.input.ReportInputs;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.pdfGen.PdfGenerator;
+import utilcalc.core.typstGen.TypstGenerator;
 
 public class Application {
     private static final String DEFAULT_EXPORT_FORMAT = "pdf";
@@ -34,6 +35,8 @@ public class Application {
                     switch (appConfig.exportFormat) {
                         case "pdf" -> PdfGenerator.generatePdf(report);
                         case "html" -> PdfGenerator.buildHtml(report)
+                                .getBytes(StandardCharsets.UTF_8);
+                        case "typst" -> TypstGenerator.generateTypst(report)
                                 .getBytes(StandardCharsets.UTF_8);
                         default -> throw new IllegalArgumentException(
                                 "Unexpected export format: " + appConfig.exportFormat);
