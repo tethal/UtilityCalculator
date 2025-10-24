@@ -5,11 +5,11 @@ Report:
   placeDate: V Praze, 2025-05-08
   sources: Vyúčtování služeb od Společenství vlastníků za rok 2024
   sections:
-    Ostatní poplatky: 39514.30
+    Náklady: 39514.30
     Přijaté zálohy: -36000
     TOTAL: 3514.30
 
-Ostatní poplatky:
+Náklady:
   2024-01-01...2025-01-01: 12.00 * 3292.86 = 39514.30
 
 Přijaté zálohy:

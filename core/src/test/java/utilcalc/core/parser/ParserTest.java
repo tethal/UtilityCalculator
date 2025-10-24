@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.*;
 import utilcalc.core.util.TestHelpers;
@@ -15,235 +13,198 @@ class ParserTest {
 
     @Test
     void valid_input_should_return_valid_ReportInputs_class() {
-        ReportInputs inputs = Parser.parse(TestHelpers.getTestCaseContent("valid"));
+        ReportInputs inputs = Parser.parse(TestHelpers.getNewTestCaseContent("valid"));
 
-        assertThat(inputs.dateRange().startDate()).isEqualTo(LocalDate.of(2024, 2, 15));
+        assertThat(inputs.dateRange().startDate()).isEqualTo(LocalDate.of(2024, 1, 1));
         assertThat(inputs.dateRange().endDateExclusive()).isEqualTo(LocalDate.of(2025, 1, 1));
-        assertThat(inputs.tenant()).containsExactly("Jméno nájemníka", "Adresa nemovitosti");
-        assertThat(inputs.owner()).containsExactly("Jméno majitele", "majitel@example.com");
+        assertThat(inputs.tenant())
+                .containsExactly("Marie Černá", "Jindřišská 16", "111 50 Praha 1");
+        assertThat(inputs.owner()).containsExactly("Jan Novák", "majitel@example.com");
         assertThat(inputs.reportPlace()).isEqualTo("V Praze");
-        assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2025, 5, 20));
-        assertThat(inputs.sources()).containsExactly("vyúčtování SVJ za rok 2024");
+        assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2025, 5, 8));
+        assertThat(inputs.sources())
+                .containsExactly("Vyúčtování služeb od Společenství vlastníků za rok 2024");
+
         assertThat(inputs.sections()).hasSize(5);
 
-        ColdWaterSectionInputs coldWater = (ColdWaterSectionInputs) inputs.sections().getFirst();
-        assertThat(coldWater.name()).isEqualTo("Studená voda");
-        assertThat(coldWater.readings())
-                .hasSize(3)
+        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
+        assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
+        assertThat(deposits.payments())
+                .hasSize(1)
                 .containsExactly(
-                        new MeterReading(
-                                "1", LocalDate.of(2021, 10, 14), BigDecimal.valueOf(184.4)),
-                        new MeterReading("2", LocalDate.of(2021, 12, 31), BigDecimal.valueOf(8.6)),
-                        new MeterReading("2", LocalDate.of(2022, 4, 30), BigDecimal.valueOf(21)));
-        assertThat(coldWater.priceList())
-                .hasSize(2)
-                .containsExactly(
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(103.4076)),
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(108.13)));
+                        new Payment(
+                                "leden - prosinec",
+                                BigDecimal.valueOf(12),
+                                BigDecimal.valueOf(3000)));
 
-        HotWaterSectionInputs hotWater = (HotWaterSectionInputs) inputs.sections().get(1);
-        assertThat(hotWater.name()).isEqualTo("Teplá voda");
-
-        assertThat(hotWater.readings())
-                .hasSize(3)
-                .containsExactly(
-                        new MeterReading(
-                                "1", LocalDate.of(2021, 10, 14), BigDecimal.valueOf(100.5)),
-                        new MeterReading("2", LocalDate.of(2021, 12, 31), BigDecimal.valueOf(55.0)),
-                        new MeterReading(
-                                "2", LocalDate.of(2022, 4, 30), BigDecimal.valueOf(80.75)));
-
-        assertThat(hotWater.priceList())
-                .hasSize(2)
-                .containsExactly(
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(145.50)),
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(150.75)));
-
-        assertThat(hotWater.heatingBasicCosts())
-                .hasSize(2)
+        HeatingFeeInputs heating = (HeatingFeeInputs) inputs.sections().get(1);
+        assertThat(heating.name()).isEqualTo("Vytápění");
+        assertThat(heating.heatingFees())
+                .hasSize(1)
                 .containsExactly(
                         new ServiceCost(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(5000.0)),
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(5200.0)));
+                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                                BigDecimal.valueOf(8712.9)));
 
-        assertThat(hotWater.heatingConsumableTariffs())
+        OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(2);
+        assertThat(otherFee.name()).isEqualTo("Náklady");
+        assertThat(otherFee.otherFees())
+                .hasSize(1)
+                .containsExactly(
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                                new BigDecimal("39514.30")));
+
+        ColdWaterSectionInputs cold = (ColdWaterSectionInputs) inputs.sections().get(3);
+        assertThat(cold.name()).isEqualTo("Studená voda");
+        assertThat(cold.readings())
                 .hasSize(2)
                 .containsExactly(
+                        new MeterReading("SV", LocalDate.of(2024, 1, 1), new BigDecimal("60.7")),
+                        new MeterReading("SV", LocalDate.of(2025, 1, 1), new BigDecimal("102.9")));
+        assertThat(cold.priceList())
+                .hasSize(1)
+                .containsExactly(
                         new WaterTariff(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(120.0)),
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(130.0)));
+                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                                new BigDecimal("140.2881516587678")));
 
-        HeatingFeeInputs heating = (HeatingFeeInputs) inputs.sections().get(2);
+        HotWaterSectionInputs hot = (HotWaterSectionInputs) inputs.sections().get(4);
+        assertThat(hot.name()).isEqualTo("Teplá voda");
+
+        assertThat(hot.readings())
+                .hasSize(2)
+                .containsExactly(
+                        new MeterReading("TV", LocalDate.of(2024, 1, 1), new BigDecimal("30.7")),
+                        new MeterReading("TV", LocalDate.of(2025, 1, 1), new BigDecimal("51.9")));
+
+        assertThat(hot.priceList())
+                .hasSize(1)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                                new BigDecimal("122.8509433962264")));
+
+        assertThat(hot.heatingBasicCosts())
+                .hasSize(1)
+                .containsExactly(
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                                new BigDecimal("2725.92")));
+
+        assertThat(hot.heatingConsumableTariffs())
+                .hasSize(1)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                                new BigDecimal("257.988")));
+    }
+
+    @Test
+    void real_2021_should_return_valid_ReportInputs_class() {
+        ReportInputs inputs = Parser.parse(TestHelpers.getNewTestCaseContent("real_2021"));
+
+        assertThat(inputs.dateRange().startDate()).isEqualTo(LocalDate.of(2021, 1, 1));
+        assertThat(inputs.dateRange().endDateExclusive())
+                .isEqualTo(LocalDate.of(2022, 4, 30).plusDays(1));
+        assertThat(inputs.tenant())
+                .containsExactly("Marie Černá", "Jindřišská 16", "111 50 Praha 1");
+        assertThat(inputs.owner()).containsExactly("Jan Novák", "majitel@example.com");
+        assertThat(inputs.reportPlace()).isEqualTo("V Praze");
+        assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2022, 5, 22));
+        assertThat(inputs.sources())
+                .containsExactly(
+                        "Vyúčtování služeb od Společenství vlastníků za rok 2021",
+                        "Příloha č. 3 k vyhlášce č.269/2015 Sb.",
+                        "Měsíční předpis záloh pro rok 2022 od Společenství vlastníků",
+                        "https://www.pvk.cz/vse-o-vode/cena-vodneho-a-stocneho/vyvoj-vodneho-a-stocneho-v-praze/");
+
+        assertThat(inputs.sections()).hasSize(5);
+
+        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
+        assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
+        assertThat(deposits.payments())
+                .hasSize(1)
+                .containsExactly(new Payment("celkem", BigDecimal.ONE, BigDecimal.valueOf(43500)));
+
+        HeatingFeeInputs heating = (HeatingFeeInputs) inputs.sections().get(1);
         assertThat(heating.name()).isEqualTo("Vytápění");
         assertThat(heating.heatingFees())
                 .hasSize(2)
                 .containsExactly(
                         new ServiceCost(
                                 new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(10992)),
+                                BigDecimal.valueOf(8712.9)),
                         new ServiceCost(
                                 new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(10992)));
+                                BigDecimal.valueOf(8472)));
 
-        OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(3);
+        OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(2);
         assertThat(otherFee.name()).isEqualTo("Ostatní poplatky");
         assertThat(otherFee.otherFees())
                 .hasSize(2)
                 .containsExactly(
                         new ServiceCost(
                                 new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-                                BigDecimal.valueOf(3000)),
+                                BigDecimal.valueOf(8772)),
                         new ServiceCost(
                                 new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
-                                BigDecimal.valueOf(3200)));
+                                BigDecimal.valueOf(8508)));
 
-        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().get(4);
-        assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
-        assertThat(deposits.payments())
-                .hasSize(3)
+        ColdWaterSectionInputs cold = (ColdWaterSectionInputs) inputs.sections().get(3);
+        assertThat(cold.name()).isEqualTo("Studená voda");
+        assertThat(cold.readings())
+                .hasSize(5)
                 .containsExactly(
-                        new Payment(
-                                "leden - duben", BigDecimal.valueOf(4), BigDecimal.valueOf(3000)),
-                        new Payment("květen", BigDecimal.valueOf(1), BigDecimal.valueOf(3500)),
-                        new Payment(
-                                "červen - prosinec",
-                                BigDecimal.valueOf(7),
-                                BigDecimal.valueOf(3500)));
-    }
+                        new MeterReading("SV", LocalDate.of(2021, 1, 1), new BigDecimal("158.1")),
+                        new MeterReading("SV", LocalDate.of(2021, 10, 15), new BigDecimal("184.4")),
+                        new MeterReading("SV", LocalDate.of(2021, 10, 15), new BigDecimal("0")),
+                        new MeterReading("SV", LocalDate.of(2022, 1, 1), new BigDecimal("8.6")),
+                        new MeterReading("SV", LocalDate.of(2022, 5, 1), new BigDecimal("21")));
+        assertThat(cold.priceList())
+                .hasSize(2)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                new BigDecimal("103.4076")),
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                new BigDecimal("108.13")));
 
-    @Test
-    void invalid_syntax_should_throw_ParsingException() {
-        assertThatThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent("bad_syntax")))
-                .isInstanceOf(ParsingException.class)
-                .hasMessageContaining("Syntax error: ");
-    }
+        HotWaterSectionInputs hot = (HotWaterSectionInputs) inputs.sections().get(4);
+        assertThat(hot.name()).isEqualTo("Teplá voda");
 
-    @Test
-    void unknown_field_should_throw_ParsingException() {
-        assertThatThrownBy(
-                        () ->
-                                Parser.parse(
-                                        TestHelpers.getTestCaseContent(
-                                                "unknown_field_in_general_section")))
-                .isInstanceOf(ParsingException.class)
-                .hasMessage("Section general contains unknown fields: [unknown, second_unknown]");
-    }
+        assertThat(hot.readings())
+                .hasSize(5)
+                .containsExactly(
+                        new MeterReading("TV", LocalDate.of(2021, 1, 1), new BigDecimal("96.6")),
+                        new MeterReading("TV", LocalDate.of(2021, 10, 15), new BigDecimal("106.5")),
+                        new MeterReading("TV", LocalDate.of(2021, 10, 15), new BigDecimal("0")),
+                        new MeterReading("TV", LocalDate.of(2022, 1, 1), new BigDecimal("5.5")),
+                        new MeterReading("TV", LocalDate.of(2022, 5, 1), new BigDecimal("13.3")));
 
-    @CsvSource({
-        "missing_general_section,Missing required table field: general",
-        "missing_start_date_general_section,Missing required date field: start_date",
-        "missing_end_date_general_section,Missing required date field: end_date",
-        "missing_tenant_general_section,Missing required array field: tenant",
-        "missing_owner_general_section,Missing required array field: owner",
-        "missing_report_place_general_section,Missing required string field: report_place",
-        "missing_report_date_general_section,Missing required date field: report_date",
-        "missing_description_deposits_section,Missing required string field: description",
-        "missing_amount_deposits_section,Missing required bigDecimal field: amount",
-        "missing_annual_cost_heating_section,Missing required bigDecimal field: annual_cost",
-        "missing_start_date_heating_section,Missing required date field: start_date",
-        "missing_end_date_heating_section,Missing required date field: end_date",
-        "missing_annual_cost_other_fees_section,Missing required bigDecimal field: annual_cost",
-        "missing_start_date_other_fees_section,Missing required date field: start_date",
-        "missing_end_date_other_fees_section,Missing required date field: end_date",
-        "missing_meter_id_cold_water_reading_section,Missing required string field: meter_id",
-        "missing_reading_date_cold_water_reading_section,Missing required date field: reading_date",
-        "missing_state_cold_water_reading_section,Missing required bigDecimal field: state",
-        "missing_start_date_cold_water_tariff_section,Missing required date field: start_date",
-        "missing_end_date_cold_water_tariff_section,Missing required date field: end_date",
-        "missing_unit_amount_cold_water_tariff_section,Missing required bigDecimal field: unit_amount",
-        "missing_tariff_array_cold_water_section,Missing required array field: tariff",
-        "missing_reading_array_cold_water_section,Missing required array field: reading",
-        "missing_meter_id_hot_water_reading_section,Missing required string field: meter_id",
-        "missing_reading_date_hot_water_reading_section,Missing required date field: reading_date",
-        "missing_state_hot_water_reading_section,Missing required bigDecimal field: state",
-        "missing_start_date_hot_water_tariff_section,Missing required date field: start_date",
-        "missing_end_date_hot_water_tariff_section,Missing required date field: end_date",
-        "missing_unit_amount_hot_water_tariff_section,Missing required bigDecimal field: unit_amount",
-        "missing_start_date_hot_water_heating_basic_cost_section,Missing required date field: start_date",
-        "missing_end_date_hot_water_heating_basic_cost_section,Missing required date field: end_date",
-        "missing_annual_cost_hot_water_heating_basic_cost_section,Missing required bigDecimal field: annual_cost",
-        "missing_start_date_hot_water_heating_consumable_tariff_section,Missing required date field: start_date",
-        "missing_end_date_hot_water_heating_consumable_tariff_section,Missing required date field: end_date",
-        "missing_unit_amount_hot_water_heating_consumable_tariff_section,Missing required bigDecimal field: unit_amount",
-        "missing_reading_array_hot_water_section,Missing required array field: reading",
-        "missing_tariff_array_hot_water_section,Missing required array field: tariff",
-        "missing_heating_basic_cost_array_hot_water_section,Missing required array field: heating_basic_cost",
-        "missing_heating_consumable_tariff_array_hot_water_section,Missing required array field: heating_consumable_tariff"
-    })
-    @ParameterizedTest
-    void missing_required_field_should_throw_ParsingException(String textCase, String message) {
-        assertThatThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)))
-                .isInstanceOf(ParsingException.class)
-                .hasMessage(message);
-    }
+        assertThat(hot.priceList())
+                .hasSize(2)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
+                                new BigDecimal("81.49536")),
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2022, 1, 1), LocalDate.of(2023, 1, 1)),
+                                new BigDecimal("108.13")));
 
-    @CsvSource({"missing_deposits_section"})
-    @ParameterizedTest
-    void missing_optional_section_should_not_throw_ParsingException(String textCase) {
-        assertThatNoException()
-                .isThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)));
-    }
+        assertThat(hot.heatingBasicCosts())
+                .hasSize(1)
+                .containsExactly(
+                        new ServiceCost(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2023, 1, 1)),
+                                new BigDecimal("1769.52")));
 
-    @CsvSource({"missing_sources_general_section", "missing_count_deposits_section"})
-    @ParameterizedTest
-    void missing_optional_field_should_not_throw_ParsingException(String textCase) {
-        assertThatNoException()
-                .isThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)));
-    }
-
-    @CsvSource({
-        "wrong_data_type_start_date_general_section,Invalid data type: Value of 'start_date' is a integer",
-        "wrong_data_type_end_date_general_section,Invalid data type: Value of 'end_date' is a integer",
-        "wrong_data_type_tenant_general_section,Invalid data type: Value of 'tenant' is a local date",
-        "wrong_data_type_owner_general_section,Invalid data type: Value of 'owner' is a local date",
-        "wrong_data_type_report_place_general_section,Invalid data type: Value of 'report_place' is a local date",
-        "wrong_data_type_report_date_general_section,Invalid data type: Value of 'report_date' is a string",
-        "wrong_data_type_sources_general_section,Invalid data type: Value of 'sources' is a local date",
-        "wrong_data_type_amount_deposits_section,Invalid data type: Value of 'amount' is a string",
-        "wrong_data_type_count_deposits_section,Invalid data type: Value of 'count' is a string",
-        "wrong_data_type_description_deposits_section,Invalid data type: Value of 'description' is a integer",
-        "wrong_data_type_annual_cost_heating_section,Invalid data type: Value of 'annual_cost' is a string",
-        "wrong_data_type_start_date_heating_section,Invalid data type: Value of 'start_date' is a string",
-        "wrong_data_type_end_date_heating_section,Invalid data type: Value of 'end_date' is a string",
-        "wrong_data_type_annual_cost_other_fees_section,Invalid data type: Value of 'annual_cost' is a string",
-        "wrong_data_type_start_date_other_fees_section,Invalid data type: Value of 'start_date' is a string",
-        "wrong_data_type_end_date_other_fees_section,Invalid data type: Value of 'end_date' is a string",
-        "wrong_data_type_meter_id_cold_water_reading_section,Invalid data type: Value of 'meter_id' is a integer",
-        "wrong_data_type_reading_date_cold_water_reading_section,Invalid data type: Value of 'reading_date' is a integer",
-        "wrong_data_type_state_cold_water_reading_section,Invalid data type: Value of 'state' is a local date",
-        "wrong_data_type_start_date_cold_water_tariff_section,Invalid data type: Value of 'start_date' is a integer",
-        "wrong_data_type_end_date_cold_water_tariff_section,Invalid data type: Value of 'end_date' is a string",
-        "wrong_data_type_meter_id_hot_water_reading_section,Invalid data type: Value of 'meter_id' is a integer",
-        "wrong_data_type_reading_date_hot_water_reading_section,Invalid data type: Value of 'reading_date' is a integer",
-        "wrong_data_type_state_hot_water_reading_section,Invalid data type: Value of 'state' is a local date",
-        "wrong_data_type_start_date_hot_water_tariff_section,Invalid data type: Value of 'start_date' is a integer",
-        "wrong_data_type_end_date_hot_water_tariff_section,Invalid data type: Value of 'end_date' is a string",
-        "wrong_data_type_unit_amount_hot_water_tariff_section,Invalid data type: Value of 'unit_amount' is a local date",
-        "wrong_data_type_start_date_hot_water_heating_basic_cost_section,Invalid data type: Value of 'start_date' is a string",
-        "wrong_data_type_end_date_hot_water_heating_basic_cost_section,Invalid data type: Value of 'end_date' is a string",
-        "wrong_data_type_annual_cost_hot_water_heating_basic_cost_section,Invalid data type: Value of 'annual_cost' is a string",
-        "wrong_data_type_start_date_hot_water_heating_consumable_tariff_section,Invalid data type: Value of 'start_date' is a string",
-        "wrong_data_type_end_date_hot_water_heating_consumable_tariff_section,Invalid data type: Value of 'end_date' is a string",
-        "wrong_data_type_unit_amount_hot_water_heating_consumable_tariff_section,Invalid data type: Value of 'unit_amount' is a local date",
-    })
-    @ParameterizedTest
-    void invalid_field_data_type_should_throw_ParsingException(String textCase, String message) {
-        assertThatThrownBy(() -> Parser.parse(TestHelpers.getTestCaseContent(textCase)))
-                .isInstanceOf(ParsingException.class)
-                .hasMessage(message);
+        assertThat(hot.heatingConsumableTariffs())
+                .hasSize(1)
+                .containsExactly(
+                        new WaterTariff(
+                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2023, 1, 1)),
+                                new BigDecimal("150.998035")));
     }
 }

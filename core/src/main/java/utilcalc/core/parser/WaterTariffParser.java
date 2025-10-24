@@ -1,13 +1,6 @@
 package utilcalc.core.parser;
 
-import static utilcalc.core.parser.ParserUtils.*;
-
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.IntStream;
-import org.tomlj.TomlArray;
-import org.tomlj.TomlTable;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.WaterTariff;
 
@@ -15,25 +8,15 @@ class WaterTariffParser {
 
     private WaterTariffParser() {}
 
-    private static final String START_DATE = "start_date";
-    private static final String END_DATE = "end_date";
-    private static final String UNIT_AMOUNT = "unit_amount";
+    static WaterTariff parseLine(String line) {
+        String[] parts = line.split(":", 2);
+        if (parts.length != 2) {
+            throw new ParsingException("Invalid water tariff line (missing ':'): " + line);
+        }
 
-    private static final Set<String> WATER_TARIFF_KNOWN_FIELDS =
-            Set.of(START_DATE, END_DATE, UNIT_AMOUNT);
+        DateRange range = ParserUtil.parseRange(parts[0].strip());
+        BigDecimal unitAmount = ExprParser.parse(parts[1].strip());
 
-    static List<WaterTariff> parse(TomlArray waterTariffs, String sectionName) {
-        return IntStream.range(0, waterTariffs.size())
-                .mapToObj(waterTariffs::getTable)
-                .map(waterTariffTable -> parseWaterTariff(waterTariffTable, sectionName))
-                .toList();
-    }
-
-    private static WaterTariff parseWaterTariff(TomlTable waterTariffTable, String sectionName) {
-        checkThatSectionContainsOnlyKnownFields(
-                waterTariffTable, WATER_TARIFF_KNOWN_FIELDS, sectionName);
-        DateRange dateRange = requireDateRange(waterTariffTable, START_DATE, END_DATE);
-        BigDecimal pricePerCubicMeter = requireBigDecimal(waterTariffTable, UNIT_AMOUNT);
-        return new WaterTariff(dateRange, pricePerCubicMeter);
+        return new WaterTariff(range, unitAmount);
     }
 }
