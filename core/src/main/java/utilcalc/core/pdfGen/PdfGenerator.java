@@ -1,12 +1,12 @@
 package utilcalc.core.pdfGen;
 
-import com.lowagie.text.pdf.BaseFont;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import org.openpdf.pdf.ITextRenderer;
+import org.openpdf.text.pdf.BaseFont;
 import utilcalc.core.model.output.*;
 import utilcalc.core.utils.ValueFormatter;
 
