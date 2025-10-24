@@ -1,12 +1,13 @@
 dependencies {
-    implementation 'com.github.librepdf:openpdf:2.2.3'
-    implementation 'com.github.librepdf:openpdf-html:2.2.3'
-    implementation 'com.github.librepdf:openpdf-fonts-extra:2.2.3'
-    implementation 'org.slf4j:slf4j-api:2.0.16'
+    implementation 'com.github.librepdf:openpdf:3.0.0'
+    implementation 'com.github.librepdf:openpdf-html:3.0.0'
+    implementation 'com.github.librepdf:openpdf-fonts-extra:3.0.0'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-    testImplementation 'org.assertj:assertj-core:3.27.3'
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.assertj:assertj-core:3.27.6'
 }
 
 test {
