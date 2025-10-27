@@ -51,62 +51,66 @@ public final class PdfGenerator {
         HtmlBuilder html = new HtmlBuilder();
         ValueFormatter formatter = html.getFormatter();
 
-        html.h1("Vyúčtování poplatků za služby a energie")
-                .p("Období: " + formatter.formatPeriod(report.dateRange()));
+        html.title("Vyúčtování poplatků za služby a energie");
+        html.beginCenter().append("Období: ").appendDateRange(report.dateRange()).endCenter();
 
         for (String line : report.tenant()) {
             html.p(line);
         }
 
-        html.h1("Celkový přehled");
+        generateSummary(html, report);
+
+        report.sections()
+                .forEach(
+                        s -> {
+                            generateSection(s, html);
+                        });
+
+        html.lineBreak()
+                .beginCenter()
+                .append(report.reportPlace() + ", " + formatter.formatDate(report.reportDate()))
+                .endCenter()
+                .lineBreak();
+
+        report.owner().forEach(html::p);
+
+        return html.build();
+    }
+
+    private static void generateSummary(HtmlBuilder html, Report report) {
+        html.beginSection("Celkový přehled");
         html.beginTable("Popis", "Částka");
-
-        for (ReportSection section : report.sections()) {
-            html.beginTr().tdText(section.name()).tdMoney(section.totalAmount()).endTr();
-        }
-
+        report.sections()
+                .forEach(s -> html.beginTr().tdText(s.name()).tdMoney(s.totalAmount()).endTr());
+        html.totalRow(
+                1,
+                report.total().signum() == -1 ? "Přeplatek" : "Nedoplatek",
+                report.total().abs());
         html.endTable();
-
-        for (ReportSection section : report.sections()) {
-            html.h1(section.name());
-
-            switch (section) {
-                case DepositSection depositSection -> appendDepositsTable(html, depositSection);
-                case OtherFeeSection otherFeeSection -> appendOtherFeeTable(html, otherFeeSection);
-                case HeatingFeeSection heatingFeeSection -> appendHeatingFeeTable(
-                        html, heatingFeeSection);
-                case ColdWaterSection coldWaterSection -> appendColdWaterTable(
-                        html, coldWaterSection);
-                case HotWaterSection hotWaterSection -> appendHotWaterTable(html, hotWaterSection);
-                default -> throw new IllegalArgumentException(
-                        "Unsupported section type: " + section.getClass().getSimpleName());
-            }
-        }
+        html.endSection();
 
         if (!report.sources().isEmpty()) {
             html.pItalic("Zdroje:");
-            for (String source : report.sources()) {
-                html.pItalicIndented(source, 20);
-            }
+            report.sources().forEach(s -> html.pItalicIndented(s, 20));
+            html.lineBreak();
         }
+    }
 
-        html.p(
-                "Vypracováno "
-                        + report.reportPlace()
-                        + " dne "
-                        + formatter.formatDate(report.reportDate()));
-
-        for (String line : report.owner()) {
-            html.p(line);
+    private static void generateSection(ReportSection section, HtmlBuilder html) {
+        switch (section) {
+            case ColdWaterSection s -> appendColdWaterTable(html, s);
+            case HotWaterSection s -> appendHotWaterTable(html, s);
+            case HeatingFeeSection s -> appendHeatingFeeTable(html, s);
+            case OtherFeeSection s -> appendOtherFeeTable(html, s);
+            case DepositSection s -> appendDepositsTable(html, s);
+            default -> throw new IllegalStateException("Unexpected section: " + section);
         }
-
-        return html.build();
     }
 
     private static void waterReadings(HtmlBuilder html, List<WaterReading> readings) {
         boolean showMeterId = readings.stream().map(WaterReading::meterId).distinct().count() > 1;
 
-        html.h2("Odečty");
+        html.h3("Odečty");
 
         html.beginTable("Období", "Počáteční stav", "Konečný stav", "Spotřeba");
 
@@ -134,6 +138,8 @@ public final class PdfGenerator {
                 depositSection.deposits().stream()
                         .anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
 
+        html.beginSection("Zálohy");
+
         if (unitCount) {
             html.beginTable("Popis", "Množství", "Záloha", "Částka");
         } else {
@@ -154,9 +160,12 @@ public final class PdfGenerator {
         html.totalRow(unitCount ? 3 : 1, "Celkem", depositSection.totalAmount().abs());
 
         html.endTable();
+        html.endSection();
     }
 
     private static void appendOtherFeeTable(HtmlBuilder html, OtherFeeSection otherFeeSection) {
+        html.beginSection("Ostatní poplatky");
+
         html.beginTable("Období", "Množství", "Sazba", "Cena");
 
         for (OtherFee fee : otherFeeSection.fees()) {
@@ -171,10 +180,13 @@ public final class PdfGenerator {
         html.totalRow(3, "Celkem", otherFeeSection.totalAmount());
 
         html.endTable();
+        html.endSection();
     }
 
     private static void appendHeatingFeeTable(
             HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
+        html.beginSection("Topení");
+
         html.beginTable("Období", "Koeficient", "Sazba", "Cena");
 
         for (HeatingFee fee : heatingFeeSection.fees()) {
@@ -189,12 +201,15 @@ public final class PdfGenerator {
         html.totalRow(3, "Celkem", heatingFeeSection.totalAmount());
 
         html.endTable();
+        html.endSection();
     }
 
     private static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
+        html.beginSection("Studená voda");
         waterReadings(html, section.readings());
+        html.endSection();
 
-        html.h2("Náklady");
+        html.beginSection("Náklady", 3);
         html.beginTable("Období", "Množství", "Sazba", "Cena");
 
         for (WaterFee fee : section.priceList()) {
@@ -208,12 +223,15 @@ public final class PdfGenerator {
 
         html.totalRow(3, "Celkem", section.totalAmount());
         html.endTable();
+        html.endSection();
     }
 
     private static void appendHotWaterTable(HtmlBuilder html, HotWaterSection section) {
+        html.beginSection("Teplá voda");
         waterReadings(html, section.readings());
+        html.endSection();
 
-        html.h2("Náklady");
+        html.beginSection("Náklady", 3);
         html.beginTable("Popis", "Množství", "Sazba", "Cena");
 
         for (WaterFee fee : section.priceList()) {
@@ -246,5 +264,6 @@ public final class PdfGenerator {
         html.totalRow(3, "Celkem", section.totalAmount());
 
         html.endTable();
+        html.endSection();
     }
 }

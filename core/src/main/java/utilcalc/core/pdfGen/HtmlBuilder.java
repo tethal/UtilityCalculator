@@ -26,14 +26,20 @@ public final class HtmlBuilder {
                         body { font-family: 'Liberation Sans', sans-serif; margin: 40px; }
                         h1 { font-size: 20pt; }
                         h2 { font-size: 16pt; }
+                        h3 { font-size: 14pt; }
                         p { font-size: 12pt; margin: 4pt 0; }
                         .italic { font-style: italic; font-size: 10pt; }
                         .indent-10 { margin-left: 10pt; }
                         .indent-20 { margin-left: 20pt; }
                         .indent-30 { margin-left: 30pt; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 10pt; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10pt; page-break-inside: avoid; break-inside: avoid; }
+                        tr { page-break-inside: avoid; break-inside: avoid }
                         th, td { border: 1px solid black; padding: 5px; text-align: left; }
                         td.money { text-align: right; }
+                        td.total-money { background-color: rgb(128,192,255); font-weight: bold; text-align:right; }
+                        .center { text-align: center; }
+                        thead { display: table-header-group; }
+                        .section { page-break-inside: avoid; break-inside: avoid; margin-bottom: 20pt; }
                     </style>
                 </head>
                 <body>
@@ -81,6 +87,10 @@ public final class HtmlBuilder {
         return appendTag("h2", text);
     }
 
+    public HtmlBuilder h3(String text) {
+        return appendTag("h3", text);
+    }
+
     public HtmlBuilder p(String text) {
         return appendTag("p", text);
     }
@@ -93,8 +103,44 @@ public final class HtmlBuilder {
         return appendTag("p", text, "italic indent-" + indentPx);
     }
 
+    public HtmlBuilder title(String text) {
+        return beginCenter().h1(text).endCenter();
+    }
+
+    public HtmlBuilder beginCenter() {
+        sb.append("<div class=\"center\">");
+        return this;
+    }
+
+    public HtmlBuilder endCenter() {
+        sb.append("</div>\n");
+        return this;
+    }
+
     public HtmlBuilder lineBreak() {
         sb.append("<br>");
+        return this;
+    }
+
+    public HtmlBuilder beginSection(String title, int headingLevel) {
+        sb.append("<div class=\"section\">");
+        headingLevel = Math.max(1, Math.min(6, headingLevel));
+        sb.append("<h")
+                .append(headingLevel)
+                .append(">")
+                .append(title)
+                .append("</h")
+                .append(headingLevel)
+                .append(">");
+        return this;
+    }
+
+    public HtmlBuilder beginSection(String title) {
+        return beginSection(title, 2);
+    }
+
+    public HtmlBuilder endSection() {
+        sb.append("</div>\n");
         return this;
     }
 
@@ -225,11 +271,17 @@ public final class HtmlBuilder {
     public HtmlBuilder totalRow(int colSpan, String label, BigDecimal value) {
         beginTr();
         if (colSpan > 1) {
-            sb.append("<td colspan=\"").append(colSpan).append("\">").append(label).append("</td>");
+            sb.append("<td colspan=\"")
+                    .append(colSpan)
+                    .append("\"><b>")
+                    .append(label)
+                    .append("</b></td>");
         } else {
-            tdText(label);
+            sb.append("<td><b>").append(label).append("</b></td>");
         }
-        tdMoney(value);
+        sb.append("<td class=\"total-money\">")
+                .append(formatter.formatMoney(value))
+                .append("</td>");
         endTr();
         return this;
     }
