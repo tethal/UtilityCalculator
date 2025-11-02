@@ -35,3 +35,9 @@ V Praze, 2024-04-27
 [zalohy]
     únor: 1 x 1500
     březen - prosinec: 10 x 3000
+
+[custom:Kauce]
+    -45000
+
+[custom:Výměna zámku]
+    4502

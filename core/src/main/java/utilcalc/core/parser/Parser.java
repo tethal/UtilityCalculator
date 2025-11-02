@@ -56,6 +56,9 @@ public class Parser {
                         sections.add(
                                 HotWaterSectionParser.parse(
                                         header, reader.readAllUntilNextGroup()));
+                case CustomSectionParser.SECTION_NAME ->
+                        sections.add(
+                                CustomSectionParser.parse(header, reader.readAllUntilNextGroup()));
                 default -> throw new ParsingException("Unknown group: " + header.name());
             }
         }

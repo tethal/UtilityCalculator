@@ -80,18 +80,30 @@ class ExprParser {
 
     private BigDecimal parseNumber() {
         skipWhitespace();
+
         int start = current;
-        while (isNotAtEnd()
-                && (Character.isDigit(input.charAt(current)) || input.charAt(current) == '.')) {
+
+        if (isNotAtEnd() && (input.charAt(current) == '-' || input.charAt(current) == '+')) {
             advance();
         }
-        if (start == current) {
+
+        boolean hasDigits = false;
+        while (isNotAtEnd()
+                && (Character.isDigit(input.charAt(current)) || input.charAt(current) == '.')) {
+            hasDigits = true;
+            advance();
+        }
+
+        if (!hasDigits) {
             throw new ParsingException("Expected number at: " + remaining());
         }
+
+        String numberStr = input.substring(start, current);
+
         try {
-            return new BigDecimal(input.substring(start, current));
+            return new BigDecimal(numberStr);
         } catch (NumberFormatException e) {
-            throw new ParsingException("Invalid number: " + input.substring(start, current));
+            throw new ParsingException("Invalid number: " + numberStr);
         }
     }
 

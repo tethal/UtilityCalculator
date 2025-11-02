@@ -18,7 +18,9 @@ Jindřišská 16 \
   [Vytápění], [7 973,06 Kč], 
   [Ostatní poplatky], [9 026,50 Kč], 
   [Přijaté zálohy], [-31 500,00 Kč], 
-  table.cell(colspan: 1, [*Přeplatek*]), total([*1 175,13 Kč*]), 
+  [Kauce], [-45 000,00 Kč], 
+  [Výměna zámku], [4 502,00 Kč], 
+  table.cell(colspan: 1, [*Přeplatek*]), total([*41 673,13 Kč*]), 
 )
 Zdroje: \
 Vyúčtování služeb od Společenství vlastníků za rok 2023 \
