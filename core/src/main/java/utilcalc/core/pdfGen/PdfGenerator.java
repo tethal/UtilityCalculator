@@ -67,9 +67,7 @@ public final class PdfGenerator {
                         });
 
         html.lineBreak()
-                .beginCenter()
                 .append(report.reportPlace() + ", " + formatter.formatDate(report.reportDate()))
-                .endCenter()
                 .lineBreak();
 
         report.owner().forEach(html::p);
@@ -138,7 +136,7 @@ public final class PdfGenerator {
                 depositSection.deposits().stream()
                         .anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
 
-        html.beginSection("Zálohy");
+        html.beginSection(depositSection.name());
 
         if (unitCount) {
             html.beginTable("Popis", "Množství", "Záloha", "Částka");
@@ -164,7 +162,7 @@ public final class PdfGenerator {
     }
 
     private static void appendOtherFeeTable(HtmlBuilder html, OtherFeeSection otherFeeSection) {
-        html.beginSection("Ostatní poplatky");
+        html.beginSection(otherFeeSection.name());
 
         html.beginTable("Období", "Množství", "Sazba", "Cena");
 
@@ -185,7 +183,7 @@ public final class PdfGenerator {
 
     private static void appendHeatingFeeTable(
             HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
-        html.beginSection("Topení");
+        html.beginSection(heatingFeeSection.name());
 
         html.beginTable("Období", "Koeficient", "Sazba", "Cena");
 
@@ -205,7 +203,7 @@ public final class PdfGenerator {
     }
 
     private static void appendColdWaterTable(HtmlBuilder html, ColdWaterSection section) {
-        html.beginSection("Studená voda");
+        html.beginSection(section.name());
         waterReadings(html, section.readings());
         html.endSection();
 
@@ -227,7 +225,7 @@ public final class PdfGenerator {
     }
 
     private static void appendHotWaterTable(HtmlBuilder html, HotWaterSection section) {
-        html.beginSection("Teplá voda");
+        html.beginSection(section.name());
         waterReadings(html, section.readings());
         html.endSection();
 

@@ -37,6 +37,7 @@ public final class HtmlBuilder {
                         th, td { border: 1px solid black; padding: 5px; text-align: left; }
                         td.money { text-align: right; }
                         td.total-money { background-color: rgb(128,192,255); font-weight: bold; text-align:right; }
+                        td.text-right { text-align: right; }
                         .center { text-align: center; }
                         thead { display: table-header-group; }
                         .section { page-break-inside: avoid; break-inside: avoid; margin-bottom: 20pt; }
@@ -211,6 +212,10 @@ public final class HtmlBuilder {
         return appendTag("td", text);
     }
 
+    public HtmlBuilder tdTextRight(String text) {
+        return appendTag("td", text, "text-right");
+    }
+
     public HtmlBuilder tdMoney(BigDecimal amount) {
         return appendTag("td", formatter.formatMoney(amount), "money");
     }
@@ -220,25 +225,19 @@ public final class HtmlBuilder {
     }
 
     public HtmlBuilder tdCubicMeter(BigDecimal value) {
-        sb.append("<td>")
-                .append(escape(formatter.formatNumber(value)))
-                .append(" m<sup>3</sup></td>\n");
-        return this;
+        return tdTextRight(formatter.formatNumber(value) + " m<sup>3</sup>");
     }
 
     public HtmlBuilder tdCzkPerCubicMeter(BigDecimal value) {
-        sb.append("<td>")
-                .append(escape(formatter.formatMoney(value)))
-                .append(" Kč/m<sup>3</sup></td>\n");
-        return this;
+        return tdTextRight(formatter.formatMoney(value) + "/m<sup>3</sup>");
     }
 
     public HtmlBuilder tdCzkPerMonth(BigDecimal value) {
-        return tdText(formatter.formatMoney(value) + "/měsíc");
+        return tdTextRight(formatter.formatMoney(value) + "/měsíc");
     }
 
     public HtmlBuilder tdCzkPerYear(BigDecimal value) {
-        return tdText(formatter.formatMoney(value) + "/rok");
+        return tdTextRight(formatter.formatMoney(value) + "/rok");
     }
 
     public HtmlBuilder tdDateRange(DateRange value) {
@@ -246,7 +245,7 @@ public final class HtmlBuilder {
     }
 
     public HtmlBuilder tdMonths(BigDecimal value) {
-        return tdText(formatter.formatNumber(value));
+        return tdTextRight(formatter.formatMonths(value));
     }
 
     public HtmlBuilder tdYearMonth(YearMonth value) {
@@ -254,7 +253,12 @@ public final class HtmlBuilder {
     }
 
     public HtmlBuilder tdDateRangeWithTitle(String title, DateRange range) {
-        return tdText(title + " " + formatter.formatPeriod(range));
+        beginTd();
+        append(title);
+        lineBreak();
+        append(formatter.formatPeriod(range));
+        endTd();
+        return this;
     }
 
     public HtmlBuilder tdNumberWithPercent(BigDecimal number, BigDecimal percent) {
@@ -265,7 +269,7 @@ public final class HtmlBuilder {
         if (percent != null) {
             content.append(formatter.formatPercent(percent));
         }
-        return tdText(content.toString());
+        return tdTextRight(content.toString());
     }
 
     public HtmlBuilder totalRow(int colSpan, String label, BigDecimal value) {
@@ -293,10 +297,16 @@ public final class HtmlBuilder {
 
     private static String escape(String text) {
         if (text == null) return "";
-        return text.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#39;");
+
+        text = text.replace("<sup>", "%%SUP_START%%").replace("</sup>", "%%SUP_END%%");
+
+        text =
+                text.replace("&", "&amp;")
+                        .replace("<", "&lt;")
+                        .replace(">", "&gt;")
+                        .replace("\"", "&quot;")
+                        .replace("'", "&#39;");
+
+        return text.replace("%%SUP_START%%", "<sup>").replace("%%SUP_END%%", "</sup>");
     }
 }
