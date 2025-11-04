@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public interface ReportSection {
 
-    String name();
+	String name();
 
-    BigDecimal totalAmount();
+	BigDecimal totalAmount();
 }

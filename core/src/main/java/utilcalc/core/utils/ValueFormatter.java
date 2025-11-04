@@ -11,79 +11,81 @@ import java.util.Locale;
 import utilcalc.core.model.DateRange;
 
 public final class ValueFormatter {
-    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
+	private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
-    private final DateTimeFormatter dateFormatter;
-    private final NumberFormat numberFormat;
-    private final NumberFormat moneyFormat;
-    private final Locale locale;
+	private final DateTimeFormatter dateFormatter;
+	private final NumberFormat numberFormat;
+	private final NumberFormat moneyFormat;
+	private final Locale locale;
 
-    public ValueFormatter() {
-        this(Locale.forLanguageTag("cs-CZ"), Currency.getInstance("CZK"));
-    }
+	public ValueFormatter() {
+		this(Locale.forLanguageTag("cs-CZ"), Currency.getInstance("CZK"));
+	}
 
-    public ValueFormatter(Locale locale) {
-        this(locale, Currency.getInstance("CZK"));
-    }
+	public ValueFormatter(Locale locale) {
+		this(locale, Currency.getInstance("CZK"));
+	}
 
-    public ValueFormatter(Locale locale, Currency currency) {
-        this.locale = locale;
-        this.dateFormatter = DateTimeFormatter.ofPattern("d. M. yyyy", locale);
+	public ValueFormatter(Locale locale, Currency currency) {
+		this.locale = locale;
+		this.dateFormatter = DateTimeFormatter.ofPattern("d. M. yyyy", locale);
 
-        this.numberFormat = NumberFormat.getNumberInstance(locale);
-        this.numberFormat.setMinimumFractionDigits(0);
-        this.numberFormat.setMaximumFractionDigits(5);
-        this.numberFormat.setGroupingUsed(true);
+		this.numberFormat = NumberFormat.getNumberInstance(locale);
+		this.numberFormat.setMinimumFractionDigits(0);
+		this.numberFormat.setMaximumFractionDigits(5);
+		this.numberFormat.setGroupingUsed(true);
 
-        this.moneyFormat = NumberFormat.getCurrencyInstance(locale);
-        this.moneyFormat.setCurrency(currency);
-        this.moneyFormat.setMinimumFractionDigits(2);
-        this.moneyFormat.setMaximumFractionDigits(2);
-    }
+		this.moneyFormat = NumberFormat.getCurrencyInstance(locale);
+		this.moneyFormat.setCurrency(currency);
+		this.moneyFormat.setMinimumFractionDigits(2);
+		this.moneyFormat.setMaximumFractionDigits(2);
+	}
 
-    public String formatDate(LocalDate date) {
-        return date != null ? date.format(dateFormatter) : "";
-    }
+	public String formatDate(LocalDate date) {
+		return date != null ? date.format(dateFormatter) : "";
+	}
 
-    public String formatPeriod(LocalDate from, LocalDate to) {
-        return formatDate(from) + " – " + formatDate(to);
-    }
+	public String formatPeriod(LocalDate from, LocalDate to) {
+		return formatDate(from) + " – " + formatDate(to);
+	}
 
-    public String formatPeriod(DateRange dateRange) {
-        if (dateRange == null) return "";
-        return formatPeriod(dateRange.startDate(), dateRange.endDateExclusive().minusDays(1));
-    }
+	public String formatPeriod(DateRange dateRange) {
+		if (dateRange == null)
+			return "";
+		return formatPeriod(dateRange.startDate(), dateRange.endDateExclusive().minusDays(1));
+	}
 
-    public String formatYearMonth(YearMonth ym) {
-        if (ym == null) return "";
-        String monthName = ym.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, locale);
-        return monthName + " " + ym.getYear();
-    }
+	public String formatYearMonth(YearMonth ym) {
+		if (ym == null)
+			return "";
+		String monthName = ym.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, locale);
+		return monthName + " " + ym.getYear();
+	}
 
-    public String formatMoney(BigDecimal amount) {
-        return amount != null ? moneyFormat.format(amount) : "";
-    }
+	public String formatMoney(BigDecimal amount) {
+		return amount != null ? moneyFormat.format(amount) : "";
+	}
 
-    public String formatNumber(BigDecimal number) {
-        return number != null ? numberFormat.format(number) : "";
-    }
+	public String formatNumber(BigDecimal number) {
+		return number != null ? numberFormat.format(number) : "";
+	}
 
-    public String formatPercent(BigDecimal value) {
-        return value.multiply(ONE_HUNDRED).intValueExact() + " %";
-    }
+	public String formatPercent(BigDecimal value) {
+		return value.multiply(ONE_HUNDRED).intValueExact() + " %";
+	}
 
-    public String formatMonths(BigDecimal value) {
-        String numberStr = formatNumber(value);
-        value = value.abs();
-        if (value.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0) {
-            return numberStr + " měsíce";
-        }
-        if (value.compareTo(BigDecimal.ONE) == 0) {
-            return numberStr + " měsíc";
-        }
-        if (value.compareTo(new BigDecimal("5")) < 0) {
-            return numberStr + " měsíce";
-        }
-        return numberStr + " měsíců";
-    }
+	public String formatMonths(BigDecimal value) {
+		String numberStr = formatNumber(value);
+		value = value.abs();
+		if (value.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0) {
+			return numberStr + " měsíce";
+		}
+		if (value.compareTo(BigDecimal.ONE) == 0) {
+			return numberStr + " měsíc";
+		}
+		if (value.compareTo(new BigDecimal("5")) < 0) {
+			return numberStr + " měsíce";
+		}
+		return numberStr + " měsíců";
+	}
 }

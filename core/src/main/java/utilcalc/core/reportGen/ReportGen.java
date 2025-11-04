@@ -18,45 +18,33 @@ import utilcalc.core.model.output.ReportSection;
 
 public final class ReportGen {
 
-    private ReportGen() {}
+	private ReportGen() {
+	}
 
-    public static Report generateReport(ReportInputs reportInputs) {
-        ensureNonNull(reportInputs, "Report inputs");
+	public static Report generateReport(ReportInputs reportInputs) {
+		ensureNonNull(reportInputs, "Report inputs");
 
-        DateRange reportDateRange = reportInputs.dateRange();
-        List<SectionInputs> inputSections = reportInputs.sections();
+		DateRange reportDateRange = reportInputs.dateRange();
+		List<SectionInputs> inputSections = reportInputs.sections();
 
-        List<ReportSection> reportSections =
-                inputSections.stream()
-                        .map(sectionInputs -> generateReportSection(sectionInputs, reportDateRange))
-                        .collect(Collectors.toList());
+		List<ReportSection> reportSections = inputSections.stream()
+				.map(sectionInputs -> generateReportSection(sectionInputs, reportDateRange))
+				.collect(Collectors.toList());
 
-        BigDecimal total = calculateAmount(reportSections, ReportSection::totalAmount);
+		BigDecimal total = calculateAmount(reportSections, ReportSection::totalAmount);
 
-        return new Report(
-                reportDateRange,
-                reportInputs.tenant(),
-                reportInputs.owner(),
-                reportInputs.reportPlace(),
-                reportInputs.reportDate(),
-                reportInputs.sources(),
-                reportSections,
-                total);
-    }
+		return new Report(reportDateRange, reportInputs.tenant(), reportInputs.owner(), reportInputs.reportPlace(),
+				reportInputs.reportDate(), reportInputs.sources(), reportSections, total);
+	}
 
-    private static ReportSection generateReportSection(
-            SectionInputs sectionInputs, DateRange reportDateRange) {
-        return switch (sectionInputs) {
-            case DepositsSectionInputs deposit -> generateDepositSection(deposit);
-            case OtherFeeInputs otherFee -> generateOtherFeeSection(reportDateRange, otherFee);
-            case HeatingFeeInputs heatingFee ->
-                    generateHeatingFeeSection(reportDateRange, heatingFee);
-            case ColdWaterSectionInputs coldWaterFee ->
-                    generateColdWaterSection(reportDateRange, coldWaterFee);
-            case HotWaterSectionInputs hotWaterFee ->
-                    generateHotWaterSection(reportDateRange, hotWaterFee);
-            default ->
-                    throw new IllegalStateException("Unexpected section: " + sectionInputs.name());
-        };
-    }
+	private static ReportSection generateReportSection(SectionInputs sectionInputs, DateRange reportDateRange) {
+		return switch (sectionInputs) {
+			case DepositsSectionInputs deposit -> generateDepositSection(deposit);
+			case OtherFeeInputs otherFee -> generateOtherFeeSection(reportDateRange, otherFee);
+			case HeatingFeeInputs heatingFee -> generateHeatingFeeSection(reportDateRange, heatingFee);
+			case ColdWaterSectionInputs coldWaterFee -> generateColdWaterSection(reportDateRange, coldWaterFee);
+			case HotWaterSectionInputs hotWaterFee -> generateHotWaterSection(reportDateRange, hotWaterFee);
+			default -> throw new IllegalStateException("Unexpected section: " + sectionInputs.name());
+		};
+	}
 }

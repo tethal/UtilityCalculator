@@ -12,29 +12,29 @@ import utilcalc.core.model.output.DepositSection;
 
 final class DepositSectionGenerator {
 
-    private DepositSectionGenerator() {}
+	private DepositSectionGenerator() {
+	}
 
-    static DepositSection generateDepositSection(DepositsSectionInputs depositsInputs) {
-        String name = depositsInputs.name();
-        List<Payment> payments = depositsInputs.payments();
+	static DepositSection generateDepositSection(DepositsSectionInputs depositsInputs) {
+		String name = depositsInputs.name();
+		List<Payment> payments = depositsInputs.payments();
 
-        List<Deposit> deposits =
-                payments.stream().map(DepositSectionGenerator::mapPaymentToDeposit).toList();
+		List<Deposit> deposits = payments.stream().map(DepositSectionGenerator::mapPaymentToDeposit).toList();
 
-        BigDecimal totalAmount = calculateAmount(deposits, Deposit::amount).negate();
+		BigDecimal totalAmount = calculateAmount(deposits, Deposit::amount).negate();
 
-        return new DepositSection(name, totalAmount, deposits);
-    }
+		return new DepositSection(name, totalAmount, deposits);
+	}
 
-    private static Deposit mapPaymentToDeposit(Payment payment) {
-        String description = payment.description();
-        BigDecimal count = payment.count();
-        BigDecimal unitAmount = payment.unitAmount();
+	private static Deposit mapPaymentToDeposit(Payment payment) {
+		String description = payment.description();
+		BigDecimal count = payment.count();
+		BigDecimal unitAmount = payment.unitAmount();
 
-        ensureNotNegativeBigDecimalValue(count, "count");
+		ensureNotNegativeBigDecimalValue(count, "count");
 
-        BigDecimal amount = count.multiply(unitAmount);
+		BigDecimal amount = count.multiply(unitAmount);
 
-        return new Deposit(description, count, unitAmount, amount);
-    }
+		return new Deposit(description, count, unitAmount, amount);
+	}
 }

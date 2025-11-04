@@ -11,47 +11,48 @@ import utilcalc.core.model.input.SectionInputs;
 
 class DepositsSectionParser {
 
-    private DepositsSectionParser() {}
+	private DepositsSectionParser() {
+	}
 
-    static final String SECTION_NAME = "zalohy";
-    private static final String SECTION_INPUTS_TITLE = "Přijaté zálohy";
+	static final String SECTION_NAME = "zalohy";
+	private static final String SECTION_INPUTS_TITLE = "Přijaté zálohy";
 
-    static SectionInputs parse(GroupHeader header, List<String> lines) {
-        List<Payment> payments = new ArrayList<>();
+	static SectionInputs parse(GroupHeader header, List<String> lines) {
+		List<Payment> payments = new ArrayList<>();
 
-        for (String line : lines) {
-            PaymentLine paymentLine = parsePaymentLine(line);
+		for (String line : lines) {
+			PaymentLine paymentLine = parsePaymentLine(line);
 
-            BigDecimal count;
-            BigDecimal unitAmount;
+			BigDecimal count;
+			BigDecimal unitAmount;
 
-            if (paymentLine.amountPart().contains("x")) {
-                String[] countAndAmount = paymentLine.amountPart().split("x", 2);
-                if (countAndAmount.length != 2) {
-                    throw new ParsingException(
-                            "Invalid payment format (missing RHS after x): " + line);
-                }
-                count = ExprParser.parse(countAndAmount[0].strip());
-                unitAmount = ExprParser.parse(countAndAmount[1].strip());
-            } else {
-                count = BigDecimal.ONE;
-                unitAmount = ExprParser.parse(paymentLine.amountPart());
-            }
+			if (paymentLine.amountPart().contains("x")) {
+				String[] countAndAmount = paymentLine.amountPart().split("x", 2);
+				if (countAndAmount.length != 2) {
+					throw new ParsingException("Invalid payment format (missing RHS after x): " + line);
+				}
+				count = ExprParser.parse(countAndAmount[0].strip());
+				unitAmount = ExprParser.parse(countAndAmount[1].strip());
+			} else {
+				count = BigDecimal.ONE;
+				unitAmount = ExprParser.parse(paymentLine.amountPart());
+			}
 
-            payments.add(new Payment(paymentLine.description(), count, unitAmount));
-        }
+			payments.add(new Payment(paymentLine.description(), count, unitAmount));
+		}
 
-        return new DepositsSectionInputs(titleOrDefault(header, SECTION_INPUTS_TITLE), payments);
-    }
+		return new DepositsSectionInputs(titleOrDefault(header, SECTION_INPUTS_TITLE), payments);
+	}
 
-    private static PaymentLine parsePaymentLine(String line) {
-        String[] parts = line.split(":", 2);
-        if (parts.length != 2) {
-            throw new ParsingException("Invalid payment line: " + line);
-        }
+	private static PaymentLine parsePaymentLine(String line) {
+		String[] parts = line.split(":", 2);
+		if (parts.length != 2) {
+			throw new ParsingException("Invalid payment line: " + line);
+		}
 
-        return new PaymentLine(parts[0].strip(), parts[1].strip());
-    }
+		return new PaymentLine(parts[0].strip(), parts[1].strip());
+	}
 
-    record PaymentLine(String description, String amountPart) {}
+	record PaymentLine(String description, String amountPart) {
+	}
 }

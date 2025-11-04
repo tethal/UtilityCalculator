@@ -11,31 +11,23 @@ import utilcalc.core.model.output.OtherFeeSection;
 
 final class OtherFeeSectionGenerator {
 
-    private OtherFeeSectionGenerator() {}
+	private OtherFeeSectionGenerator() {
+	}
 
-    static OtherFeeSection generateOtherFeeSection(
-            DateRange reportDateRange, OtherFeeInputs otherFeeInputs) {
+	static OtherFeeSection generateOtherFeeSection(DateRange reportDateRange, OtherFeeInputs otherFeeInputs) {
 
-        String name = otherFeeInputs.name();
+		String name = otherFeeInputs.name();
 
-        List<OtherFee> otherFees =
-                calculateFees(reportDateRange, otherFeeInputs.otherFees()).stream()
-                        .map(OtherFeeSectionGenerator::mapFeeResultToOtherFee)
-                        .toList();
+		List<OtherFee> otherFees = calculateFees(reportDateRange, otherFeeInputs.otherFees()).stream()
+				.map(OtherFeeSectionGenerator::mapFeeResultToOtherFee).toList();
 
-        BigDecimal totalAmount =
-                otherFees.stream()
-                        .map(OtherFee::feeAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal totalAmount = otherFees.stream().map(OtherFee::feeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new OtherFeeSection(name, totalAmount, otherFees);
-    }
+		return new OtherFeeSection(name, totalAmount, otherFees);
+	}
 
-    private static OtherFee mapFeeResultToOtherFee(FeeCalculationResult feeCalculationResult) {
-        return new OtherFee(
-                feeCalculationResult.dateRange(),
-                feeCalculationResult.monthlyCost(),
-                feeCalculationResult.monthCount(),
-                feeCalculationResult.feeAmount());
-    }
+	private static OtherFee mapFeeResultToOtherFee(FeeCalculationResult feeCalculationResult) {
+		return new OtherFee(feeCalculationResult.dateRange(), feeCalculationResult.monthlyCost(),
+				feeCalculationResult.monthCount(), feeCalculationResult.feeAmount());
+	}
 }

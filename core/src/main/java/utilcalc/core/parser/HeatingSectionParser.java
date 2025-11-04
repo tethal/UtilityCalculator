@@ -9,13 +9,14 @@ import utilcalc.core.model.input.ServiceCost;
 
 class HeatingSectionParser {
 
-    private HeatingSectionParser() {}
+	private HeatingSectionParser() {
+	}
 
-    static final String SECTION_NAME = "vytapeni";
-    private static final String SECTION_INPUTS_TITLE = "Vytápění";
+	static final String SECTION_NAME = "vytapeni";
+	private static final String SECTION_INPUTS_TITLE = "Vytápění";
 
-    static SectionInputs parse(ParserUtil.GroupHeader header, List<String> lines) {
-        List<ServiceCost> serviceCosts = ServiceCostsParser.parse(lines);
-        return new HeatingFeeInputs(titleOrDefault(header, SECTION_INPUTS_TITLE), serviceCosts);
-    }
+	static SectionInputs parse(ParserUtil.GroupHeader header, List<String> lines) {
+		List<ServiceCost> serviceCosts = ServiceCostsParser.parse(lines);
+		return new HeatingFeeInputs(titleOrDefault(header, SECTION_INPUTS_TITLE), serviceCosts);
+	}
 }
