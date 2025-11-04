@@ -58,8 +58,9 @@ class RealDataIntegrationTest {
                 case HotWaterSection s -> dumpHotWaterSection(s);
                 case HeatingFeeSection s -> dumpHeatingFeeSection(s);
                 case OtherFeeSection s -> dumpOtherFeeSection(s);
-                default -> throw new IllegalStateException(
-                        "Unexpected section: " + section.getClass());
+                default ->
+                        throw new IllegalStateException(
+                                "Unexpected section: " + section.getClass());
             }
         }
 

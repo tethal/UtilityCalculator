@@ -49,14 +49,14 @@ public final class ReportGen {
         return switch (sectionInputs) {
             case DepositsSectionInputs deposit -> generateDepositSection(deposit);
             case OtherFeeInputs otherFee -> generateOtherFeeSection(reportDateRange, otherFee);
-            case HeatingFeeInputs heatingFee -> generateHeatingFeeSection(
-                    reportDateRange, heatingFee);
-            case ColdWaterSectionInputs coldWaterFee -> generateColdWaterSection(
-                    reportDateRange, coldWaterFee);
-            case HotWaterSectionInputs hotWaterFee -> generateHotWaterSection(
-                    reportDateRange, hotWaterFee);
-            default -> throw new IllegalStateException(
-                    "Unexpected section: " + sectionInputs.name());
+            case HeatingFeeInputs heatingFee ->
+                    generateHeatingFeeSection(reportDateRange, heatingFee);
+            case ColdWaterSectionInputs coldWaterFee ->
+                    generateColdWaterSection(reportDateRange, coldWaterFee);
+            case HotWaterSectionInputs hotWaterFee ->
+                    generateHotWaterSection(reportDateRange, hotWaterFee);
+            default ->
+                    throw new IllegalStateException("Unexpected section: " + sectionInputs.name());
         };
     }
 }
