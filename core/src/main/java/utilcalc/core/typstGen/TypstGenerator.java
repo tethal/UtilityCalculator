@@ -41,13 +41,13 @@ public final class TypstGenerator {
     }
 
     private static void generateSection(ReportSection section, TypstBuilder b) {
-        b.h1(section.name());
         switch (section) {
             case ColdWaterSection s -> generateColdWater(b, s);
             case HotWaterSection s -> generateHotWater(b, s);
             case HeatingFeeSection s -> generateHeating(b, s);
             case OtherFeeSection s -> generateOtherFee(b, s);
             case DepositSection s -> generateDeposit(b, s);
+            case CustomSection ignore -> {}
             default -> throw new IllegalStateException("Unexpected value: " + section);
         }
     }
@@ -73,6 +73,7 @@ public final class TypstGenerator {
     }
 
     private static void generateColdWater(TypstBuilder b, ColdWaterSection section) {
+        b.h1(section.name());
         waterReadings(b, section.readings());
         b.h2("Náklady");
         b.beginTable("Období", "Množství", "Sazba", "Cena");
@@ -91,6 +92,7 @@ public final class TypstGenerator {
     }
 
     private static void generateHotWater(TypstBuilder b, HotWaterSection section) {
+        b.h1(section.name());
         waterReadings(b, section.readings());
         b.h2("Náklady");
         b.beginTable("Popis", "Množství", "Sazba", "Cena");
@@ -141,6 +143,7 @@ public final class TypstGenerator {
     }
 
     private static void generateHeating(TypstBuilder b, HeatingFeeSection section) {
+        b.h1(section.name());
         b.beginTable("Období", "Koeficient", "Sazba", "Cena");
         section.fees()
                 .forEach(
@@ -161,6 +164,7 @@ public final class TypstGenerator {
     }
 
     private static void generateOtherFee(TypstBuilder b, OtherFeeSection section) {
+        b.h1(section.name());
         b.beginTable("Období", "Množství", "Sazba", "Cena");
         section.fees()
                 .forEach(
@@ -177,6 +181,7 @@ public final class TypstGenerator {
     }
 
     private static void generateDeposit(TypstBuilder b, DepositSection section) {
+        b.h1(section.name());
         boolean extended =
                 section.deposits().stream().anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
         if (extended) {

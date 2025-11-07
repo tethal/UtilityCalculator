@@ -101,6 +101,7 @@ public final class PdfGenerator {
             case HeatingFeeSection s -> appendHeatingFeeTable(html, s);
             case OtherFeeSection s -> appendOtherFeeTable(html, s);
             case DepositSection s -> appendDepositsTable(html, s);
+            case CustomSection ignore -> {}
             default -> throw new IllegalStateException("Unexpected section: " + section);
         }
     }

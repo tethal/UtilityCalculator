@@ -140,6 +140,8 @@ class PdfGeneratorTest {
                                                 LocalDate.of(2025, 12, 31)),
                                         BigDecimal.valueOf(95))));
 
+        SectionInputs customInput = new CustomSectionInputs("Kauce", BigDecimal.valueOf(100));
+
         DateRange dateRange =
                 DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 12, 31));
 
@@ -151,7 +153,13 @@ class PdfGeneratorTest {
                         "Praha",
                         LocalDate.now(),
                         List.of("Faktury, podklady měření"),
-                        List.of(deposits, otherFees, heatingFees, coldWaterFees, hotWaterFees));
+                        List.of(
+                                deposits,
+                                otherFees,
+                                heatingFees,
+                                coldWaterFees,
+                                hotWaterFees,
+                                customInput));
 
         Report report = ReportGen.generateReport(inputs);
 

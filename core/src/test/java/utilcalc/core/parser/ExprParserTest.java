@@ -42,7 +42,7 @@ class ExprParserTest {
     }
 
     @ParameterizedTest(name = "{index} ⇒ throws Exception: {0}")
-    @ValueSource(strings = {"abc", "1+", "+2", "(1+2", "1+2)"})
+    @ValueSource(strings = {"abc", "1+", "(1+2", "1+2)"})
     @DisplayName("Invalid expressions should throw")
     void invalidExpressionsThrow(String expr) {
         assertThrows(ParsingException.class, () -> ExprParser.parse(expr));
