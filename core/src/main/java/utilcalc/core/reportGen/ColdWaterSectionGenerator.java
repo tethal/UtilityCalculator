@@ -19,15 +19,12 @@ final class ColdWaterSectionGenerator {
     static ColdWaterSection generateColdWaterSection(
             DateRange reportDateRange, ColdWaterSectionInputs coldWaterSectionInputs) {
 
-        List<WaterReading> readings =
-                generateWaterReadings(reportDateRange, coldWaterSectionInputs.readings());
+        List<WaterReading> readings = generateWaterReadings(reportDateRange, coldWaterSectionInputs.readings());
 
-        List<WaterFee> priceList =
-                generatePriceList(reportDateRange, coldWaterSectionInputs.priceList(), readings);
+        List<WaterFee> priceList = generatePriceList(reportDateRange, coldWaterSectionInputs.priceList(), readings);
 
         BigDecimal totalAmount = calculateAmount(priceList, WaterFee::periodAmount);
 
-        return new ColdWaterSection(
-                coldWaterSectionInputs.name(), totalAmount, readings, priceList);
+        return new ColdWaterSection(coldWaterSectionInputs.name(), totalAmount, readings, priceList);
     }
 }

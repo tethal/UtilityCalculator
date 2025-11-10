@@ -37,34 +37,23 @@ public class Parser {
                 case TENANT -> tenant.addAll(reader.readAllUntilNextGroup());
                 case OWNER -> owner.addAll(reader.readAllUntilNextGroup());
                 case SOURCES -> sources.addAll(reader.readAllUntilNextGroup());
-                case DepositsSectionParser.SECTION_NAME ->
-                        sections.add(
-                                DepositsSectionParser.parse(
-                                        header, reader.readAllUntilNextGroup()));
-                case HeatingSectionParser.SECTION_NAME ->
-                        sections.add(
-                                HeatingSectionParser.parse(header, reader.readAllUntilNextGroup()));
-                case OtherFeesSectionParser.SECTION_NAME ->
-                        sections.add(
-                                OtherFeesSectionParser.parse(
-                                        header, reader.readAllUntilNextGroup()));
-                case ColdWaterSectionParser.SECTION_NAME ->
-                        sections.add(
-                                ColdWaterSectionParser.parse(
-                                        header, reader.readAllUntilNextGroup()));
-                case HotWaterSectionParser.SECTION_NAME ->
-                        sections.add(
-                                HotWaterSectionParser.parse(
-                                        header, reader.readAllUntilNextGroup()));
-                case CustomSectionParser.SECTION_NAME ->
-                        sections.add(
-                                CustomSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case DepositsSectionParser.SECTION_NAME -> sections.add(
+                        DepositsSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case HeatingSectionParser.SECTION_NAME -> sections.add(
+                        HeatingSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case OtherFeesSectionParser.SECTION_NAME -> sections.add(
+                        OtherFeesSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case ColdWaterSectionParser.SECTION_NAME -> sections.add(
+                        ColdWaterSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case HotWaterSectionParser.SECTION_NAME -> sections.add(
+                        HotWaterSectionParser.parse(header, reader.readAllUntilNextGroup()));
+                case CustomSectionParser.SECTION_NAME -> sections.add(
+                        CustomSectionParser.parse(header, reader.readAllUntilNextGroup()));
                 default -> throw new ParsingException("Unknown group: " + header.name());
             }
         }
 
-        return new ReportInputs(
-                dateRange, tenant, owner, reportPlace, reportDate, sources, sections);
+        return new ReportInputs(dateRange, tenant, owner, reportPlace, reportDate, sources, sections);
     }
 
     private static StringDatePair parseStringDatePair(String line) {

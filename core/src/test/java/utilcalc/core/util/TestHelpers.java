@@ -70,8 +70,7 @@ public final class TestHelpers {
     }
 
     private static Path getResourcePath(String name) {
-        return getResourcePathIfExists(name)
-                .orElseThrow(() -> new RuntimeException("Resource not found: " + name));
+        return getResourcePathIfExists(name).orElseThrow(() -> new RuntimeException("Resource not found: " + name));
     }
 
     private static Optional<Path> getResourcePathIfExists(String name) {

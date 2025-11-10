@@ -15,12 +15,9 @@ class RealDataIntegrationTest {
     @ValueSource(strings = {"2017", "2018", "2019", "2020", "2021", "2023", "2024", "2024_simple"})
     @ParameterizedTest
     void testGoldenFiles(String name) {
-        TestHelpers.goldenTest(
-                "real/" + name,
-                src ->
-                        new Dumper()
-                                .dumpReport(ReportGen.generateReport(Parser.parse(src)))
-                                .toString());
+        TestHelpers.goldenTest("real/" + name, src -> new Dumper()
+                .dumpReport(ReportGen.generateReport(Parser.parse(src)))
+                .toString());
     }
 
     private static final class Dumper {
@@ -37,14 +34,11 @@ class RealDataIntegrationTest {
             dumpStringList("tenant", report.tenant());
             dumpStringList("owner", report.owner());
             dumpStringList(
-                    "placeDate", List.of(report.reportPlace(), report.reportDate().toString()));
+                    "placeDate",
+                    List.of(report.reportPlace(), report.reportDate().toString()));
             dumpStringList("sources", report.sources());
             append("  sections:\n");
-            dumpTable(
-                    report.sections(),
-                    "    %: %\n",
-                    ReportSection::name,
-                    ReportSection::totalAmount);
+            dumpTable(report.sections(), "    %: %\n", ReportSection::name, ReportSection::totalAmount);
             append("    TOTAL: ").append(report.total()).append("\n");
             report.sections().forEach(this::dumpSection);
             return this;
@@ -58,9 +52,7 @@ class RealDataIntegrationTest {
                 case HotWaterSection s -> dumpHotWaterSection(s);
                 case HeatingFeeSection s -> dumpHeatingFeeSection(s);
                 case OtherFeeSection s -> dumpOtherFeeSection(s);
-                default ->
-                        throw new IllegalStateException(
-                                "Unexpected section: " + section.getClass());
+                default -> throw new IllegalStateException("Unexpected section: " + section.getClass());
             }
         }
 
@@ -146,18 +138,16 @@ class RealDataIntegrationTest {
         }
 
         @SafeVarargs
-        private <T> void dumpTable(
-                List<T> items, String format, Function<T, ?>... columnExtractor) {
+        private <T> void dumpTable(List<T> items, String format, Function<T, ?>... columnExtractor) {
             int columns = columnExtractor.length;
             String[] separators = format.split("%");
             assert separators.length == columns + 1;
-            items.forEach(
-                    item -> {
-                        for (int i = 0; i < columns; i++) {
-                            append(separators[i]).append(columnExtractor[i].apply(item));
-                        }
-                        append(separators[columns]);
-                    });
+            items.forEach(item -> {
+                for (int i = 0; i < columns; i++) {
+                    append(separators[i]).append(columnExtractor[i].apply(item));
+                }
+                append(separators[columns]);
+            });
         }
 
         private void dumpStringList(String label, List<String> stringList) {

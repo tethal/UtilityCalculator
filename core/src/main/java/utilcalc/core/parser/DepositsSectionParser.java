@@ -28,8 +28,7 @@ class DepositsSectionParser {
             if (paymentLine.amountPart().contains("x")) {
                 String[] countAndAmount = paymentLine.amountPart().split("x", 2);
                 if (countAndAmount.length != 2) {
-                    throw new ParsingException(
-                            "Invalid payment format (missing RHS after x): " + line);
+                    throw new ParsingException("Invalid payment format (missing RHS after x): " + line);
                 }
                 count = ExprParser.parse(countAndAmount[0].strip());
                 unitAmount = ExprParser.parse(countAndAmount[1].strip());

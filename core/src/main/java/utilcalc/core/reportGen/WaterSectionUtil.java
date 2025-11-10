@@ -22,21 +22,16 @@ final class WaterSectionUtil {
 
     public static List<WaterReading> generateWaterReadings(
             DateRange reportDateRange, List<MeterReading> meterReadings) {
-        return meterReadings.stream()
-                .collect(Collectors.groupingBy(MeterReading::meterId))
-                .values()
-                .stream()
+        return meterReadings.stream().collect(Collectors.groupingBy(MeterReading::meterId)).values().stream()
                 .flatMap(group -> createColdWaterReadings(reportDateRange, group).stream())
                 .toList();
     }
 
-    private static List<WaterReading> createColdWaterReadings(
-            DateRange reportDateRange, List<MeterReading> readings) {
+    private static List<WaterReading> createColdWaterReadings(DateRange reportDateRange, List<MeterReading> readings) {
 
-        List<MeterReading> sortedMeterReadings =
-                readings.stream()
-                        .sorted(Comparator.comparing(MeterReading::readingDate))
-                        .collect(Collectors.toList());
+        List<MeterReading> sortedMeterReadings = readings.stream()
+                .sorted(Comparator.comparing(MeterReading::readingDate))
+                .collect(Collectors.toList());
 
         LinkedList<WaterReading> waterReadings =
                 new LinkedList<>(createColdWaterReadingsFromMeterData(sortedMeterReadings));
@@ -47,17 +42,13 @@ final class WaterSectionUtil {
         LocalDate reportStart = reportDateRange.startDate();
         LocalDate reportEnd = reportDateRange.endDateExclusive();
 
-        if (reportStart.isBefore(firstReadingStart))
-            addMissingStartWaterReading(reportDateRange, waterReadings, true);
+        if (reportStart.isBefore(firstReadingStart)) addMissingStartWaterReading(reportDateRange, waterReadings, true);
 
-        if (reportStart.isAfter(firstReadingStart))
-            addMissingStartWaterReading(reportDateRange, waterReadings, false);
+        if (reportStart.isAfter(firstReadingStart)) addMissingStartWaterReading(reportDateRange, waterReadings, false);
 
-        if (reportEnd.isBefore(lastReadingEnd))
-            addMissingEndWaterReading(reportDateRange, waterReadings, false);
+        if (reportEnd.isBefore(lastReadingEnd)) addMissingEndWaterReading(reportDateRange, waterReadings, false);
 
-        if (reportEnd.isAfter(lastReadingEnd))
-            addMissingEndWaterReading(reportDateRange, waterReadings, true);
+        if (reportEnd.isAfter(lastReadingEnd)) addMissingEndWaterReading(reportDateRange, waterReadings, true);
 
         return waterReadings;
     }
@@ -66,18 +57,16 @@ final class WaterSectionUtil {
             DateRange reportDateRange, List<WaterReading> readings, boolean isInnerReading) {
         WaterReading first = readings.getFirst();
         WaterReading second = readings.get(1);
-        LocalDate endDateExclusive =
-                isInnerReading ? first.dateRange().startDate() : second.dateRange().startDate();
+        LocalDate endDateExclusive = isInnerReading
+                ? first.dateRange().startDate()
+                : second.dateRange().startDate();
         BigDecimal startState = isInnerReading ? first.startState() : second.startState();
 
         DateRange newDateRange = new DateRange(reportDateRange.startDate(), endDateExclusive);
-        BigDecimal newConsumption =
-                calculateConsumption(newDateRange, first).setScale(3, RoundingMode.HALF_UP);
-        BigDecimal newStartState =
-                startState.subtract(newConsumption).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal newConsumption = calculateConsumption(newDateRange, first).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal newStartState = startState.subtract(newConsumption).setScale(3, RoundingMode.HALF_UP);
         WaterReading newWaterReading =
-                new WaterReading(
-                        newDateRange, first.meterId(), newStartState, startState, newConsumption);
+                new WaterReading(newDateRange, first.meterId(), newStartState, startState, newConsumption);
 
         if (!isInnerReading) readings.removeFirst();
         readings.addFirst(newWaterReading);
@@ -87,36 +76,28 @@ final class WaterSectionUtil {
             DateRange reportDateRange, List<WaterReading> readings, boolean isInnerReading) {
         WaterReading last = readings.getLast();
         WaterReading penultimate = readings.size() > 1 ? readings.get(readings.size() - 2) : last;
-        LocalDate startDate =
-                isInnerReading
-                        ? last.dateRange().endDateExclusive()
-                        : penultimate.dateRange().endDateExclusive();
+        LocalDate startDate = isInnerReading
+                ? last.dateRange().endDateExclusive()
+                : penultimate.dateRange().endDateExclusive();
         BigDecimal endState = isInnerReading ? last.endState() : penultimate.endState();
 
         DateRange newDateRange = new DateRange(startDate, reportDateRange.endDateExclusive());
-        BigDecimal newConsumption =
-                calculateConsumption(newDateRange, last).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal newConsumption = calculateConsumption(newDateRange, last).setScale(3, RoundingMode.HALF_UP);
         BigDecimal newEndState = endState.add(newConsumption).setScale(3, RoundingMode.HALF_UP);
         WaterReading newWaterReading =
-                new WaterReading(
-                        newDateRange, last.meterId(), endState, newEndState, newConsumption);
+                new WaterReading(newDateRange, last.meterId(), endState, newEndState, newConsumption);
         if (!isInnerReading) readings.removeLast();
         readings.addLast(newWaterReading);
     }
 
-    private static List<WaterReading> createColdWaterReadingsFromMeterData(
-            List<MeterReading> meterReadings) {
+    private static List<WaterReading> createColdWaterReadingsFromMeterData(List<MeterReading> meterReadings) {
         return IntStream.range(0, meterReadings.size() - 1)
-                .mapToObj(
-                        i ->
-                                calculateColdWaterReading(
-                                        meterReadings.get(i), meterReadings.get(i + 1)))
+                .mapToObj(i -> calculateColdWaterReading(meterReadings.get(i), meterReadings.get(i + 1)))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private static WaterReading calculateColdWaterReading(
-            MeterReading currentReading, MeterReading nextReading) {
+    private static WaterReading calculateColdWaterReading(MeterReading currentReading, MeterReading nextReading) {
         BigDecimal startReadingState = currentReading.state();
         BigDecimal nextReadingState = nextReading.state();
         String meterId = currentReading.meterId();
@@ -135,12 +116,9 @@ final class WaterSectionUtil {
     // region water price list
 
     public static List<WaterFee> generatePriceList(
-            DateRange reportDateRange,
-            List<WaterTariff> waterTariffs,
-            List<WaterReading> waterReadings) {
+            DateRange reportDateRange, List<WaterTariff> waterTariffs, List<WaterReading> waterReadings) {
 
-        validateDateRangeCoverage(
-                reportDateRange, waterTariffs, WaterTariff::dateRange, "WaterTariff");
+        validateDateRangeCoverage(reportDateRange, waterTariffs, WaterTariff::dateRange, "WaterTariff");
 
         return waterTariffs.stream()
                 .sorted(Comparator.comparing(WaterTariff::dateRange))
@@ -148,13 +126,9 @@ final class WaterSectionUtil {
                 .toList();
     }
 
-    private static List<WaterFee> createColdWaterFees(
-            WaterTariff waterTariff, List<WaterReading> waterReadings) {
+    private static List<WaterFee> createColdWaterFees(WaterTariff waterTariff, List<WaterReading> waterReadings) {
         return extractValidIntervals(waterTariff, waterReadings).stream()
-                .map(
-                        interval ->
-                                createColdWaterFee(
-                                        waterTariff.pricePerCubicMeter(), waterReadings, interval))
+                .map(interval -> createColdWaterFee(waterTariff.pricePerCubicMeter(), waterReadings, interval))
                 .toList();
     }
 
@@ -162,18 +136,12 @@ final class WaterSectionUtil {
             BigDecimal pricePerCubicMeter, List<WaterReading> waterReadings, DateRange interval) {
 
         BigDecimal quantity = calculateQuantity(waterReadings, interval);
-        BigDecimal periodAmount =
-                quantity.multiply(pricePerCubicMeter).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal periodAmount = quantity.multiply(pricePerCubicMeter).setScale(2, RoundingMode.HALF_UP);
 
-        return new WaterFee(
-                interval,
-                quantity.setScale(3, RoundingMode.HALF_UP),
-                pricePerCubicMeter,
-                periodAmount);
+        return new WaterFee(interval, quantity.setScale(3, RoundingMode.HALF_UP), pricePerCubicMeter, periodAmount);
     }
 
-    private static List<DateRange> extractValidIntervals(
-            WaterTariff waterTariff, List<WaterReading> meterReadings) {
+    private static List<DateRange> extractValidIntervals(WaterTariff waterTariff, List<WaterReading> meterReadings) {
 
         LocalDate startDateFirstReading = meterReadings.getFirst().dateRange().startDate();
         LocalDate endDateLastReading = meterReadings.getLast().dateRange().endDateExclusive();
@@ -181,10 +149,9 @@ final class WaterSectionUtil {
         LocalDate waterTariffStartDate = waterTariff.dateRange().startDate();
         LocalDate waterTariffEndDate = waterTariff.dateRange().endDateExclusive();
 
-        Set<LocalDate> datePoints =
-                meterReadings.stream()
-                        .flatMap(reading -> reading.dateRange().stream())
-                        .collect(Collectors.toSet());
+        Set<LocalDate> datePoints = meterReadings.stream()
+                .flatMap(reading -> reading.dateRange().stream())
+                .collect(Collectors.toSet());
 
         if (waterTariffStartDate.isAfter(startDateFirstReading)) {
             datePoints.add(waterTariffStartDate);
@@ -203,15 +170,12 @@ final class WaterSectionUtil {
                 .toList();
     }
 
-    private static BigDecimal calculateQuantity(
-            List<WaterReading> detailWaterReadings, DateRange interval) {
+    private static BigDecimal calculateQuantity(List<WaterReading> detailWaterReadings, DateRange interval) {
         return detailWaterReadings.stream()
-                .map(
-                        reading ->
-                                reading.dateRange()
-                                        .intersect(interval)
-                                        .map(overlap -> calculateConsumption(overlap, reading))
-                                        .orElse(BigDecimal.ZERO))
+                .map(reading -> reading.dateRange()
+                        .intersect(interval)
+                        .map(overlap -> calculateConsumption(overlap, reading))
+                        .orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -220,11 +184,8 @@ final class WaterSectionUtil {
     private static BigDecimal calculateConsumption(DateRange dateRange, WaterReading reading) {
         BigDecimal readingConsumption = reading.consumption();
         BigDecimal monthCount = reading.dateRange().getMonthCount();
-        BigDecimal monthlyConsumption =
-                readingConsumption.divide(monthCount, 10, RoundingMode.HALF_UP);
+        BigDecimal monthlyConsumption = readingConsumption.divide(monthCount, 10, RoundingMode.HALF_UP);
 
-        return monthlyConsumption
-                .multiply(dateRange.getMonthCount())
-                .setScale(10, RoundingMode.HALF_UP);
+        return monthlyConsumption.multiply(dateRange.getMonthCount()).setScale(10, RoundingMode.HALF_UP);
     }
 }

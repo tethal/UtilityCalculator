@@ -64,26 +64,22 @@ public class DateRangeTest {
 
     @Test
     void full2024Interval_should_haveCorrectMonthCount() {
-        assertThat(createInterval("2024-01-01", "2025-01-01").getMonthCount())
-                .isEqualTo("12.0000000000");
+        assertThat(createInterval("2024-01-01", "2025-01-01").getMonthCount()).isEqualTo("12.0000000000");
     }
 
     @Test
     void partialMonthInterval_should_haveCorrectMonthCount() {
-        assertThat(createInterval("2024-01-15", "2024-01-25").getMonthCount())
-                .isEqualTo("0.3225806452");
+        assertThat(createInterval("2024-01-15", "2024-01-25").getMonthCount()).isEqualTo("0.3225806452");
     }
 
     @Test
     void twoPartialMonthsInterval_should_haveCorrectMonthCount() {
-        assertThat(createInterval("2024-01-15", "2025-01-15").getMonthCount())
-                .isEqualTo("12.0000000000");
+        assertThat(createInterval("2024-01-15", "2025-01-15").getMonthCount()).isEqualTo("12.0000000000");
     }
 
     @Test
     void oneDayInterval_should_haveCorrectMonthCount() {
-        assertThat(createInterval("2024-01-01", "2024-01-02").getMonthCount())
-                .isEqualTo("0.0322580645");
+        assertThat(createInterval("2024-01-01", "2024-01-02").getMonthCount()).isEqualTo("0.0322580645");
     }
 
     @Test

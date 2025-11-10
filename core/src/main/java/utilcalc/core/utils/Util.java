@@ -51,10 +51,9 @@ public final class Util {
         if (clazz.isInstance(object)) {
             return clazz.cast(object);
         }
-        throw new IllegalArgumentException(
-                "Expected type "
-                        + clazz.getSimpleName()
-                        + ", but got: "
-                        + (object == null ? "null" : object.getClass().getSimpleName()));
+        throw new IllegalArgumentException("Expected type "
+                + clazz.getSimpleName()
+                + ", but got: "
+                + (object == null ? "null" : object.getClass().getSimpleName()));
     }
 }

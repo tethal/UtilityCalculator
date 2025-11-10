@@ -15,12 +15,9 @@ class OtherFeeSectionGeneratorTest {
 
     @Test
     void otherFee_withOneServiceCost_should_haveCorrectNameAndSum() {
-        OtherFeeSection otherFeeSection =
-                generateOtherFeeSection(
-                        createDateRange("2024-01-01", "2025-01-01"),
-                        createOtherFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        OtherFeeSection otherFeeSection = generateOtherFeeSection(
+                createDateRange("2024-01-01", "2025-01-01"),
+                createOtherFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         assertThat(otherFeeSection.name()).isEqualTo("Other fees");
         assertThat(otherFeeSection.totalAmount()).isEqualTo("8772.00");
@@ -31,12 +28,9 @@ class OtherFeeSectionGeneratorTest {
     void otherFee_withOneServiceCost_should_haveCorrectOtherFeeProperties() {
         DateRange otherFeeDateRange = createDateRange("2024-01-01", "2025-01-01");
 
-        OtherFeeSection otherFeeSection =
-                generateOtherFeeSection(
-                        otherFeeDateRange,
-                        createOtherFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        OtherFeeSection otherFeeSection = generateOtherFeeSection(
+                otherFeeDateRange,
+                createOtherFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         OtherFee otherFee = otherFeeSection.fees().getFirst();
 
@@ -51,12 +45,10 @@ class OtherFeeSectionGeneratorTest {
         DateRange otherFee1DateRange = createDateRange("2024-01-01", "2025-01-01");
         DateRange otherFee2DateRange = createDateRange("2025-01-01", "2026-01-01");
 
-        OtherFeeSection otherFeeSection =
-                generateOtherFeeSection(
-                        createDateRange("2024-01-01", "2026-01-01"),
-                        createOtherFeeInputs(
-                                createServiceCost(otherFee1DateRange, "8772"),
-                                createServiceCost(otherFee2DateRange, "8000")));
+        OtherFeeSection otherFeeSection = generateOtherFeeSection(
+                createDateRange("2024-01-01", "2026-01-01"),
+                createOtherFeeInputs(
+                        createServiceCost(otherFee1DateRange, "8772"), createServiceCost(otherFee2DateRange, "8000")));
 
         assertThat(otherFeeSection.totalAmount()).isEqualTo("16772.00");
 
@@ -78,12 +70,9 @@ class OtherFeeSectionGeneratorTest {
     void otherFee_withPartialMonthServiceCost_should_haveCorrectOtherFeeProperties() {
         DateRange otherFeeSectionDateRange = createDateRange("2024-01-15", "2024-01-25");
 
-        OtherFeeSection otherFeeSection =
-                generateOtherFeeSection(
-                        otherFeeSectionDateRange,
-                        createOtherFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        OtherFeeSection otherFeeSection = generateOtherFeeSection(
+                otherFeeSectionDateRange,
+                createOtherFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         OtherFee otherFee = otherFeeSection.fees().getFirst();
 
@@ -100,12 +89,10 @@ class OtherFeeSectionGeneratorTest {
         DateRange otherFee1DateRange = createDateRange("2024-01-01", "2025-01-01");
         DateRange otherFee2DateRange = createDateRange("2025-01-01", "2026-01-01");
 
-        OtherFeeSection otherFeeSection =
-                generateOtherFeeSection(
-                        createDateRange("2024-01-15", "2025-01-15"),
-                        createOtherFeeInputs(
-                                createServiceCost(otherFee1DateRange, "8772"),
-                                createServiceCost(otherFee2DateRange, "8000")));
+        OtherFeeSection otherFeeSection = generateOtherFeeSection(
+                createDateRange("2024-01-15", "2025-01-15"),
+                createOtherFeeInputs(
+                        createServiceCost(otherFee1DateRange, "8772"), createServiceCost(otherFee2DateRange, "8000")));
 
         assertThat(otherFeeSection.totalAmount()).isEqualTo("8742.95");
 
@@ -126,30 +113,20 @@ class OtherFeeSectionGeneratorTest {
     @Test
     void otherFee_withPartialServiceCost_should_throw_illegalArgumentException() {
         OtherFeeInputs otherFeeInputs =
-                createOtherFeeInputs(
-                        createServiceCost(createDateRange("2024-01-15", "2025-01-15"), "8772"));
+                createOtherFeeInputs(createServiceCost(createDateRange("2024-01-15", "2025-01-15"), "8772"));
 
-        assertThatThrownBy(
-                        () ->
-                                generateOtherFeeSection(
-                                        createDateRange("2024-01-01", "2025-01-01"),
-                                        otherFeeInputs))
+        assertThatThrownBy(() -> generateOtherFeeSection(createDateRange("2024-01-01", "2025-01-01"), otherFeeInputs))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("ServiceCosts do not fully cover the report date interval.");
     }
 
     @Test
     void otherFee_withOverlapServiceCost_should_throw_illegalArgumentException() {
-        OtherFeeInputs otherFeeInputs =
-                createOtherFeeInputs(
-                        createServiceCost(createDateRange("2024-01-15", "2025-01-15"), "8775"),
-                        createServiceCost(createDateRange("2025-01-01", "2026-01-01"), "8000"));
+        OtherFeeInputs otherFeeInputs = createOtherFeeInputs(
+                createServiceCost(createDateRange("2024-01-15", "2025-01-15"), "8775"),
+                createServiceCost(createDateRange("2025-01-01", "2026-01-01"), "8000"));
 
-        assertThatThrownBy(
-                        () ->
-                                generateOtherFeeSection(
-                                        createDateRange("2025-01-01", "2026-01-01"),
-                                        otherFeeInputs))
+        assertThatThrownBy(() -> generateOtherFeeSection(createDateRange("2025-01-01", "2026-01-01"), otherFeeInputs))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(
                         "ServiceCosts do not connect seamlessly or they overlap: "
@@ -159,16 +136,11 @@ class OtherFeeSectionGeneratorTest {
 
     @Test
     void otherFee_withNotConnectServiceCost_should_throw_illegalArgumentException() {
-        OtherFeeInputs otherFeeInputs =
-                createOtherFeeInputs(
-                        createServiceCost(createDateRange("2024-01-01", "2024-12-15"), "8775"),
-                        createServiceCost(createDateRange("2025-01-01", "2026-01-01"), "8000"));
+        OtherFeeInputs otherFeeInputs = createOtherFeeInputs(
+                createServiceCost(createDateRange("2024-01-01", "2024-12-15"), "8775"),
+                createServiceCost(createDateRange("2025-01-01", "2026-01-01"), "8000"));
 
-        assertThatThrownBy(
-                        () ->
-                                generateOtherFeeSection(
-                                        createDateRange("2025-01-01", "2026-01-01"),
-                                        otherFeeInputs))
+        assertThatThrownBy(() -> generateOtherFeeSection(createDateRange("2025-01-01", "2026-01-01"), otherFeeInputs))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(
                         "ServiceCosts do not connect seamlessly or they overlap: "

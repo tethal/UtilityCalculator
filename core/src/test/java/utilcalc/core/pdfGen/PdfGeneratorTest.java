@@ -18,148 +18,87 @@ class PdfGeneratorTest {
 
     @Test
     void generatePdf_should_return_non_empty_bytes_and_write_file() throws IOException {
-        SectionInputs deposits =
-                new DepositsSectionInputs(
-                        "Přijaté zálohy",
-                        List.of(
-                                new Payment(
-                                        "leden - duben",
-                                        BigDecimal.valueOf(4),
-                                        BigDecimal.valueOf(3000)),
-                                new Payment("květen", BigDecimal.ONE, BigDecimal.valueOf(3500)),
-                                new Payment(
-                                        "červen - prosinec",
-                                        BigDecimal.valueOf(7),
-                                        BigDecimal.valueOf(4000))));
+        SectionInputs deposits = new DepositsSectionInputs(
+                "Přijaté zálohy",
+                List.of(
+                        new Payment("leden - duben", BigDecimal.valueOf(4), BigDecimal.valueOf(3000)),
+                        new Payment("květen", BigDecimal.ONE, BigDecimal.valueOf(3500)),
+                        new Payment("červen - prosinec", BigDecimal.valueOf(7), BigDecimal.valueOf(4000))));
 
-        SectionInputs otherFees =
-                new OtherFeeInputs(
-                        "Ostatní poplatky",
-                        List.of(
-                                new ServiceCost(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2024, 1, 1),
-                                                LocalDate.of(2024, 12, 31)),
-                                        BigDecimal.valueOf(8772)),
-                                new ServiceCost(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2025, 1, 1),
-                                                LocalDate.of(2025, 12, 31)),
-                                        BigDecimal.valueOf(8000))));
+        SectionInputs otherFees = new OtherFeeInputs(
+                "Ostatní poplatky",
+                List.of(
+                        new ServiceCost(
+                                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31)),
+                                BigDecimal.valueOf(8772)),
+                        new ServiceCost(
+                                DateRange.fromInclusive(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
+                                BigDecimal.valueOf(8000))));
 
-        SectionInputs heatingFees =
-                new HeatingFeeInputs(
-                        "Vytápění",
-                        List.of(
-                                new ServiceCost(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2024, 1, 1),
-                                                LocalDate.of(2024, 12, 31)),
-                                        BigDecimal.valueOf(8772)),
-                                new ServiceCost(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2025, 1, 1),
-                                                LocalDate.of(2025, 12, 31)),
-                                        BigDecimal.valueOf(8000))));
+        SectionInputs heatingFees = new HeatingFeeInputs(
+                "Vytápění",
+                List.of(
+                        new ServiceCost(
+                                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31)),
+                                BigDecimal.valueOf(8772)),
+                        new ServiceCost(
+                                DateRange.fromInclusive(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
+                                BigDecimal.valueOf(8000))));
 
-        SectionInputs coldWaterFees =
-                new ColdWaterSectionInputs(
-                        "Studená voda",
-                        List.of(
-                                new MeterReading(
-                                        "Vodoměr 1",
-                                        LocalDate.of(2024, 1, 1),
-                                        BigDecimal.valueOf(120)),
-                                new MeterReading(
-                                        "Vodoměr 1",
-                                        LocalDate.of(2024, 1, 31),
-                                        BigDecimal.valueOf(150)),
-                                new MeterReading(
-                                        "Vodoměr 2",
-                                        LocalDate.of(2024, 1, 1),
-                                        BigDecimal.valueOf(200)),
-                                new MeterReading(
-                                        "Vodoměr 2",
-                                        LocalDate.of(2024, 1, 31),
-                                        BigDecimal.valueOf(230))),
-                        List.of(
-                                new WaterTariff(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2024, 1, 1),
-                                                LocalDate.of(2024, 12, 31)),
-                                        BigDecimal.valueOf(50)),
-                                new WaterTariff(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2025, 1, 1),
-                                                LocalDate.of(2025, 12, 31)),
-                                        BigDecimal.valueOf(55))));
+        SectionInputs coldWaterFees = new ColdWaterSectionInputs(
+                "Studená voda",
+                List.of(
+                        new MeterReading("Vodoměr 1", LocalDate.of(2024, 1, 1), BigDecimal.valueOf(120)),
+                        new MeterReading("Vodoměr 1", LocalDate.of(2024, 1, 31), BigDecimal.valueOf(150)),
+                        new MeterReading("Vodoměr 2", LocalDate.of(2024, 1, 1), BigDecimal.valueOf(200)),
+                        new MeterReading("Vodoměr 2", LocalDate.of(2024, 1, 31), BigDecimal.valueOf(230))),
+                List.of(
+                        new WaterTariff(
+                                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31)),
+                                BigDecimal.valueOf(50)),
+                        new WaterTariff(
+                                DateRange.fromInclusive(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
+                                BigDecimal.valueOf(55))));
 
-        SectionInputs hotWaterFees =
-                new HotWaterSectionInputs(
-                        "Teplá voda",
-                        List.of(
-                                new MeterReading(
-                                        "Vodoměr T1",
-                                        LocalDate.of(2024, 1, 1),
-                                        BigDecimal.valueOf(300)),
-                                new MeterReading(
-                                        "Vodoměr T1",
-                                        LocalDate.of(2024, 1, 31),
-                                        BigDecimal.valueOf(330))),
-                        List.of(
-                                new WaterTariff(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2024, 1, 1),
-                                                LocalDate.of(2024, 12, 31)),
-                                        BigDecimal.valueOf(50)),
-                                new WaterTariff(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2025, 1, 1),
-                                                LocalDate.of(2025, 12, 31)),
-                                        BigDecimal.valueOf(55))),
-                        List.of(
-                                new ServiceCost(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2024, 1, 1),
-                                                LocalDate.of(2024, 12, 31)),
-                                        BigDecimal.valueOf(200)),
-                                new ServiceCost(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2025, 1, 1),
-                                                LocalDate.of(2025, 12, 31)),
-                                        BigDecimal.valueOf(220))),
-                        List.of(
-                                new WaterTariff(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2024, 1, 1),
-                                                LocalDate.of(2024, 12, 31)),
-                                        BigDecimal.valueOf(90)),
-                                new WaterTariff(
-                                        DateRange.fromInclusive(
-                                                LocalDate.of(2025, 1, 1),
-                                                LocalDate.of(2025, 12, 31)),
-                                        BigDecimal.valueOf(95))));
+        SectionInputs hotWaterFees = new HotWaterSectionInputs(
+                "Teplá voda",
+                List.of(
+                        new MeterReading("Vodoměr T1", LocalDate.of(2024, 1, 1), BigDecimal.valueOf(300)),
+                        new MeterReading("Vodoměr T1", LocalDate.of(2024, 1, 31), BigDecimal.valueOf(330))),
+                List.of(
+                        new WaterTariff(
+                                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31)),
+                                BigDecimal.valueOf(50)),
+                        new WaterTariff(
+                                DateRange.fromInclusive(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
+                                BigDecimal.valueOf(55))),
+                List.of(
+                        new ServiceCost(
+                                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31)),
+                                BigDecimal.valueOf(200)),
+                        new ServiceCost(
+                                DateRange.fromInclusive(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
+                                BigDecimal.valueOf(220))),
+                List.of(
+                        new WaterTariff(
+                                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31)),
+                                BigDecimal.valueOf(90)),
+                        new WaterTariff(
+                                DateRange.fromInclusive(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31)),
+                                BigDecimal.valueOf(95))));
 
         SectionInputs customInput = new CustomSectionInputs("Kauce", BigDecimal.valueOf(100));
 
-        DateRange dateRange =
-                DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 12, 31));
+        DateRange dateRange = DateRange.fromInclusive(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 12, 31));
 
-        ReportInputs inputs =
-                new ReportInputs(
-                        dateRange,
-                        List.of("Jan Nájemník"),
-                        List.of("Karel Vlastník"),
-                        "Praha",
-                        LocalDate.now(),
-                        List.of("Faktury, podklady měření"),
-                        List.of(
-                                deposits,
-                                otherFees,
-                                heatingFees,
-                                coldWaterFees,
-                                hotWaterFees,
-                                customInput));
+        ReportInputs inputs = new ReportInputs(
+                dateRange,
+                List.of("Jan Nájemník"),
+                List.of("Karel Vlastník"),
+                "Praha",
+                LocalDate.now(),
+                List.of("Faktury, podklady měření"),
+                List.of(deposits, otherFees, heatingFees, coldWaterFees, hotWaterFees, customInput));
 
         Report report = ReportGen.generateReport(inputs);
 
@@ -173,8 +112,7 @@ class PdfGeneratorTest {
         if (!parentDir.exists()) {
             boolean created = parentDir.mkdirs();
             if (!created) {
-                throw new IOException(
-                        "Nepodařilo se vytvořit adresář: " + parentDir.getAbsolutePath());
+                throw new IOException("Nepodařilo se vytvořit adresář: " + parentDir.getAbsolutePath());
             }
         }
         try (FileOutputStream out = new FileOutputStream(outputFile)) {
