@@ -34,14 +34,10 @@ public class Application {
             byte[] exportBytes =
                     switch (appConfig.exportFormat) {
                         case "pdf" -> PdfGenerator.generatePdf(report);
-                        case "html" ->
-                                PdfGenerator.buildHtml(report).getBytes(StandardCharsets.UTF_8);
-                        case "typst" ->
-                                TypstGenerator.generateTypst(report)
-                                        .getBytes(StandardCharsets.UTF_8);
-                        default ->
-                                throw new IllegalArgumentException(
-                                        "Unexpected export format: " + appConfig.exportFormat);
+                        case "html" -> PdfGenerator.buildHtml(report).getBytes(StandardCharsets.UTF_8);
+                        case "typst" -> TypstGenerator.generateTypst(report).getBytes(StandardCharsets.UTF_8);
+                        default -> throw new IllegalArgumentException(
+                                "Unexpected export format: " + appConfig.exportFormat);
                     };
 
             prepareOutputDirectory(appConfig.outputPath);

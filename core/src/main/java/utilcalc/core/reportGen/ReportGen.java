@@ -27,10 +27,9 @@ public final class ReportGen {
         DateRange reportDateRange = reportInputs.dateRange();
         List<SectionInputs> inputSections = reportInputs.sections();
 
-        List<ReportSection> reportSections =
-                inputSections.stream()
-                        .map(sectionInputs -> generateReportSection(sectionInputs, reportDateRange))
-                        .collect(Collectors.toList());
+        List<ReportSection> reportSections = inputSections.stream()
+                .map(sectionInputs -> generateReportSection(sectionInputs, reportDateRange))
+                .collect(Collectors.toList());
 
         BigDecimal total = calculateAmount(reportSections, ReportSection::totalAmount);
 
@@ -45,20 +44,15 @@ public final class ReportGen {
                 total);
     }
 
-    private static ReportSection generateReportSection(
-            SectionInputs sectionInputs, DateRange reportDateRange) {
+    private static ReportSection generateReportSection(SectionInputs sectionInputs, DateRange reportDateRange) {
         return switch (sectionInputs) {
             case DepositsSectionInputs deposit -> generateDepositSection(deposit);
             case OtherFeeInputs otherFee -> generateOtherFeeSection(reportDateRange, otherFee);
-            case HeatingFeeInputs heatingFee ->
-                    generateHeatingFeeSection(reportDateRange, heatingFee);
-            case ColdWaterSectionInputs coldWaterFee ->
-                    generateColdWaterSection(reportDateRange, coldWaterFee);
-            case HotWaterSectionInputs hotWaterFee ->
-                    generateHotWaterSection(reportDateRange, hotWaterFee);
+            case HeatingFeeInputs heatingFee -> generateHeatingFeeSection(reportDateRange, heatingFee);
+            case ColdWaterSectionInputs coldWaterFee -> generateColdWaterSection(reportDateRange, coldWaterFee);
+            case HotWaterSectionInputs hotWaterFee -> generateHotWaterSection(reportDateRange, hotWaterFee);
             case CustomSectionInputs customSection -> generateCustomSection(customSection);
-            default ->
-                    throw new IllegalStateException("Unexpected section: " + sectionInputs.name());
+            default -> throw new IllegalStateException("Unexpected section: " + sectionInputs.name());
         };
     }
 }

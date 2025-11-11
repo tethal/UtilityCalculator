@@ -28,7 +28,8 @@ public final class TypstGenerator {
         b.h1("Celkový přehled");
         b.beginTable(2);
         report.sections()
-                .forEach(s -> b.beginRow().cell(s.name()).cellCzk(s.totalAmount()).endRow());
+                .forEach(s ->
+                        b.beginRow().cell(s.name()).cellCzk(s.totalAmount()).endRow());
         b.totalRow(
                 1,
                 report.total().signum() == -1 ? "Přeplatek" : "Nedoplatek",
@@ -53,22 +54,22 @@ public final class TypstGenerator {
     }
 
     private static void waterReadings(TypstBuilder b, List<WaterReading> readings) {
-        boolean showMeterId = readings.stream().map(WaterReading::meterId).distinct().count() > 1;
+        boolean showMeterId =
+                readings.stream().map(WaterReading::meterId).distinct().count() > 1;
         b.h2("Odečty");
         b.beginTable("Období", "Počáteční stav", "Konečný stav", "Spotřeba");
-        readings.forEach(
-                r -> {
-                    b.beginRow();
-                    b.beginCell().appendDateRange(r.dateRange());
-                    if (showMeterId) {
-                        b.lineBreak().append(r.meterId());
-                    }
-                    b.endCell();
-                    b.cellCubicMeter(r.startState());
-                    b.cellCubicMeter(r.endState());
-                    b.cellCubicMeter(r.consumption());
-                    b.endRow();
-                });
+        readings.forEach(r -> {
+            b.beginRow();
+            b.beginCell().appendDateRange(r.dateRange());
+            if (showMeterId) {
+                b.lineBreak().append(r.meterId());
+            }
+            b.endCell();
+            b.cellCubicMeter(r.startState());
+            b.cellCubicMeter(r.endState());
+            b.cellCubicMeter(r.consumption());
+            b.endRow();
+        });
         b.endTable();
     }
 
@@ -77,16 +78,14 @@ public final class TypstGenerator {
         waterReadings(b, section.readings());
         b.h2("Náklady");
         b.beginTable("Období", "Množství", "Sazba", "Cena");
-        section.priceList()
-                .forEach(
-                        i -> {
-                            b.beginRow();
-                            b.cellDateRange(i.dateRange());
-                            b.cellCubicMeter(i.quantity());
-                            b.cellCzkPerCubicMeter(i.unitAmount());
-                            b.cellCzk(i.periodAmount());
-                            b.endRow();
-                        });
+        section.priceList().forEach(i -> {
+            b.beginRow();
+            b.cellDateRange(i.dateRange());
+            b.cellCubicMeter(i.quantity());
+            b.cellCzkPerCubicMeter(i.unitAmount());
+            b.cellCzk(i.periodAmount());
+            b.endRow();
+        });
         b.totalRow(3, "CELKEM", section.totalAmount());
         b.endTable();
     }
@@ -96,48 +95,42 @@ public final class TypstGenerator {
         waterReadings(b, section.readings());
         b.h2("Náklady");
         b.beginTable("Popis", "Množství", "Sazba", "Cena");
-        section.priceList()
-                .forEach(
-                        i -> {
-                            b.beginRow();
-                            b.beginCell()
-                                    .append("Studená voda")
-                                    .lineBreak()
-                                    .appendDateRange(i.dateRange())
-                                    .endCell();
-                            b.cellCubicMeter(i.quantity());
-                            b.cellCzkPerCubicMeter(i.unitAmount());
-                            b.cellCzk(i.periodAmount());
-                            b.endRow();
-                        });
-        section.heatingBasicParts()
-                .forEach(
-                        i -> {
-                            b.beginRow();
-                            b.beginCell()
-                                    .append("Ohřev základní složka")
-                                    .lineBreak()
-                                    .appendDateRange(i.dateRange())
-                                    .endCell();
-                            b.cellMonths(i.numberOfMonths());
-                            b.cellCzkPerMonth(i.monthlyCost());
-                            b.cellCzk(i.totalAmount());
-                            b.endRow();
-                        });
-        section.heatingConsumableParts()
-                .forEach(
-                        i -> {
-                            b.beginRow();
-                            b.beginCell()
-                                    .append("Ohřev spotřební složka")
-                                    .lineBreak()
-                                    .appendDateRange(i.dateRange())
-                                    .endCell();
-                            b.cellCubicMeter(i.unitAmount());
-                            b.cellCzkPerCubicMeter(i.unitCost());
-                            b.cellCzk(i.totalCost());
-                            b.endRow();
-                        });
+        section.priceList().forEach(i -> {
+            b.beginRow();
+            b.beginCell()
+                    .append("Studená voda")
+                    .lineBreak()
+                    .appendDateRange(i.dateRange())
+                    .endCell();
+            b.cellCubicMeter(i.quantity());
+            b.cellCzkPerCubicMeter(i.unitAmount());
+            b.cellCzk(i.periodAmount());
+            b.endRow();
+        });
+        section.heatingBasicParts().forEach(i -> {
+            b.beginRow();
+            b.beginCell()
+                    .append("Ohřev základní složka")
+                    .lineBreak()
+                    .appendDateRange(i.dateRange())
+                    .endCell();
+            b.cellMonths(i.numberOfMonths());
+            b.cellCzkPerMonth(i.monthlyCost());
+            b.cellCzk(i.totalAmount());
+            b.endRow();
+        });
+        section.heatingConsumableParts().forEach(i -> {
+            b.beginRow();
+            b.beginCell()
+                    .append("Ohřev spotřební složka")
+                    .lineBreak()
+                    .appendDateRange(i.dateRange())
+                    .endCell();
+            b.cellCubicMeter(i.unitAmount());
+            b.cellCzkPerCubicMeter(i.unitCost());
+            b.cellCzk(i.totalCost());
+            b.endRow();
+        });
         b.totalRow(3, "CELKEM", section.totalAmount());
         b.endTable();
     }
@@ -145,20 +138,18 @@ public final class TypstGenerator {
     private static void generateHeating(TypstBuilder b, HeatingFeeSection section) {
         b.h1(section.name());
         b.beginTable("Období", "Koeficient", "Sazba", "Cena");
-        section.fees()
-                .forEach(
-                        i -> {
-                            b.beginRow();
-                            b.cellYearMonth(i.yearMonth());
-                            b.beginCell();
-                            if (i.monthCount().compareTo(BigDecimal.ONE) != 0) {
-                                b.appendNumber(i.monthCount()).append(" x ");
-                            }
-                            b.appendPercent(i.coefficient()).endCell();
-                            b.cellCzkPerYear(i.annualCost());
-                            b.cellCzk(i.feeAmount());
-                            b.endRow();
-                        });
+        section.fees().forEach(i -> {
+            b.beginRow();
+            b.cellYearMonth(i.yearMonth());
+            b.beginCell();
+            if (i.monthCount().compareTo(BigDecimal.ONE) != 0) {
+                b.appendNumber(i.monthCount()).append(" x ");
+            }
+            b.appendPercent(i.coefficient()).endCell();
+            b.cellCzkPerYear(i.annualCost());
+            b.cellCzk(i.feeAmount());
+            b.endRow();
+        });
         b.totalRow(3, "CELKEM", section.totalAmount());
         b.endTable();
     }
@@ -166,41 +157,36 @@ public final class TypstGenerator {
     private static void generateOtherFee(TypstBuilder b, OtherFeeSection section) {
         b.h1(section.name());
         b.beginTable("Období", "Množství", "Sazba", "Cena");
-        section.fees()
-                .forEach(
-                        i -> {
-                            b.beginRow();
-                            b.cellDateRange(i.dateRange());
-                            b.cellMonths(i.monthCount());
-                            b.cellCzkPerMonth(i.monthlyCost());
-                            b.cellCzk(i.feeAmount());
-                            b.endRow();
-                        });
+        section.fees().forEach(i -> {
+            b.beginRow();
+            b.cellDateRange(i.dateRange());
+            b.cellMonths(i.monthCount());
+            b.cellCzkPerMonth(i.monthlyCost());
+            b.cellCzk(i.feeAmount());
+            b.endRow();
+        });
         b.totalRow(3, "CELKEM", section.totalAmount());
         b.endTable();
     }
 
     private static void generateDeposit(TypstBuilder b, DepositSection section) {
         b.h1(section.name());
-        boolean extended =
-                section.deposits().stream().anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
+        boolean extended = section.deposits().stream().anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
         if (extended) {
             b.beginTable("Popis", "Množství", "Záloha", "Částka");
         } else {
             b.beginTable("Popis", "Částka");
         }
-        section.deposits()
-                .forEach(
-                        i -> {
-                            b.beginRow();
-                            b.cell(i.description());
-                            if (extended) {
-                                b.cellMonths(i.count());
-                                b.cellCzkPerMonth(i.unitAmount());
-                            }
-                            b.cellCzk(i.amount());
-                            b.endRow();
-                        });
+        section.deposits().forEach(i -> {
+            b.beginRow();
+            b.cell(i.description());
+            if (extended) {
+                b.cellMonths(i.count());
+                b.cellCzkPerMonth(i.unitAmount());
+            }
+            b.cellCzk(i.amount());
+            b.endRow();
+        });
         b.totalRow(extended ? 3 : 1, "CELKEM", section.totalAmount().abs());
         b.endTable();
     }

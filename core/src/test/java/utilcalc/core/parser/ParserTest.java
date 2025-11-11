@@ -17,43 +17,34 @@ class ParserTest {
 
         assertThat(inputs.dateRange().startDate()).isEqualTo(LocalDate.of(2024, 1, 1));
         assertThat(inputs.dateRange().endDateExclusive()).isEqualTo(LocalDate.of(2025, 1, 1));
-        assertThat(inputs.tenant())
-                .containsExactly("Marie Černá", "Jindřišská 16", "111 50 Praha 1");
+        assertThat(inputs.tenant()).containsExactly("Marie Černá", "Jindřišská 16", "111 50 Praha 1");
         assertThat(inputs.owner()).containsExactly("Jan Novák", "majitel@example.com");
         assertThat(inputs.reportPlace()).isEqualTo("V Praze");
         assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2025, 5, 8));
-        assertThat(inputs.sources())
-                .containsExactly("Vyúčtování služeb od Společenství vlastníků za rok 2024");
+        assertThat(inputs.sources()).containsExactly("Vyúčtování služeb od Společenství vlastníků za rok 2024");
 
         assertThat(inputs.sections()).hasSize(5);
 
-        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
+        DepositsSectionInputs deposits =
+                (DepositsSectionInputs) inputs.sections().getFirst();
         assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
         assertThat(deposits.payments())
                 .hasSize(1)
-                .containsExactly(
-                        new Payment(
-                                "leden - prosinec",
-                                BigDecimal.valueOf(12),
-                                BigDecimal.valueOf(3000)));
+                .containsExactly(new Payment("leden - prosinec", BigDecimal.valueOf(12), BigDecimal.valueOf(3000)));
 
         HeatingFeeInputs heating = (HeatingFeeInputs) inputs.sections().get(1);
         assertThat(heating.name()).isEqualTo("Vytápění");
         assertThat(heating.heatingFees())
                 .hasSize(1)
-                .containsExactly(
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
-                                BigDecimal.valueOf(8712.9)));
+                .containsExactly(new ServiceCost(
+                        new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)), BigDecimal.valueOf(8712.9)));
 
         OtherFeeInputs otherFee = (OtherFeeInputs) inputs.sections().get(2);
         assertThat(otherFee.name()).isEqualTo("Náklady");
         assertThat(otherFee.otherFees())
                 .hasSize(1)
-                .containsExactly(
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
-                                new BigDecimal("39514.30")));
+                .containsExactly(new ServiceCost(
+                        new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)), new BigDecimal("39514.30")));
 
         ColdWaterSectionInputs cold = (ColdWaterSectionInputs) inputs.sections().get(3);
         assertThat(cold.name()).isEqualTo("Studená voda");
@@ -64,10 +55,9 @@ class ParserTest {
                         new MeterReading("SV", LocalDate.of(2025, 1, 1), new BigDecimal("102.9")));
         assertThat(cold.priceList())
                 .hasSize(1)
-                .containsExactly(
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
-                                new BigDecimal("140.2881516587678")));
+                .containsExactly(new WaterTariff(
+                        new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                        new BigDecimal("140.2881516587678")));
 
         HotWaterSectionInputs hot = (HotWaterSectionInputs) inputs.sections().get(4);
         assertThat(hot.name()).isEqualTo("Teplá voda");
@@ -80,24 +70,19 @@ class ParserTest {
 
         assertThat(hot.priceList())
                 .hasSize(1)
-                .containsExactly(
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
-                                new BigDecimal("122.8509433962264")));
+                .containsExactly(new WaterTariff(
+                        new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
+                        new BigDecimal("122.8509433962264")));
 
         assertThat(hot.heatingBasicCosts())
                 .hasSize(1)
-                .containsExactly(
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
-                                new BigDecimal("2725.92")));
+                .containsExactly(new ServiceCost(
+                        new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)), new BigDecimal("2725.92")));
 
         assertThat(hot.heatingConsumableTariffs())
                 .hasSize(1)
-                .containsExactly(
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)),
-                                new BigDecimal("257.988")));
+                .containsExactly(new WaterTariff(
+                        new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2025, 1, 1)), new BigDecimal("257.988")));
     }
 
     @Test
@@ -107,8 +92,7 @@ class ParserTest {
         assertThat(inputs.dateRange().startDate()).isEqualTo(LocalDate.of(2021, 1, 1));
         assertThat(inputs.dateRange().endDateExclusive())
                 .isEqualTo(LocalDate.of(2022, 4, 30).plusDays(1));
-        assertThat(inputs.tenant())
-                .containsExactly("Marie Černá", "Jindřišská 16", "111 50 Praha 1");
+        assertThat(inputs.tenant()).containsExactly("Marie Černá", "Jindřišská 16", "111 50 Praha 1");
         assertThat(inputs.owner()).containsExactly("Jan Novák", "majitel@example.com");
         assertThat(inputs.reportPlace()).isEqualTo("V Praze");
         assertThat(inputs.reportDate()).isEqualTo(LocalDate.of(2022, 5, 22));
@@ -121,7 +105,8 @@ class ParserTest {
 
         assertThat(inputs.sections()).hasSize(5);
 
-        DepositsSectionInputs deposits = (DepositsSectionInputs) inputs.sections().getFirst();
+        DepositsSectionInputs deposits =
+                (DepositsSectionInputs) inputs.sections().getFirst();
         assertThat(deposits.name()).isEqualTo("Přijaté zálohy");
         assertThat(deposits.payments())
                 .hasSize(1)
@@ -195,16 +180,13 @@ class ParserTest {
 
         assertThat(hot.heatingBasicCosts())
                 .hasSize(1)
-                .containsExactly(
-                        new ServiceCost(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2023, 1, 1)),
-                                new BigDecimal("1769.52")));
+                .containsExactly(new ServiceCost(
+                        new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2023, 1, 1)), new BigDecimal("1769.52")));
 
         assertThat(hot.heatingConsumableTariffs())
                 .hasSize(1)
-                .containsExactly(
-                        new WaterTariff(
-                                new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2023, 1, 1)),
-                                new BigDecimal("150.998035")));
+                .containsExactly(new WaterTariff(
+                        new DateRange(LocalDate.of(2021, 1, 1), LocalDate.of(2023, 1, 1)),
+                        new BigDecimal("150.998035")));
     }
 }

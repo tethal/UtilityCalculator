@@ -18,8 +18,9 @@ final class DepositSectionGenerator {
         String name = depositsInputs.name();
         List<Payment> payments = depositsInputs.payments();
 
-        List<Deposit> deposits =
-                payments.stream().map(DepositSectionGenerator::mapPaymentToDeposit).toList();
+        List<Deposit> deposits = payments.stream()
+                .map(DepositSectionGenerator::mapPaymentToDeposit)
+                .toList();
 
         BigDecimal totalAmount = calculateAmount(deposits, Deposit::amount).negate();
 

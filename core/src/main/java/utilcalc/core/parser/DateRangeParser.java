@@ -42,7 +42,8 @@ class DateRangeParser {
             LocalDate start = YearMonth.parse(from).atDay(1);
             LocalDate end = YearMonth.parse(to).atEndOfMonth().plusDays(1);
             return new DateRange(start, end);
-        } else if (YEAR_PATTERN.matcher(from).matches() && YEAR_PATTERN.matcher(to).matches()) {
+        } else if (YEAR_PATTERN.matcher(from).matches()
+                && YEAR_PATTERN.matcher(to).matches()) {
             LocalDate start = Year.parse(from).atDay(1);
             LocalDate end = Year.parse(to).atMonth(12).atEndOfMonth().plusDays(1);
             return new DateRange(start, end);

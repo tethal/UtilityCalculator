@@ -12,7 +12,6 @@ class TypstGenTest {
     @ParameterizedTest
     void testGoldenFiles(String name) {
         TestHelpers.goldenTest(
-                "typst/" + name,
-                src -> TypstGenerator.generateTypst(ReportGen.generateReport(Parser.parse(src))));
+                "typst/" + name, src -> TypstGenerator.generateTypst(ReportGen.generateReport(Parser.parse(src))));
     }
 }

@@ -30,8 +30,6 @@ class ColdWaterSectionParser {
         }
 
         return new ColdWaterSectionInputs(
-                ParserUtil.titleOrDefault(header, SECTION_INPUTS_TITLE),
-                meterReadings,
-                waterTariffs);
+                ParserUtil.titleOrDefault(header, SECTION_INPUTS_TITLE), meterReadings, waterTariffs);
     }
 }

@@ -26,8 +26,7 @@ public class ApplicationTest {
 
         assertThat(appConfiguration.exportFormat()).isEqualTo("pdf");
         assertThat(appConfiguration.inputPath()).isEqualTo(Path.of("user/documents/inputFile.uc"));
-        assertThat(appConfiguration.outputPath())
-                .isEqualTo(Path.of("user/documents/inputFile.pdf"));
+        assertThat(appConfiguration.outputPath()).isEqualTo(Path.of("user/documents/inputFile.pdf"));
     }
 
     @Test

@@ -17,12 +17,9 @@ public class HeatingFeeSectionGeneratorTest {
 
     @Test
     void heatingFee_withOneServiceCost_should_haveCorrectNameAndSum() {
-        HeatingFeeSection heatingFeeSection =
-                generateHeatingFeeSection(
-                        createDateRange("2024-01-01", "2025-01-01"),
-                        createHeatingFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        HeatingFeeSection heatingFeeSection = generateHeatingFeeSection(
+                createDateRange("2024-01-01", "2025-01-01"),
+                createHeatingFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         assertThat(heatingFeeSection.name()).isEqualTo("Heating fees");
         assertThat(heatingFeeSection.totalAmount()).isEqualTo("8772.00");
@@ -31,39 +28,32 @@ public class HeatingFeeSectionGeneratorTest {
 
     @Test
     void heatingFee_withDecimalPlaces_should_haveCorrectSum() {
-        HeatingFeeSection heatingFeeSection =
-                generateHeatingFeeSection(
-                        createDateRange("2024-01-01", "2025-01-01"),
-                        createHeatingFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "12431.84")));
+        HeatingFeeSection heatingFeeSection = generateHeatingFeeSection(
+                createDateRange("2024-01-01", "2025-01-01"),
+                createHeatingFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "12431.84")));
 
         assertThat(heatingFeeSection.totalAmount()).isEqualTo("12431.84");
     }
 
     @Test
     void heatingFee_withOneServiceCost_should_haveCorrectHeatingFeeProperties() {
-        HeatingFeeSection heatingFeeSection =
-                generateHeatingFeeSection(
-                        createDateRange("2024-01-01", "2025-01-01"),
-                        createHeatingFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        HeatingFeeSection heatingFeeSection = generateHeatingFeeSection(
+                createDateRange("2024-01-01", "2025-01-01"),
+                createHeatingFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
-        List<ExpectedFee> expectedFees =
-                List.of(
-                        new ExpectedFee("2024-01", "0.19", "1666.68", "8772"),
-                        new ExpectedFee("2024-02", "0.16", "1403.52", "8772"),
-                        new ExpectedFee("2024-03", "0.14", "1228.08", "8772"),
-                        new ExpectedFee("2024-04", "0.09", "789.48", "8772"),
-                        new ExpectedFee("2024-05", "0.02", "175.44", "8772"),
-                        new ExpectedFee("2024-06", "0.0", "0.00", "8772"),
-                        new ExpectedFee("2024-07", "0.0", "0.00", "8772"),
-                        new ExpectedFee("2024-08", "0.0", "0.00", "8772"),
-                        new ExpectedFee("2024-09", "0.01", "87.72", "8772"),
-                        new ExpectedFee("2024-10", "0.08", "701.76", "8772"),
-                        new ExpectedFee("2024-11", "0.14", "1228.08", "8772"),
-                        new ExpectedFee("2024-12", "0.17", "1491.24", "8772"));
+        List<ExpectedFee> expectedFees = List.of(
+                new ExpectedFee("2024-01", "0.19", "1666.68", "8772"),
+                new ExpectedFee("2024-02", "0.16", "1403.52", "8772"),
+                new ExpectedFee("2024-03", "0.14", "1228.08", "8772"),
+                new ExpectedFee("2024-04", "0.09", "789.48", "8772"),
+                new ExpectedFee("2024-05", "0.02", "175.44", "8772"),
+                new ExpectedFee("2024-06", "0.0", "0.00", "8772"),
+                new ExpectedFee("2024-07", "0.0", "0.00", "8772"),
+                new ExpectedFee("2024-08", "0.0", "0.00", "8772"),
+                new ExpectedFee("2024-09", "0.01", "87.72", "8772"),
+                new ExpectedFee("2024-10", "0.08", "701.76", "8772"),
+                new ExpectedFee("2024-11", "0.14", "1228.08", "8772"),
+                new ExpectedFee("2024-12", "0.17", "1491.24", "8772"));
 
         List<HeatingFee> actualFees = heatingFeeSection.fees();
 
@@ -86,31 +76,29 @@ public class HeatingFeeSectionGeneratorTest {
         DateRange heatingFee1DateRange = createDateRange("2024-01-01", "2025-01-01");
         DateRange heatingFee2DateRange = createDateRange("2025-01-01", "2026-01-01");
 
-        HeatingFeeSection heatingFeeSection =
-                generateHeatingFeeSection(
-                        createDateRange("2024-06-01", "2025-06-01"),
-                        createHeatingFeeInputs(
-                                createServiceCost(heatingFee1DateRange, "8772"),
-                                createServiceCost(heatingFee2DateRange, "8000")));
+        HeatingFeeSection heatingFeeSection = generateHeatingFeeSection(
+                createDateRange("2024-06-01", "2025-06-01"),
+                createHeatingFeeInputs(
+                        createServiceCost(heatingFee1DateRange, "8772"),
+                        createServiceCost(heatingFee2DateRange, "8000")));
 
         assertThat(heatingFeeSection.name()).isEqualTo("Heating fees");
         assertThat(heatingFeeSection.totalAmount()).isEqualTo("8308.80");
         assertThat(heatingFeeSection.fees()).hasSize(12);
 
-        List<ExpectedFee> expectedFees =
-                List.of(
-                        new ExpectedFee("2024-06", "0.0", "0.00", "8772"),
-                        new ExpectedFee("2024-07", "0.0", "0.00", "8772"),
-                        new ExpectedFee("2024-08", "0.0", "0.00", "8772"),
-                        new ExpectedFee("2024-09", "0.01", "87.72", "8772"),
-                        new ExpectedFee("2024-10", "0.08", "701.76", "8772"),
-                        new ExpectedFee("2024-11", "0.14", "1228.08", "8772"),
-                        new ExpectedFee("2024-12", "0.17", "1491.24", "8772"),
-                        new ExpectedFee("2025-01", "0.19", "1520.00", "8000"),
-                        new ExpectedFee("2025-02", "0.16", "1280.00", "8000"),
-                        new ExpectedFee("2025-03", "0.14", "1120.00", "8000"),
-                        new ExpectedFee("2025-04", "0.09", "720.00", "8000"),
-                        new ExpectedFee("2025-05", "0.02", "160.00", "8000"));
+        List<ExpectedFee> expectedFees = List.of(
+                new ExpectedFee("2024-06", "0.0", "0.00", "8772"),
+                new ExpectedFee("2024-07", "0.0", "0.00", "8772"),
+                new ExpectedFee("2024-08", "0.0", "0.00", "8772"),
+                new ExpectedFee("2024-09", "0.01", "87.72", "8772"),
+                new ExpectedFee("2024-10", "0.08", "701.76", "8772"),
+                new ExpectedFee("2024-11", "0.14", "1228.08", "8772"),
+                new ExpectedFee("2024-12", "0.17", "1491.24", "8772"),
+                new ExpectedFee("2025-01", "0.19", "1520.00", "8000"),
+                new ExpectedFee("2025-02", "0.16", "1280.00", "8000"),
+                new ExpectedFee("2025-03", "0.14", "1120.00", "8000"),
+                new ExpectedFee("2025-04", "0.09", "720.00", "8000"),
+                new ExpectedFee("2025-05", "0.02", "160.00", "8000"));
 
         List<HeatingFee> actualFees = heatingFeeSection.fees();
 
@@ -133,32 +121,30 @@ public class HeatingFeeSectionGeneratorTest {
         DateRange heatingFee1DateRange = createDateRange("2024-01-01", "2024-06-15");
         DateRange heatingFee2DateRange = createDateRange("2024-06-15", "2025-01-01");
 
-        HeatingFeeSection heatingFeeSection =
-                generateHeatingFeeSection(
-                        createDateRange("2024-01-01", "2025-01-01"),
-                        createHeatingFeeInputs(
-                                createServiceCost(heatingFee1DateRange, "8772"),
-                                createServiceCost(heatingFee2DateRange, "8000")));
+        HeatingFeeSection heatingFeeSection = generateHeatingFeeSection(
+                createDateRange("2024-01-01", "2025-01-01"),
+                createHeatingFeeInputs(
+                        createServiceCost(heatingFee1DateRange, "8772"),
+                        createServiceCost(heatingFee2DateRange, "8000")));
 
         assertThat(heatingFeeSection.name()).isEqualTo("Heating fees");
         assertThat(heatingFeeSection.totalAmount()).isEqualTo("8463.20");
         assertThat(heatingFeeSection.fees()).hasSize(13);
 
-        List<ExpectedFee> expectedFees =
-                List.of(
-                        new ExpectedFee("2024-01", "0.19", "1666.68", "8772"),
-                        new ExpectedFee("2024-02", "0.16", "1403.52", "8772"),
-                        new ExpectedFee("2024-03", "0.14", "1228.08", "8772"),
-                        new ExpectedFee("2024-04", "0.09", "789.48", "8772"),
-                        new ExpectedFee("2024-05", "0.02", "175.44", "8772"),
-                        new ExpectedFee("2024-06", "0.0", "0.00", "8772"),
-                        new ExpectedFee("2024-06", "0.0", "0.00", "8000"),
-                        new ExpectedFee("2024-07", "0.0", "0.00", "8000"),
-                        new ExpectedFee("2024-08", "0.0", "0.00", "8000"),
-                        new ExpectedFee("2024-09", "0.01", "80.00", "8000"),
-                        new ExpectedFee("2024-10", "0.08", "640.00", "8000"),
-                        new ExpectedFee("2024-11", "0.14", "1120.00", "8000"),
-                        new ExpectedFee("2024-12", "0.17", "1360.00", "8000"));
+        List<ExpectedFee> expectedFees = List.of(
+                new ExpectedFee("2024-01", "0.19", "1666.68", "8772"),
+                new ExpectedFee("2024-02", "0.16", "1403.52", "8772"),
+                new ExpectedFee("2024-03", "0.14", "1228.08", "8772"),
+                new ExpectedFee("2024-04", "0.09", "789.48", "8772"),
+                new ExpectedFee("2024-05", "0.02", "175.44", "8772"),
+                new ExpectedFee("2024-06", "0.0", "0.00", "8772"),
+                new ExpectedFee("2024-06", "0.0", "0.00", "8000"),
+                new ExpectedFee("2024-07", "0.0", "0.00", "8000"),
+                new ExpectedFee("2024-08", "0.0", "0.00", "8000"),
+                new ExpectedFee("2024-09", "0.01", "80.00", "8000"),
+                new ExpectedFee("2024-10", "0.08", "640.00", "8000"),
+                new ExpectedFee("2024-11", "0.14", "1120.00", "8000"),
+                new ExpectedFee("2024-12", "0.17", "1360.00", "8000"));
 
         List<HeatingFee> actualFees = heatingFeeSection.fees();
 
@@ -181,12 +167,9 @@ public class HeatingFeeSectionGeneratorTest {
     void heatingFee_withPartialMonthReportDateRange_should_haveCorrectHeatingFeeProperties() {
         DateRange heatingFeeSectionDateRange = createDateRange("2024-01-15", "2024-01-25");
 
-        HeatingFeeSection heatingFeeSection =
-                generateHeatingFeeSection(
-                        heatingFeeSectionDateRange,
-                        createHeatingFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        HeatingFeeSection heatingFeeSection = generateHeatingFeeSection(
+                heatingFeeSectionDateRange,
+                createHeatingFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         HeatingFee heatingFee = heatingFeeSection.fees().getFirst();
 
@@ -202,12 +185,8 @@ public class HeatingFeeSectionGeneratorTest {
 
     @Test
     void multipleMonthServiceCost_should_throw_illegalArgumentException() {
-        assertThatThrownBy(
-                        () ->
-                                calculateHeatingFee(
-                                        createServiceCost(
-                                                createDateRange("2024-01-01", "2024-02-02"),
-                                                "8000")))
+        assertThatThrownBy(() ->
+                        calculateHeatingFee(createServiceCost(createDateRange("2024-01-01", "2024-02-02"), "8000")))
                 .hasMessage("Date range of service cost must be within a single month");
     }
 

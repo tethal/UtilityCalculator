@@ -47,12 +47,8 @@ class ReportGenTest {
 
     @Test
     void invalid_ReportInputs_should_throw_IllegalStateException() {
-        InvalidSectionInput invalidSectionInput =
-                new InvalidSectionInput(
-                        "Invalid section",
-                        List.of(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        InvalidSectionInput invalidSectionInput = new InvalidSectionInput(
+                "Invalid section", List.of(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         ReportInputs reportInputs = validReportInputWithSections(invalidSectionInput);
 
@@ -64,8 +60,7 @@ class ReportGenTest {
     @Test
     void valid_DepositSectionInputs_should_generate_valid_depositSection() {
         ReportInputs reportInputs =
-                validReportInputWithSections(
-                        createDepositSectionInput(createPayment("Leden - Červen", "6", "500")));
+                validReportInputWithSections(createDepositSectionInput(createPayment("Leden - Červen", "6", "500")));
 
         Report report = generateReport(reportInputs);
 
@@ -75,11 +70,8 @@ class ReportGenTest {
 
     @Test
     void valid_OtherFeeSectionInputs_should_generate_valid_otherFeeSection() {
-        ReportInputs reportInputs =
-                validReportInputWithSections(
-                        createOtherFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        ReportInputs reportInputs = validReportInputWithSections(
+                createOtherFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         Report report = generateReport(reportInputs);
 
@@ -89,11 +81,8 @@ class ReportGenTest {
 
     @Test
     void valid_HeatingFeeSectionInputs_should_generate_valid_heatingFeeSection() {
-        ReportInputs reportInputs =
-                validReportInputWithSections(
-                        createHeatingFeeInputs(
-                                createServiceCost(
-                                        createDateRange("2024-01-01", "2025-01-01"), "8772")));
+        ReportInputs reportInputs = validReportInputWithSections(
+                createHeatingFeeInputs(createServiceCost(createDateRange("2024-01-01", "2025-01-01"), "8772")));
 
         Report report = generateReport(reportInputs);
 
@@ -108,20 +97,11 @@ class ReportGenTest {
         MeterReading meterReading3 = createMeterReading("1", "2024-06-01", "0");
         MeterReading meterReading4 = createMeterReading("1", "2025-01-01", "60");
 
-        ReportInputs reportInputs =
-                validReportInputWithSections(
-                        createColdWaterSectionInputs(
-                                List.of(
-                                        createWaterTariff(
-                                                createDateRange("2024-01-01", "2024-05-01"), "90"),
-                                        createWaterTariff(
-                                                createDateRange("2024-05-01", "2025-01-01"),
-                                                "100")),
-                                List.of(
-                                        meterReading1,
-                                        meterReading2,
-                                        meterReading3,
-                                        meterReading4)));
+        ReportInputs reportInputs = validReportInputWithSections(createColdWaterSectionInputs(
+                List.of(
+                        createWaterTariff(createDateRange("2024-01-01", "2024-05-01"), "90"),
+                        createWaterTariff(createDateRange("2024-05-01", "2025-01-01"), "100")),
+                List.of(meterReading1, meterReading2, meterReading3, meterReading4)));
 
         Report report = generateReport(reportInputs);
 
@@ -135,29 +115,23 @@ class ReportGenTest {
         MeterReading meterReading2 = createMeterReading("kitchen", "2024-06-01", "125");
         MeterReading meterReading3 = createMeterReading("kitchen", "2025-01-01", "150");
 
-        WaterTariff waterTariff1 =
-                createWaterTariff(createDateRange("2024-01-01", "2025-01-01"), "90");
+        WaterTariff waterTariff1 = createWaterTariff(createDateRange("2024-01-01", "2025-01-01"), "90");
 
-        ServiceCost heatingBasicCost1 =
-                createServiceCost(createDateRange("2023-02-01", "2024-02-01"), "8000");
+        ServiceCost heatingBasicCost1 = createServiceCost(createDateRange("2023-02-01", "2024-02-01"), "8000");
 
-        ServiceCost heatingBasicCost2 =
-                createServiceCost(createDateRange("2024-02-01", "2025-02-01"), "8100");
+        ServiceCost heatingBasicCost2 = createServiceCost(createDateRange("2024-02-01", "2025-02-01"), "8100");
 
-        WaterTariff heatingConsumableTariffs1 =
-                createWaterTariff(createDateRange("2023-02-01", "2024-02-01"), "90");
+        WaterTariff heatingConsumableTariffs1 = createWaterTariff(createDateRange("2023-02-01", "2024-02-01"), "90");
 
-        WaterTariff heatingConsumableTariffs2 =
-                createWaterTariff(createDateRange("2024-02-01", "2025-02-01"), "100");
+        WaterTariff heatingConsumableTariffs2 = createWaterTariff(createDateRange("2024-02-01", "2025-02-01"), "100");
 
-        HotWaterSection hotWaterSection =
-                generateHotWaterSection(
-                        createDateRange("2024-01-01", "2025-01-01"),
-                        createHotWaterSectionInputs(
-                                List.of(meterReading1, meterReading2, meterReading3),
-                                List.of(waterTariff1),
-                                List.of(heatingBasicCost1, heatingBasicCost2),
-                                List.of(heatingConsumableTariffs1, heatingConsumableTariffs2)));
+        HotWaterSection hotWaterSection = generateHotWaterSection(
+                createDateRange("2024-01-01", "2025-01-01"),
+                createHotWaterSectionInputs(
+                        List.of(meterReading1, meterReading2, meterReading3),
+                        List.of(waterTariff1),
+                        List.of(heatingBasicCost1, heatingBasicCost2),
+                        List.of(heatingConsumableTariffs1, heatingConsumableTariffs2)));
 
         assertThat(hotWaterSection.name()).isEqualTo("Hot water");
         assertThat(hotWaterSection.readings().size()).isEqualTo(2);
@@ -167,6 +141,5 @@ class ReportGenTest {
         assertThat(hotWaterSection.totalAmount()).isEqualTo("17541.67");
     }
 
-    private record InvalidSectionInput(String name, List<ServiceCost> serviceCosts)
-            implements SectionInputs {}
+    private record InvalidSectionInput(String name, List<ServiceCost> serviceCosts) implements SectionInputs {}
 }

@@ -16,8 +16,7 @@ class DepositSectionGeneratorTest {
     @Test
     void depositSection_withOnePayment_should_haveCorrectNameAndSum() {
         DepositSection depositSection =
-                generateDepositSection(
-                        createDepositSectionInput(createPayment("Leden - Červen", "6", "500")));
+                generateDepositSection(createDepositSectionInput(createPayment("Leden - Červen", "6", "500")));
 
         assertThat(depositSection.name()).isEqualTo("Deposits");
         assertThat(depositSection.totalAmount()).isEqualTo("-3000");
@@ -36,8 +35,7 @@ class DepositSectionGeneratorTest {
     void depositSection_withMultiplePayments_should_haveCorrectDepositsProperties() {
         Payment payment1 = createPayment("Leden - Červen", "6", "500");
         Payment payment2 = createPayment("Červenec - Září", "4", "600");
-        DepositSection depositSection =
-                generateDepositSection(createDepositSectionInput(payment1, payment2));
+        DepositSection depositSection = generateDepositSection(createDepositSectionInput(payment1, payment2));
         Deposit deposit1 = depositSection.deposits().getFirst();
         Deposit deposit2 = depositSection.deposits().get(1);
 
@@ -49,17 +47,13 @@ class DepositSectionGeneratorTest {
 
     @Test
     void payment_withInvalidCount_should_throw_illegalArgumentException() {
-        assertThatThrownBy(
-                        () ->
-                                generateDepositSection(
-                                        createDepositSectionInput(
-                                                createPayment("Leden - Červen", "-6", "200"))))
+        assertThatThrownBy(() ->
+                        generateDepositSection(createDepositSectionInput(createPayment("Leden - Červen", "-6", "200"))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("count must not be a negative value");
     }
 
-    private void assertDepositMatchesPayment(
-            Deposit deposit, Payment payment, String expectedAmount) {
+    private void assertDepositMatchesPayment(Deposit deposit, Payment payment, String expectedAmount) {
 
         assertThat(deposit.description()).isEqualTo(payment.description());
         assertThat(deposit.count()).isEqualTo(payment.count());

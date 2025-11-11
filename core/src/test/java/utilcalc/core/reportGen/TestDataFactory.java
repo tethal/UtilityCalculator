@@ -25,25 +25,11 @@ public class TestDataFactory {
     private static final List<SectionInputs> EMPTY_SECTIONS = List.of();
 
     public static ReportInputs validReportInputWithSections(SectionInputs... sectionInputs) {
-        return new ReportInputs(
-                DATE_RANGE,
-                TENANT,
-                OWNER,
-                REPORT_PLACE,
-                REPORT_DATE,
-                SOURCES,
-                List.of(sectionInputs));
+        return new ReportInputs(DATE_RANGE, TENANT, OWNER, REPORT_PLACE, REPORT_DATE, SOURCES, List.of(sectionInputs));
     }
 
     public static ReportInputs emptySourceReportInput() {
-        return new ReportInputs(
-                DATE_RANGE,
-                TENANT,
-                OWNER,
-                REPORT_PLACE,
-                REPORT_DATE,
-                EMPTY_SOURCES,
-                EMPTY_SECTIONS);
+        return new ReportInputs(DATE_RANGE, TENANT, OWNER, REPORT_PLACE, REPORT_DATE, EMPTY_SOURCES, EMPTY_SECTIONS);
     }
 
     public static Payment createPayment(String description, String count, String unitAmount) {
@@ -75,8 +61,7 @@ public class TestDataFactory {
         return new ColdWaterSectionInputs("Cold water", meterReadings, waterTariffs);
     }
 
-    public static MeterReading createMeterReading(
-            String meterId, String readingDate, String state) {
+    public static MeterReading createMeterReading(String meterId, String readingDate, String state) {
         return new MeterReading(meterId, LocalDate.parse(readingDate), new BigDecimal(state));
     }
 
@@ -89,7 +74,6 @@ public class TestDataFactory {
             List<WaterTariff> priceList,
             List<ServiceCost> heatingBasicCost,
             List<WaterTariff> heatingConsumableTariffs) {
-        return new HotWaterSectionInputs(
-                "Hot water", readings, priceList, heatingBasicCost, heatingConsumableTariffs);
+        return new HotWaterSectionInputs("Hot water", readings, priceList, heatingBasicCost, heatingConsumableTariffs);
     }
 }

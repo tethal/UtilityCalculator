@@ -11,8 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Stream;
 
-public record DateRange(LocalDate startDate, LocalDate endDateExclusive)
-        implements Comparable<DateRange> {
+public record DateRange(LocalDate startDate, LocalDate endDateExclusive) implements Comparable<DateRange> {
     public DateRange {
         ensureNonNull(startDate, "startDate");
         ensureNonNull(endDateExclusive, "endDateExclusive");
@@ -23,8 +22,7 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive)
         }
     }
 
-    public static DateRange fromInclusive(
-            LocalDate startDateInclusive, LocalDate endDateInclusive) {
+    public static DateRange fromInclusive(LocalDate startDateInclusive, LocalDate endDateInclusive) {
         return new DateRange(startDateInclusive, endDateInclusive.plusDays(1));
     }
 
@@ -33,8 +31,7 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive)
         LocalDate otherEndDate = other.endDateExclusive;
 
         LocalDate overlapStart = otherStartDate.isAfter(startDate) ? otherStartDate : startDate;
-        LocalDate overlapEnd =
-                otherEndDate.isBefore(endDateExclusive) ? otherEndDate : endDateExclusive;
+        LocalDate overlapEnd = otherEndDate.isBefore(endDateExclusive) ? otherEndDate : endDateExclusive;
 
         return overlapStart.isBefore(overlapEnd)
                 ? Optional.of(new DateRange(overlapStart, overlapEnd))
@@ -47,9 +44,7 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive)
             return calculateDaysInMonthFraction(startDate, endDateExclusive);
         }
 
-        return splitByMonths().stream()
-                .map(DateRange::getMonthCount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return splitByMonths().stream().map(DateRange::getMonthCount).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public List<DateRange> splitByMonths() {
@@ -59,8 +54,7 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive)
         while (currentStart.isBefore(endDateExclusive)) {
             YearMonth currentYM = YearMonth.from(currentStart);
             LocalDate monthEnd = currentYM.plusMonths(1).atDay(1);
-            LocalDate currentEnd =
-                    monthEnd.isBefore(endDateExclusive) ? monthEnd : endDateExclusive;
+            LocalDate currentEnd = monthEnd.isBefore(endDateExclusive) ? monthEnd : endDateExclusive;
 
             result.add(new DateRange(currentStart, currentEnd));
             currentStart = currentEnd;
@@ -72,8 +66,7 @@ public record DateRange(LocalDate startDate, LocalDate endDateExclusive)
     private static BigDecimal calculateDaysInMonthFraction(LocalDate from, LocalDate toExclusive) {
         int daysInMonth = YearMonth.from(from).lengthOfMonth();
         long days = ChronoUnit.DAYS.between(from, toExclusive);
-        return BigDecimal.valueOf(days)
-                .divide(BigDecimal.valueOf(daysInMonth), 10, RoundingMode.HALF_UP);
+        return BigDecimal.valueOf(days).divide(BigDecimal.valueOf(daysInMonth), 10, RoundingMode.HALF_UP);
     }
 
     public boolean isSingleMonth() {

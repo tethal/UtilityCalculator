@@ -88,8 +88,7 @@ class ExprParser {
         }
 
         boolean hasDigits = false;
-        while (isNotAtEnd()
-                && (Character.isDigit(input.charAt(current)) || input.charAt(current) == '.')) {
+        while (isNotAtEnd() && (Character.isDigit(input.charAt(current)) || input.charAt(current) == '.')) {
             hasDigits = true;
             advance();
         }

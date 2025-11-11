@@ -300,12 +300,11 @@ public final class HtmlBuilder {
 
         text = text.replace("<sup>", "%%SUP_START%%").replace("</sup>", "%%SUP_END%%");
 
-        text =
-                text.replace("&", "&amp;")
-                        .replace("<", "&lt;")
-                        .replace(">", "&gt;")
-                        .replace("\"", "&quot;")
-                        .replace("'", "&#39;");
+        text = text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
 
         return text.replace("%%SUP_START%%", "<sup>").replace("%%SUP_END%%", "</sup>");
     }

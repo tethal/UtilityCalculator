@@ -19,11 +19,9 @@ final class HotWaterSectionGenerator {
     static HotWaterSection generateHotWaterSection(
             DateRange reportDateRange, HotWaterSectionInputs hotWaterSectionInputs) {
 
-        List<WaterReading> readings =
-                generateWaterReadings(reportDateRange, hotWaterSectionInputs.readings());
+        List<WaterReading> readings = generateWaterReadings(reportDateRange, hotWaterSectionInputs.readings());
 
-        List<WaterFee> priceList =
-                generatePriceList(reportDateRange, hotWaterSectionInputs.priceList(), readings);
+        List<WaterFee> priceList = generatePriceList(reportDateRange, hotWaterSectionInputs.priceList(), readings);
 
         List<WaterHeatingBasicPart> heatingBasicParts =
                 calculateFees(reportDateRange, hotWaterSectionInputs.heatingBasicCosts()).stream()
@@ -31,17 +29,12 @@ final class HotWaterSectionGenerator {
                         .toList();
 
         List<WaterHeatingConsumablePart> heatingConsumableParts =
-                generatePriceList(
-                                reportDateRange,
-                                hotWaterSectionInputs.heatingConsumableTariffs(),
-                                readings)
-                        .stream()
+                generatePriceList(reportDateRange, hotWaterSectionInputs.heatingConsumableTariffs(), readings).stream()
                         .map(HotWaterSectionGenerator::mapWaterFeeToWaterHeatingConsumablePart)
                         .toList();
 
         BigDecimal priceListsAmount = calculateAmount(priceList, WaterFee::periodAmount);
-        BigDecimal basicPartsAmount =
-                calculateAmount(heatingBasicParts, WaterHeatingBasicPart::totalAmount);
+        BigDecimal basicPartsAmount = calculateAmount(heatingBasicParts, WaterHeatingBasicPart::totalAmount);
         BigDecimal consumablePartsAmount =
                 calculateAmount(heatingConsumableParts, WaterHeatingConsumablePart::totalCost);
         BigDecimal totalAmount = priceListsAmount.add(basicPartsAmount).add(consumablePartsAmount);
@@ -55,8 +48,7 @@ final class HotWaterSectionGenerator {
                 heatingConsumableParts);
     }
 
-    private static WaterHeatingBasicPart mapFeeResultToHeatingBasicPart(
-            FeeCalculationResult feeCalculationResult) {
+    private static WaterHeatingBasicPart mapFeeResultToHeatingBasicPart(FeeCalculationResult feeCalculationResult) {
         return new WaterHeatingBasicPart(
                 feeCalculationResult.dateRange(),
                 feeCalculationResult.monthCount(),
@@ -64,12 +56,8 @@ final class HotWaterSectionGenerator {
                 feeCalculationResult.feeAmount());
     }
 
-    private static WaterHeatingConsumablePart mapWaterFeeToWaterHeatingConsumablePart(
-            WaterFee waterFee) {
+    private static WaterHeatingConsumablePart mapWaterFeeToWaterHeatingConsumablePart(WaterFee waterFee) {
         return new WaterHeatingConsumablePart(
-                waterFee.dateRange(),
-                waterFee.quantity(),
-                waterFee.unitAmount(),
-                waterFee.periodAmount());
+                waterFee.dateRange(), waterFee.quantity(), waterFee.unitAmount(), waterFee.periodAmount());
     }
 }

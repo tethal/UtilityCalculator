@@ -6,10 +6,7 @@ import java.math.BigDecimal;
 import utilcalc.core.model.DateRange;
 
 public record WaterHeatingBasicPart(
-        DateRange dateRange,
-        BigDecimal numberOfMonths,
-        BigDecimal monthlyCost,
-        BigDecimal totalAmount) {
+        DateRange dateRange, BigDecimal numberOfMonths, BigDecimal monthlyCost, BigDecimal totalAmount) {
     public WaterHeatingBasicPart {
         ensureNonNull(dateRange, "dateRange");
         ensureNonNull(numberOfMonths, "numberOfMonths");

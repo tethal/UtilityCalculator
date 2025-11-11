@@ -41,9 +41,7 @@ public final class PdfGenerator {
 
             Files.copy(fontStream, tempFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            renderer.getFontResolver()
-                    .addFont(
-                            tempFontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            renderer.getFontResolver().addFont(tempFontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         }
     }
 
@@ -52,7 +50,10 @@ public final class PdfGenerator {
         ValueFormatter formatter = html.getFormatter();
 
         html.title("Vyúčtování poplatků za služby a energie");
-        html.beginCenter().append("Období: ").appendDateRange(report.dateRange()).endCenter();
+        html.beginCenter()
+                .append("Období: ")
+                .appendDateRange(report.dateRange())
+                .endCenter();
 
         for (String line : report.tenant()) {
             html.p(line);
@@ -60,11 +61,9 @@ public final class PdfGenerator {
 
         generateSummary(html, report);
 
-        report.sections()
-                .forEach(
-                        s -> {
-                            generateSection(s, html);
-                        });
+        report.sections().forEach(s -> {
+            generateSection(s, html);
+        });
 
         html.lineBreak()
                 .append(report.reportPlace() + ", " + formatter.formatDate(report.reportDate()))
@@ -79,7 +78,8 @@ public final class PdfGenerator {
         html.beginSection("Celkový přehled");
         html.beginTable("Popis", "Částka");
         report.sections()
-                .forEach(s -> html.beginTr().tdText(s.name()).tdMoney(s.totalAmount()).endTr());
+                .forEach(s ->
+                        html.beginTr().tdText(s.name()).tdMoney(s.totalAmount()).endTr());
         html.totalRow(
                 1,
                 report.total().signum() == -1 ? "Přeplatek" : "Nedoplatek",
@@ -107,7 +107,8 @@ public final class PdfGenerator {
     }
 
     private static void waterReadings(HtmlBuilder html, List<WaterReading> readings) {
-        boolean showMeterId = readings.stream().map(WaterReading::meterId).distinct().count() > 1;
+        boolean showMeterId =
+                readings.stream().map(WaterReading::meterId).distinct().count() > 1;
 
         html.h3("Odečty");
 
@@ -134,8 +135,7 @@ public final class PdfGenerator {
 
     private static void appendDepositsTable(HtmlBuilder html, DepositSection depositSection) {
         boolean unitCount =
-                depositSection.deposits().stream()
-                        .anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
+                depositSection.deposits().stream().anyMatch(d -> d.count().compareTo(BigDecimal.ONE) != 0);
 
         html.beginSection(depositSection.name());
 
@@ -182,8 +182,7 @@ public final class PdfGenerator {
         html.endSection();
     }
 
-    private static void appendHeatingFeeTable(
-            HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
+    private static void appendHeatingFeeTable(HtmlBuilder html, HeatingFeeSection heatingFeeSection) {
         html.beginSection(heatingFeeSection.name());
 
         html.beginTable("Období", "Koeficient", "Sazba", "Cena");
