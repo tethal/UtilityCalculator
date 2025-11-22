@@ -21,147 +21,102 @@ Endpoint pro generování reportu.
 
 ```json
 {
-  "start_date": "2024-02-15",
-  "end_date": "2024-12-31",
+  "startDate": "2021-01-01",
+  "endDate": "2022-04-30",
+
   "tenant": [
-    "Jméno nájemníka",
-    "Adresa nemovitosti"
+    "Marie Černá",
+    "Jindřišská 16",
+    "111 50 Praha 1"
   ],
+
   "owner": [
-    "Jméno majitele",
+    "Jan Novák",
     "majitel@example.com"
   ],
-  "report_place": "V Praze",
-  "report_date": "2025-05-20",
+
+  "reportPlace": "V Praze",
+  "reportDate": "2022-05-22",
+
   "sources": [
-    "vyúčtování SVJ za rok 2024"
+    "Vyúčtování služeb od Společenství vlastníků za rok 2021",
+    "Příloha č. 3 k vyhlášce č.269/2015 Sb.",
+    "Měsíční předpis záloh pro rok 2022 od Společenství vlastníků",
+    "https://www.pvk.cz/vse-o-vode/cena-vodneho-a-stocneho/vyvoj-vodneho-a-stocneho-v-praze/"
   ],
+
   "deposits": [
     {
-      "description": "leden - duben",
-      "count": 4,
-      "amount": 3000
-    },
-    {
-      "description": "květen",
-      "amount": 3500
-    },
-    {
-      "description": "červen - prosinec",
-      "count": 7,
-      "amount": 3500
+      "name": "deposits",
+      "payments": [
+        { "description": "jednorázově", "count": 1, "amount": 43500 }
+      ]
     }
   ],
+
   "heating": [
     {
-      "annual_cost": 10992,
-      "start_date": "2021-01-01",
-      "end_date": "2021-12-31"
-    },
-    {
-      "annual_cost": 10992,
-      "start_date": "2022-01-01",
-      "end_date": "2022-12-31"
+      "name": "heating",
+      "heatingFees": [
+        { "annualCost": 8712.9, "startDate": "2021-01-01", "endDate": "2021-12-31" },
+        { "annualCost": 8472.0, "startDate": "2022-01-01", "endDate": "2022-12-31" }
+      ]
     }
   ],
-  "other_fees": [
+
+  "otherFees": [
     {
-      "start_date": "2021-01-01",
-      "end_date": "2021-12-31",
-      "annual_cost": 3000
-    },
-    {
-      "start_date": "2022-01-01",
-      "end_date": "2022-12-31",
-      "annual_cost": 3200
+      "name": "other_fees",
+      "otherFees": [
+        { "annualCost": 8772, "startDate": "2021-01-01", "endDate": "2021-12-31" },
+        { "annualCost": 8508, "startDate": "2022-01-01", "endDate": "2022-12-31" }
+      ]
     }
   ],
-  "cold_water": {
-    "reading": [
-      {
-        "meter_id": "1",
-        "reading_date": "2021-10-14",
-        "state": 184.4
-      },
-      {
-        "meter_id": "2",
-        "reading_date": "2021-12-31",
-        "state": 8.6
-      },
-      {
-        "meter_id": "2",
-        "reading_date": "2022-04-30",
-        "state": 21
-      }
-    ],
-    "tariff": [
-      {
-        "start_date": "2021-01-01",
-        "end_date": "2021-12-31",
-        "unit_amount": 103.4076
-      },
-      {
-        "start_date": "2022-01-01",
-        "end_date": "2022-12-31",
-        "unit_amount": 108.13
-      }
-    ]
-  },
-  "hot_water": {
-    "reading": [
-      {
-        "meter_id": "1",
-        "reading_date": "2021-10-14",
-        "state": 100.5
-      },
-      {
-        "meter_id": "2",
-        "reading_date": "2021-12-31",
-        "state": 55.0
-      },
-      {
-        "meter_id": "2",
-        "reading_date": "2022-04-30",
-        "state": 80.75
-      }
-    ],
-    "tariff": [
-      {
-        "start_date": "2021-01-01",
-        "end_date": "2021-12-31",
-        "unit_amount": 145.50
-      },
-      {
-        "start_date": "2022-01-01",
-        "end_date": "2022-12-31",
-        "unit_amount": 150.75
-      }
-    ],
-    "heating_basic_cost": [
-      {
-        "start_date": "2021-01-01",
-        "end_date": "2021-12-31",
-        "annual_cost": 5000.0
-      },
-      {
-        "start_date": "2022-01-01",
-        "end_date": "2022-12-31",
-        "annual_cost": 5200.0
-      }
-    ],
-    "heating_consumable_tariff": [
-      {
-        "start_date": "2021-01-01",
-        "end_date": "2021-12-31",
-        "unit_amount": 120.0
-      },
-      {
-        "start_date": "2022-01-01",
-        "end_date": "2022-12-31",
-        "unit_amount": 130.0
-      }
-    ]
-  }
+
+  "coldWater": [
+    {
+      "name": "cold_water",
+      "readings": [
+        { "meterId": "1", "readingDate": "2021-01-01", "state": 158.1 },
+        { "meterId": "1", "readingDate": "2021-10-15", "state": 184.4 },
+        { "meterId": "2", "readingDate": "2021-10-15", "state": 0 },
+        { "meterId": "2", "readingDate": "2022-01-01", "state": 8.6 },
+        { "meterId": "2", "readingDate": "2022-05-01", "state": 21 }
+      ],
+      "priceList": [
+        { "startDate": "2021-01-01", "endDate": "2021-12-31", "pricePerCubicMeter": 103.4076 },
+        { "startDate": "2022-01-01", "endDate": "2022-12-31", "pricePerCubicMeter": 108.13 }
+      ]
+    }
+  ],
+
+  "hotWater": [
+    {
+      "name": "hot_water",
+      "readings": [
+        { "meterId": "1", "readingDate": "2021-01-01", "state": 96.6 },
+        { "meterId": "1", "readingDate": "2021-10-15", "state": 106.5 },
+        { "meterId": "2", "readingDate": "2021-10-15", "state": 0 },
+        { "meterId": "2", "readingDate": "2022-01-01", "state": 5.5 },
+        { "meterId": "2", "readingDate": "2022-05-01", "state": 13.3 }
+      ],
+      "priceList": [
+        { "startDate": "2021-01-01", "endDate": "2021-12-31", "pricePerCubicMeter": 81.49536 },
+        { "startDate": "2022-01-01", "endDate": "2022-12-31", "pricePerCubicMeter": 108.13 }
+      ],
+      "heatingBasicCosts": [
+        { "annualCost": 5000.0, "startDate": "2021-01-01", "endDate": "2021-12-31" },
+        { "annualCost": 5200.0, "startDate": "2022-01-01", "endDate": "2022-12-31" }
+      ],
+      "heatingConsumableTariffs": [
+        { "startDate": "2021-01-01", "endDate": "2021-12-31", "pricePerCubicMeter": 120.0 },
+        { "startDate": "2022-01-01", "endDate": "2022-12-31", "pricePerCubicMeter": 130.0 }
+      ]
+    }
+  ],
+
+  "custom": []
 }
 ```
 
