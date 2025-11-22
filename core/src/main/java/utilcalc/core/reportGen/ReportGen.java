@@ -9,17 +9,31 @@ import static utilcalc.core.reportGen.OtherFeeSectionGenerator.generateOtherFeeS
 import static utilcalc.core.reportGen.ReportGenUtil.calculateAmount;
 import static utilcalc.core.utils.Util.ensureNonNull;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import utilcalc.core.model.DateRange;
 import utilcalc.core.model.input.*;
 import utilcalc.core.model.output.Report;
 import utilcalc.core.model.output.ReportSection;
+import utilcalc.core.pdfGen.PdfGenerator;
+import utilcalc.core.typstGen.TypstGenerator;
 
 public final class ReportGen {
 
     private ReportGen() {}
+
+    public static byte[] generateReportInBytes(ReportInputs convert, Format format) throws IOException {
+        Report report = ReportGen.generateReport(convert);
+
+        return switch (format) {
+            case PDF -> PdfGenerator.generatePdf(report);
+            case HTML -> PdfGenerator.buildHtml(report).getBytes(StandardCharsets.UTF_8);
+            case TYPST -> TypstGenerator.generateTypst(report).getBytes(StandardCharsets.UTF_8);
+        };
+    }
 
     public static Report generateReport(ReportInputs reportInputs) {
         ensureNonNull(reportInputs, "Report inputs");

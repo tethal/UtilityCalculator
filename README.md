@@ -1,15 +1,53 @@
-# Utility calculator
+# Utility Calculator
 
-See [design](doc/design.md) for design details.
+TODO – brief introduction of the project itself.
 
-## Build the Project
-To build the project, run:
+## 📂 Project Structure
+
+The project is organized as a multi-module Gradle build:
+
+* **`core`**: Contains shared business logic, domain models, and services used by other modules.
+* **`web`**: Web application built with Spring.
+* **`cli`**: Command-line interface.
+
+## 🛠 Technologies
+
+* **Language**: Java
+* **Build Tool**: Gradle
+
+### Prerequisites
+
+Before running the project, make sure you have:
+
+* **Java 21** (ensure the `JAVA_HOME` environment variable points to this JDK)
+* **Git**
+
+## 🔨 Building the Project
+
+The project uses the Gradle wrapper, so you don’t need to install Gradle globally:
+
 ```bash
-./gradlew build
+./gradlew clean build
 ```
 
-## Run Tests
-To execute tests, use:
+## ▶️ Running the Application
+
+### Web Application
+Start the web application by running the following command:
+```bash
+./gradlew bootRun
+```
+The application will be available at:
+`http://localhost:8080` (unless configured otherwise)
+
+### CLI Application
+Run the CLI tool by passing an input file as a parameter:
+```bash
+./gradlew run <file>
+```
+
+## 🧪 Testing
+Run tests in all modules:
 ```bash
 ./gradlew test
 ```

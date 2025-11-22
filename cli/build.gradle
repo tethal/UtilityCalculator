@@ -1,3 +1,7 @@
+plugins {
+    id 'application'
+}
+
 dependencies {
     implementation project(':core')
 
@@ -9,6 +13,10 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass = 'utilcalc.cli.Application'
 }
 
 jar {

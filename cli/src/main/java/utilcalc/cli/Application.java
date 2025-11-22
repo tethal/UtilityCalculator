@@ -1,21 +1,17 @@
 package utilcalc.cli;
 
 import static utilcalc.core.parser.Parser.parse;
-import static utilcalc.core.reportGen.ReportGen.generateReport;
-import static utilcalc.core.utils.Util.ensureNonBlank;
+import static utilcalc.core.reportGen.ReportGen.generateReportInBytes;
 import static utilcalc.core.utils.Util.ensureNonNull;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import utilcalc.core.model.input.ReportInputs;
-import utilcalc.core.model.output.Report;
-import utilcalc.core.pdfGen.PdfGenerator;
-import utilcalc.core.typstGen.TypstGenerator;
+import utilcalc.core.reportGen.Format;
 
 public class Application {
-    private static final String DEFAULT_EXPORT_FORMAT = "pdf";
+    private static final Format DEFAULT_EXPORT_FORMAT = Format.PDF;
 
     public static void main(String[] args) {
 
@@ -29,16 +25,8 @@ public class Application {
 
             String inputFileContent = Files.readString(appConfig.inputPath());
             ReportInputs inputs = parse(inputFileContent);
-            Report report = generateReport(inputs);
 
-            byte[] exportBytes =
-                    switch (appConfig.exportFormat) {
-                        case "pdf" -> PdfGenerator.generatePdf(report);
-                        case "html" -> PdfGenerator.buildHtml(report).getBytes(StandardCharsets.UTF_8);
-                        case "typst" -> TypstGenerator.generateTypst(report).getBytes(StandardCharsets.UTF_8);
-                        default -> throw new IllegalArgumentException(
-                                "Unexpected export format: " + appConfig.exportFormat);
-                    };
+            byte[] exportBytes = generateReportInBytes(inputs, appConfig.exportFormat);
 
             prepareOutputDirectory(appConfig.outputPath);
             Files.write(appConfig.outputPath(), exportBytes);
@@ -64,23 +52,23 @@ public class Application {
     }
 
     static AppConfiguration parseMultipleArgument(String[] args) {
-        String exportFormat;
+        Format exportFormat;
         Path inputPath;
         Path outputPath;
 
         if (args[0].startsWith("--")) {
-            exportFormat = args[0].replace("--", "");
+            exportFormat = Format.fromString(args[0].replace("--", ""));
             inputPath = Path.of(args[1]);
             outputPath = createOutputPath(inputPath, exportFormat);
         } else {
-            exportFormat = getExtension(args[1]);
+            exportFormat = Format.fromString(getExtension(args[1]));
             inputPath = Path.of(args[0]);
             outputPath = Path.of(args[1]);
         }
         return new AppConfiguration(exportFormat, inputPath, outputPath);
     }
 
-    private static Path createOutputPath(Path inputPath, String newExtension) {
+    private static Path createOutputPath(Path inputPath, Format format) {
         Path fullFileName = inputPath.getFileName();
         if (fullFileName == null) {
             throw new IllegalArgumentException("Path does not contain a file name: " + inputPath);
@@ -90,7 +78,7 @@ public class Application {
             throw new IllegalArgumentException("Invalid input file:" + fullFileName);
         }
         String fileName = fullFileName.toString().substring(0, dotIndex + 1);
-        return inputPath.resolveSibling(fileName + newExtension);
+        return inputPath.resolveSibling(fileName + format.getExtension());
     }
 
     private static String getExtension(String path) {
@@ -103,12 +91,14 @@ public class Application {
 
     private static void prepareOutputDirectory(Path outputPath) throws IOException {
         Path parentDirectory = outputPath.getParent();
-        if (parentDirectory != null) Files.createDirectories(parentDirectory);
+        if (parentDirectory != null) {
+            Files.createDirectories(parentDirectory);
+        }
     }
 
-    record AppConfiguration(String exportFormat, Path inputPath, Path outputPath) {
+    record AppConfiguration(Format exportFormat, Path inputPath, Path outputPath) {
         public AppConfiguration {
-            ensureNonBlank(exportFormat, "Export format");
+            ensureNonNull(exportFormat, "Export format");
             ensureNonNull(inputPath, "Input file");
             ensureNonNull(outputPath, "Output file");
         }
