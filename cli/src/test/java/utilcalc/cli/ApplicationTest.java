@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
+import utilcalc.core.reportGen.Format;
 
 public class ApplicationTest {
 
@@ -13,7 +14,7 @@ public class ApplicationTest {
 
         Application.AppConfiguration appConfiguration = Application.parseSingleArgument(argument);
 
-        assertThat(appConfiguration.exportFormat()).isEqualTo("pdf");
+        assertThat(appConfiguration.exportFormat()).isEqualTo(Format.PDF);
         assertThat(appConfiguration.inputPath()).isEqualTo(Path.of("inputFile.uc"));
         assertThat(appConfiguration.outputPath()).isEqualTo(Path.of("inputFile.pdf"));
     }
@@ -24,7 +25,7 @@ public class ApplicationTest {
 
         Application.AppConfiguration appConfiguration = Application.parseSingleArgument(argument);
 
-        assertThat(appConfiguration.exportFormat()).isEqualTo("pdf");
+        assertThat(appConfiguration.exportFormat()).isEqualTo(Format.PDF);
         assertThat(appConfiguration.inputPath()).isEqualTo(Path.of("user/documents/inputFile.uc"));
         assertThat(appConfiguration.outputPath()).isEqualTo(Path.of("user/documents/inputFile.pdf"));
     }
@@ -35,7 +36,7 @@ public class ApplicationTest {
 
         Application.AppConfiguration appConfiguration = Application.parseMultipleArgument(args);
 
-        assertThat(appConfiguration.exportFormat()).isEqualTo("pdf");
+        assertThat(appConfiguration.exportFormat()).isEqualTo(Format.PDF);
         assertThat(appConfiguration.inputPath()).isEqualTo(Path.of("inputFile.uc"));
         assertThat(appConfiguration.outputPath()).isEqualTo(Path.of("inputFile.pdf"));
     }
@@ -46,7 +47,7 @@ public class ApplicationTest {
 
         Application.AppConfiguration appConfiguration = Application.parseMultipleArgument(args);
 
-        assertThat(appConfiguration.exportFormat()).isEqualTo("pdf");
+        assertThat(appConfiguration.exportFormat()).isEqualTo(Format.PDF);
         assertThat(appConfiguration.inputPath()).isEqualTo(Path.of("inputFile.uc"));
         assertThat(appConfiguration.outputPath()).isEqualTo(Path.of("outputFile.pdf"));
     }
